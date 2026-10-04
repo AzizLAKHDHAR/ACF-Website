@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Tooling output
+.playwright-mcp/
+.claude/settings.local.json
