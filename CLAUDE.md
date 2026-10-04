@@ -15,18 +15,21 @@ scene. It has four access levels: public · members · board · admin. Read thes
 
 ## Current state
 
-**Phase 1 (foundation) is done; phase 2 (data model, auth, RLS, seed) is next.** The app is a
-trilingual Next.js shell with placeholder pages for every route. There is no database and no auth
-yet: `src/lib/auth/guards.ts` is a stub that makes every hidden area answer 404 (dev-only preview
-with `ACF_PREVIEW_HIDDEN_AREAS=1`). Colours, fonts and logo are placeholders until the ACF charter
-lands in `/brand`. Update this section at the end of every phase.
+**Phase 1 (foundation) is done, including the ACF brand; phase 2 (data model, auth, RLS, seed) is
+next.** The app is a trilingual Next.js shell (French by default) styled with the Amplify Creative
+Foundation charter from `/brand` (D-041–D-047): the home and About pages carry the official one-pager
+copy, every other route is a placeholder. There is no database and no auth yet:
+`src/lib/auth/guards.ts` is a stub that makes every hidden area answer 404 (dev-only preview with
+`ACF_PREVIEW_HIDDEN_AREAS=1`). Hosting is Vercel (D-042); the Vercel and Supabase projects still have
+to be created by ACF. Still provisional: the fonts (open-licence stand-ins) and the logo (raster masks until an SVG
+exists). Update this section at the end of every phase.
 
 ## Stack
 
-Next.js 16 (App Router; Edge `middleware.ts`, not `proxy.ts` — D-031) · React 19 · TypeScript 6.0 (`strict`) · Tailwind CSS v4 · shadcn/ui ·
-next-intl (`ar` RTL, `fr`, `en`) · Supabase (Postgres + RLS, Auth, Storage) · Zod · React Hook Form ·
-Resend + React Email · Vitest · Playwright + axe · pgTAP · next-themes (light/dark/system) · deploy with
-`@opennextjs/cloudflare` on Workers (D-032). ESLint 9 (not 10: `eslint-config-next` plugins). Package manager: **npm** only. Node 22.
+Next.js 16 (App Router; Node `src/proxy.ts`) · React 19 · TypeScript 6.0 (`strict`) · Tailwind CSS v4 · shadcn/ui ·
+next-intl (`fr` default, `ar` RTL, `en`) · Supabase (Postgres + RLS, Auth, Storage) · Zod · React Hook Form ·
+Resend + React Email · Vitest · Playwright + axe · pgTAP · next-themes (light/dark/system) · hosted on
+**Vercel** through its Git integration (D-042). ESLint 9 (not 10: `eslint-config-next` plugins). Package manager: **npm** only. Node 22.
 
 ## Commands
 
@@ -42,10 +45,8 @@ Keep this table true. Rows marked *phase 2* don't exist yet.
 | `npm test` | Vitest: unit tests, token contrast (AA), config ↔ messages, `.env.example` completeness |
 | `npm run test:e2e` | Playwright on the production build: desktop + mobile, ar/fr/en, axe |
 | `npm run i18n:check` | Message files have identical keys and placeholders |
-| `npm run screenshots` | Shell screenshots, every locale × theme × viewport → `docs/screenshots/phase-1/` |
+| `npm run screenshots` | Shell screenshots, every locale × theme × viewport → `docs/screenshots/brand/` (or `$SCREENSHOT_DIR`) |
 | `npm run lighthouse` | Mobile Lighthouse on the home pages (needs `npm start`), fails below 90 |
-| `npm run cf:build` / `cf:size` | OpenNext Workers build / size vs the 3 MiB free limit |
-| `npm run preview:cf` / `deploy:cf` | Run the Worker locally in workerd / deploy (needs credentials) |
 | `npx supabase start` / `db reset` | *phase 2* — local stack / rebuild schema + seed (needs Docker) |
 | `npx supabase migration new <name>` | *phase 2* — new migration (the only way to change the schema) |
 | `npx supabase test db` | *phase 2* — pgTAP RLS suite |
@@ -60,11 +61,12 @@ src/app/[locale]/(public|auth|account|member|board|admin)/…   routes only, thi
 src/app/api/cron/[job] · src/app/api/webhooks/…               service-role code lives ONLY here (phase 2+)
 src/features/<domain>/{components,queries.ts,actions.ts,schemas.ts}   from phase 3
 src/components/ui        shadcn/ui (hand-ported v4 source; restyle through tokens, not edits)
-src/components/layout    header, footer, nav, locale switcher, theme toggle, shells
+src/components/layout    header, footer, nav, locale switcher, theme toggle, logo, shells
+src/components/brand     charter motifs and one-pager sections (camo, genres, values, axes, members)
 src/config/              navigation.ts (every menu) · icons.ts
 src/lib/                 auth/guards.ts · metadata.ts · i18n-params.ts · env.ts · routes/ (page factories)
 src/lib/supabase/        server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role) — phase 2
-src/i18n/ · messages/{ar,fr,en}.json · src/middleware.ts · src/emails/ (phase 2+)
+src/i18n/ · messages/{ar,fr,en}.json · src/proxy.ts · src/emails/ (phase 2+)
 supabase/migrations · supabase/tests · supabase/seed.sql                  — phase 2
 tests/e2e · tests/screenshots · docs/ · scripts/
 ```
@@ -90,8 +92,7 @@ Unit tests sit next to the code (`*.test.ts`).
 - Accessibility (WCAG 2.2 AA): semantic HTML, a label for every input, visible focus, everything reachable by
   keyboard and touch (no hover-only UI), `alt` text, reduced-motion support.
 - **No fabricated content.** Demo data lives in `supabase/seed.sql`, is obviously fictional, and never ships to prod.
-- New dependencies need a reason in the PR. Prefer platform and Next.js built-ins, and watch the Workers bundle
-  limit (3 MB compressed).
+- New dependencies need a reason in the PR. Prefer platform and Next.js built-ins, and keep client bundles small.
 - Comments explain *why*, not *what*. Match surrounding style.
 
 ## i18n and RTL rules
@@ -172,12 +173,12 @@ Versions are pinned in `.mcp.json`. The wrappers live in `scripts/mcp/`. Cloud s
 ## Cloud environment notes
 
 - The environment's network policy may block hosts (currently `context7.com`, `ui.shadcn.com`,
-  `supabase.com`, `api.supabase.com`, `api.cloudflare.com`, `nextjs.org`, `opennext.js.org`). If you hit a
+  `supabase.com`, `api.supabase.com`, `nextjs.org`). If you hit a
   403 from the proxy, report the host. Don't work around it. Next.js docs ship in `node_modules/next/dist/docs/`.
 - Chromium is pre-installed at `/opt/pw-browsers`. Don't run `playwright install`; the session hook exports
   `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`, which `playwright.config.ts` uses.
-- Don't add `lighthouse` (or anything pulling `@opentelemetry/api`) as a dependency: it breaks the OpenNext
-  build (D-033). `npm run lighthouse` runs it through `npx`.
+- `npm run lighthouse` runs Lighthouse through `npx` (not a dependency, D-033/D-048); point it at Chromium with
+  `CHROME_PATH=/opt/pw-browsers/chromium`.
 - The container is ephemeral: anything not committed and pushed is lost.
 
 <!-- BEGIN:nextjs-agent-rules -->

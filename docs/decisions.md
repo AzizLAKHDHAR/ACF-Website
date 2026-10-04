@@ -47,7 +47,7 @@ Format:
 - Consequences: CI and the session hook use npm.
 
 ## D-005: Locales `ar`, `fr`, `en`, always prefixed; default `ar` (provisional)
-- Date: 2026-10-04 · Phase: 0 · Status: proposed (needs ACF confirmation)
+- Date: 2026-10-04 · Phase: 0 · Status: superseded by D-043 (default locale); the rest stays accepted
 - Context: All three languages are required, and Arabic is RTL. A default is needed for `/` when
   negotiation fails.
 - Decision: next-intl with `localePrefix: 'always'`, negotiation by `Accept-Language` + cookie, fallback `ar`.
@@ -109,7 +109,7 @@ Format:
 - Consequences: Adding a state (e.g. `cancelled`) needs a migration and a decision entry.
 
 ## D-013: Hosting: Cloudflare Workers via OpenNext first, Vercel Hobby as fallback
-- Date: 2026-10-04 · Phase: 0 · Status: superseded by D-032
+- Date: 2026-10-04 · Phase: 0 · Status: superseded by D-032, then D-042
 - Context: Both are free. Vercel Hobby is limited to non-commercial use. Workers Free has a 3 MB compressed
   bundle limit and 10 ms CPU per request.
 - Decision: Build for Workers (`@opennextjs/cloudflare`), serve public pages from the ISR cache, keep
@@ -171,7 +171,7 @@ Format:
 - Consequences: No consent banner needed for analytics.
 
 ## D-022: Placeholder design tokens until the ACF charter is provided
-- Date: 2026-10-04 · Phase: 0 · Status: accepted
+- Date: 2026-10-04 · Phase: 0 · Status: superseded by D-044
 - Context: There is no `/brand` folder. The only assets are the predecessor's (AltScene TN).
 - Decision: Phase 1 uses shadcn's neutral palette, clearly marked as a placeholder. AltScene colors are
   kept in `brand.md` as legacy reference only.
@@ -235,7 +235,7 @@ Format:
 - Consequences: The charter only changes layer 1. Any new token pair used for text must be added to the contrast test.
 
 ## D-030: Placeholder fonts: IBM Plex Sans + IBM Plex Sans Arabic
-- Date: 2026-10-04 · Phase: 1 · Status: proposed (replace with the charter's fonts)
+- Date: 2026-10-04 · Phase: 1 · Status: superseded by D-045
 - Context: The charter is missing; Arabic needs a real web font (system fallbacks render poorly and inconsistently).
 - Decision: The first proposal from `brand.md`, loaded with `next/font/google` (downloaded at build, self-hosted,
   no runtime Google requests): Plex Sans (variable, Latin) and Plex Sans Arabic 400/600, exposed as `--font-latin`
@@ -243,7 +243,7 @@ Format:
 - Consequences: About 140 KB of fonts per first visit; revisit when the charter names its typefaces.
 
 ## D-031: Edge `middleware.ts` instead of Next 16's `proxy.ts`; static-assets cache on Workers
-- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Date: 2026-10-04 · Phase: 1 · Status: superseded by D-042
 - Context: Next 16 renames middleware to `proxy.ts`, which always runs on Node.js. OpenNext bundles Node middleware for
   Workers only experimentally ("not officially maintained"), and measured on this app it produces a 2.70 MiB gzipped
   Worker (it drags in Next's `@vercel/og` wasm) against 1.54 MiB with the Edge `middleware.ts`. The free plan allows 3 MiB.
@@ -255,7 +255,7 @@ Format:
   `middleware.ts` (a future major); the CI bundle-size job will show the cost of switching.
 
 ## D-032: Hosting: Cloudflare Workers confirmed as the primary target (provisional until the first deploy)
-- Date: 2026-10-04 · Phase: 1 · Status: accepted (CPU confirmation pending), supersedes the "proposed" status of D-013
+- Date: 2026-10-04 · Phase: 1 · Status: superseded by D-042
 - Context: The phase 1 spike couldn't deploy: there is no Cloudflare account or token in this environment and
   `api.cloudflare.com` is blocked. Measured locally instead:
   - Worker bundle (`wrangler deploy --dry-run`): **7.93 MiB raw, 1.54 MiB gzip = 51% of the 3 MiB free limit**.
@@ -272,7 +272,7 @@ Format:
 - Consequences: The first real deploy must record CPU time p50/p99 (Cloudflare dashboard → Workers → Metrics) here.
 
 ## D-033: Lighthouse runs through npx, never as a dependency
-- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Date: 2026-10-04 · Phase: 1 · Status: accepted (the OpenNext reason is historical since D-042; see D-048)
 - Context: Installing `lighthouse` pulls `@opentelemetry/api` into `node_modules`. Next's tracer then `require`s it, and
   OpenNext's trace copies only part of that package, so the Workers build fails to bundle.
 - Decision: `npm run lighthouse` calls `npx lighthouse@13.5.0` and parses the JSON reports. The lockfile was regenerated so
@@ -280,7 +280,7 @@ Format:
 - Consequences: Anything that adds `@opentelemetry/api` (e.g. some monitoring SDKs) will break `cf:build`; CI catches it.
 
 ## D-034: Light, dark and system themes
-- Date: 2026-10-04 · Phase: 1 · Status: proposed (needs ACF confirmation, open question 3)
+- Date: 2026-10-04 · Phase: 1 · Status: accepted (confirmed by ACF; colours in D-044)
 - Decision: `next-themes` with the `.dark` class, default `system`, a three-option menu in every header. Both themes are
   contrast-tested and screenshotted.
 - Consequences: The charter must provide (or approve derived) dark-theme colours.
@@ -323,7 +323,83 @@ Format:
   with the static pages, so it is designed in the phase 9 security review.
 
 ## D-040: Screenshots committed as contact sheets
-- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Date: 2026-10-04 · Phase: 1 · Status: accepted (output folder made configurable, D-048)
 - Decision: `npm run screenshots` captures every area × locale × theme × viewport (54 PNGs in `test-results/`, not
   committed) and composes one JPEG contact sheet per area into `docs/screenshots/phase-1/` (about 700 KB total).
 - Consequences: Each later phase adds its own folder rather than overwriting history.
+
+## D-041: ACF is the Amplify Creative Foundation; the one-pager is the official copy
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted
+- Context: ACF added `/brand`: a one-page charter and a two-page one-pager in English, French and Arabic. It names
+  the association (Amplify Creative Foundation), its tagline, values, three axes of action and member types.
+- Decision: Use the name in metadata, the footer and the logo. The home hero and the About page use the one-pager
+  text verbatim in each language (`brand.*` messages), so About is no longer a placeholder. Contact channels are left
+  out: the one-pager prints `[EMAIL]`, `[WEBSITE]`, `[INSTAGRAM]` placeholders.
+- Consequences: Copy changes go through ACF. `docs/vision.md` keeps the platform scope; the mission now comes from
+  the one-pager.
+
+## D-042: Hosting on Vercel; Next 16's Node `proxy.ts`
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted, supersedes D-013, D-031, D-032
+- Context: ACF chose Vercel for hosting and Supabase for the database. The Workers constraints that shaped D-031/D-032
+  (3 MiB bundle, 10 ms CPU, experimental Node middleware in OpenNext) no longer apply. Vercel Hobby is free but
+  limited to non-commercial use (D-013); which plan ACF uses is an open question in the PR. A non-profit's
+  informational site fits Hobby; selling tickets or memberships on the site would not.
+- Decision: Deploy with Vercel's Git integration: production from `main`, a preview deployment per pull request.
+  Removed `@opennextjs/cloudflare`, `wrangler`, `open-next.config.ts`, `wrangler.jsonc`, the `cf:*` scripts, the
+  bundle-size CI job and `deploy.yml`. `src/middleware.ts` became `src/proxy.ts` (Node runtime, no deprecation
+  warning). Supabase stays as planned (D-014).
+- Consequences: Vercel project settings (Node 22, `NEXT_PUBLIC_SITE_URL`, later the Supabase and Resend variables)
+  live in the Vercel dashboard, never in git; the Functions region should match the Supabase region. Scheduled jobs
+  stay on GitHub Actions (Vercel Hobby cron runs at most daily). If the site ever sells anything, move to Vercel Pro
+  or revisit hosting.
+
+## D-043: French is the default locale
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted, supersedes the default in D-005
+- Decision: `defaultLocale: 'fr'`. Negotiation is unchanged: locale cookie, then `Accept-Language`, then French.
+  Every URL stays prefixed (`/fr`, `/ar`, `/en`).
+- Consequences: `/` redirects to `/fr` for visitors whose browser prefers none of the three languages. Tested in
+  `src/i18n/locale.test.ts` and `tests/e2e/i18n.spec.ts`.
+
+## D-044: Brand tokens from the charter, with derived tints and a green-as-surface rule
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted, supersedes D-022
+- Context: The charter defines three colours: green `#72c71e`, ink `#181414`, white. Green on white is 2.1:1, which
+  fails WCAG AA for text and even for UI boundaries.
+- Decision: Primitives are the exact charter colours plus derived green tints (50–900) and warm greys from the ink.
+  Green is a surface colour with ink text and a 2 px `primary-border` outline (ink in light, green in dark); text
+  and links on light backgrounds are ink; the focus ring is ink (light) / green (dark). New tokens: `primary-border`,
+  `brand`, `brand-foreground`, `camo`. Dark theme: ink page, white text, ink-900 cards, green actions. `--radius` is
+  `1rem` and buttons are pills, after the charter's rounded shapes. The camo motif is an inline SVG pattern
+  (`src/components/brand/camo-tile.ts`): as a CSS mask image it became the mobile LCP element.
+- Consequences: The contrast suite covers the new pairs in both themes. Full mapping in `docs/brand.md`.
+
+## D-045: Outfit and Alexandria stand in for Rokiest and GC Arturm
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted (until web licences exist), supersedes D-030
+- Context: The charter's typefaces (Rokiest for display, GC Arturm Light for text) are commercial and not supplied;
+  neither has Arabic.
+- Decision: Outfit (variable, Latin) for display and body, Alexandria (variable, Arabic) for Arabic, both through
+  `next/font/google` (self-hosted at build). Both are geometric and open-licence (OFL).
+- Consequences: About 80 KB of preloaded fonts per first visit. If ACF buys web licences, switch to `next/font/local`
+  in `src/app/[locale]/layout.tsx`; nothing else changes.
+
+## D-046: Logo as raster alpha masks until a vector logo exists
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted (replace with SVG)
+- Context: `/brand` has the logo only inside JPG/PNG pages, no SVG.
+- Decision: The wordmark (460×159) and the full lockup (1652×665) were cut from the one-pager into single-colour alpha
+  PNGs in `public/brand/` and drawn with CSS `mask-image` over `currentColor`, so one file serves ink-on-light and
+  white-on-ink like the charter's two variants. The favicon and Apple icon are a green rounded square with an ink "A".
+  The link around the logo carries an accessible name ("Amplify Creative Foundation — Home").
+- Consequences: Slightly soft edges at large sizes. When ACF provides SVGs, swap the files in `logo.tsx` and regenerate
+  the icons.
+
+## D-047: Light, dark and system themes confirmed
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted (confirms D-034)
+- Decision: Keep the three-option theme menu with `system` as default. The dark theme follows the charter's
+  "white wordmark on an ink tile" variant (D-044). Both themes are axe-tested and screenshotted.
+
+## D-048: Screenshot folder per milestone; Lighthouse stays on npx
+- Date: 2026-10-04 · Phase: 1 (brand follow-up) · Status: accepted
+- Decision: `npm run screenshots` writes to `docs/screenshots/brand/` by default, or to `$SCREENSHOT_DIR`; the
+  phase 1 sheets stay in `docs/screenshots/phase-1/` as history. The About page joins the matrix. Lighthouse keeps
+  running through `npx` (D-033): without OpenNext it no longer breaks the build, but it is a large tool needed only
+  for audits. Mobile scores after the brand: performance 93 (`/ar`), 94 (`/fr`), 96 (`/en`); accessibility, best
+  practices and SEO 100.

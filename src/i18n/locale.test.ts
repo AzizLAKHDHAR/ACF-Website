@@ -11,6 +11,7 @@ describe('locales', () => {
 
   it('uses always-prefixed URLs and a persistent locale cookie', () => {
     expect(routing.locales).toEqual(['ar', 'fr', 'en']);
+    expect(routing.defaultLocale).toBe('fr');
     expect(routing.localePrefix).toBe('always');
     expect(routing.localeCookie).toMatchObject({ maxAge: 60 * 60 * 24 * 365 });
   });

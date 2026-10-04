@@ -19,7 +19,7 @@ continues the same phase.
 Audit, `CLAUDE.md`, vision, roles, architecture, brand, roadmap, decisions log, MCP servers, session
 setup hook.
 
-## Phase 1: Foundation ✅ (except the live Workers deploy — see D-032)
+## Phase 1: Foundation ✅ (AzizLAKHDHAR/ACF-Website#2, brand follow-up; live deploy waits on the Vercel project)
 
 **Goal:** replace the legacy Vite SPA with an empty but production-shaped Next.js app: trilingual,
 RTL-ready, themed, deployable.
@@ -27,7 +27,8 @@ RTL-ready, themed, deployable.
 Scope: Next.js 16 (App Router) + React 19 + TypeScript 6 strict; Tailwind v4; shadcn/ui regenerated;
 next-intl (`ar`, `fr`, `en`); design tokens per [`brand.md`](brand.md) (placeholders if the charter isn't
 in yet); layout shell; route-group skeletons; ESLint + Prettier; Vitest + Playwright baseline; CI
-workflow; deployment spike on Cloudflare Workers; delete legacy files (list in [`audit.md`](audit.md)).
+workflow; deployment spike on Cloudflare Workers (replaced by Vercel, D-042); delete legacy files (list in
+[`audit.md`](audit.md)). Follow-up: the ACF charter from `/brand`, French as default locale (D-041–D-048).
 
 Acceptance criteria:
 - [x] `npm run dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:e2e` exist and pass locally and in CI (`.github/workflows/ci.yml`).
@@ -37,15 +38,17 @@ Acceptance criteria:
 - [x] The locale switcher keeps the current path and persists the choice (`NEXT_LOCALE`, one year).
 - [x] `messages/ar.json`, `fr.json` and `en.json` have identical key sets (CI check). The shell has no hard-coded UI strings (lint rule).
 - [x] Design tokens live in `globals.css` (primitives → semantic → `@theme inline`). Components use only token classes (default palette removed). An automated check covers token-pair contrast (AA).
-- [x] Layout shell: header with public navigation, mobile drawer, footer, skip link, visible focus states. Menus work with keyboard and touch. Correct in RTL (screenshots in `docs/screenshots/phase-1/`).
+- [x] Layout shell: header with public navigation, mobile drawer, footer, skip link, visible focus states. Menus work with keyboard and touch. Correct in RTL (screenshots in `docs/screenshots/phase-1/`, and in the brand in `docs/screenshots/brand/`).
 - [x] Route groups `(public)`, `(auth)`, `(account)`, `(member)`, `(board)`, `(admin)` exist with placeholder pages. Hidden areas are `noindex` and return 404 until auth lands in phase 2.
 - [x] Localized `not-found` and `error` pages (404 content renders client-side in Next 16.3 — D-036).
-- [x] Lighthouse (mobile) ≥ 90 for Performance, Accessibility, Best Practices and SEO on the home page, in all three locales (scores in D-032).
-- [ ] The shell is deployed to Cloudflare Workers via OpenNext (preview URL in the PR). Compressed bundle size and a CPU-time sample are recorded in `decisions.md`, along with the **final hosting decision** (Workers or Vercel Hobby).
-  *Partly done:* bundle size (1.54 MiB gzip), a local `workerd` run and the hosting decision are recorded (D-031, D-032); the live deploy and a real CPU-time sample need a Cloudflare account (deploy workflow ready).
+- [x] Lighthouse (mobile) ≥ 90 for Performance, Accessibility, Best Practices and SEO on the home page, in all three locales (scores in D-032; after the brand in D-048).
+- [ ] The shell is deployed (preview URL in the PR) and the **final hosting decision** is recorded in `decisions.md`.
+  *Partly done:* the hosting decision is Vercel (D-042, replacing the Workers spike of D-031/D-032) and the app builds with no platform-specific code; the first preview URL appears once ACF imports the repository into a Vercel project.
+- [x] Design tokens, fonts, logo and motif follow the ACF charter in `/brand` in light and dark themes (D-044–D-047); French is the default locale (D-043).
 - [x] `.env.example` lists every variable from [`architecture.md`](architecture.md#configuration-envexample-in-phase-1) (unit-tested). README rewritten for ACF.
 
-Inputs needed: brand charter (or OK to proceed with placeholders), default locale, Cloudflare account.
+Inputs received: brand charter (`/brand`), default locale (French), hosting (Vercel). Still needed: the Vercel
+project, a vector logo, font licences (optional).
 
 ## Phase 2: Data model, auth, RLS, seed data
 

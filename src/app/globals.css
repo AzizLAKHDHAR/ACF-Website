@@ -5,41 +5,42 @@
 
 /*
  * Design tokens (docs/brand.md). Three layers:
- *   1. brand primitives  --acf-*        raw palette from the ACF charter
+ *   1. brand primitives  --acf-*        palette from the ACF charter (/brand/charte.png)
  *   2. semantic tokens   --background…  what components use (shadcn/ui names), per theme
  *   3. @theme inline                    exposes the semantic tokens as Tailwind classes
  *
- * PLACEHOLDER — replace with ACF charter (D-022). Until the charter is in /brand, the primitives
- * are a neutral grey scale. Changing the brand means editing layer 1 only.
+ * Charter colours: green #72c71e, ink #181414, white #ffffff. Tints are derived (D-044).
+ * Green is a surface colour: as text on white it is only ~2.1:1, so text on light backgrounds is ink.
  * Token pairs are contrast-checked (WCAG AA) by src/styles/contrast.test.ts.
  */
 
-/* 1. Brand primitives — PLACEHOLDER */
+/* 1. Brand primitives */
 :root {
-  --acf-neutral-50: oklch(0.985 0 0);
-  --acf-neutral-100: oklch(0.97 0 0);
-  --acf-neutral-200: oklch(0.922 0 0);
-  --acf-neutral-300: oklch(0.87 0 0);
-  --acf-neutral-400: oklch(0.708 0 0);
-  --acf-neutral-500: oklch(0.556 0 0);
-  --acf-neutral-600: oklch(0.439 0 0);
-  --acf-neutral-700: oklch(0.371 0 0);
-  --acf-neutral-800: oklch(0.269 0 0);
-  --acf-neutral-900: oklch(0.205 0 0);
-  --acf-neutral-950: oklch(0.145 0 0);
+  --acf-green: #72c71e;
+  --acf-ink: #181414;
+  --acf-white: #ffffff;
 
-  --acf-ink: var(--acf-neutral-950);
-  --acf-paper: oklch(1 0 0);
-  --acf-primary: var(--acf-neutral-900);
-  --acf-primary-ink: var(--acf-neutral-50);
-  --acf-secondary: var(--acf-neutral-100);
-  --acf-accent: var(--acf-neutral-100);
+  /* Derived green tints (backgrounds, hovers, the pixel-camo motif) */
+  --acf-green-50: #f3faeb;
+  --acf-green-100: #e3f4d1;
+  --acf-green-200: #c8e9a4;
+  --acf-green-800: #2a4512;
+  --acf-green-900: #1f2c14;
 
-  /* Functional colours (not from the charter): errors and statuses. */
+  /* Derived warm greys from the ink */
+  --acf-ink-900: #221d1d;
+  --acf-ink-800: #2e2828;
+  --acf-ink-700: #3d3636;
+  --acf-ink-600: #5e5656;
+  --acf-ink-500: #7a7272;
+  --acf-ink-400: #a8a0a0;
+  --acf-ink-200: #e4dfdf;
+  --acf-ink-100: #f3f0f0;
+
+  /* Functional colours (not in the charter): errors and statuses */
   --acf-red-700: oklch(0.505 0.213 27.518);
   --acf-red-400: oklch(0.704 0.191 22.216);
-  --acf-green-700: oklch(0.527 0.154 150.069);
-  --acf-green-400: oklch(0.792 0.209 151.711);
+  --acf-green-ok-700: oklch(0.527 0.154 150.069);
   --acf-amber-700: oklch(0.555 0.163 48.998);
   --acf-amber-400: oklch(0.828 0.189 84.429);
   --acf-blue-700: oklch(0.488 0.243 264.376);
@@ -48,38 +49,43 @@
 
 /* 2. Semantic tokens — light theme */
 :root {
-  --background: var(--acf-paper);
+  --background: var(--acf-white);
   --foreground: var(--acf-ink);
-  --card: var(--acf-paper);
+  --card: var(--acf-white);
   --card-foreground: var(--acf-ink);
-  --popover: var(--acf-paper);
+  --popover: var(--acf-white);
   --popover-foreground: var(--acf-ink);
-  --primary: var(--acf-primary);
-  --primary-foreground: var(--acf-primary-ink);
-  --secondary: var(--acf-secondary);
-  --secondary-foreground: var(--acf-neutral-900);
-  --muted: var(--acf-neutral-100);
-  --muted-foreground: var(--acf-neutral-600);
-  --accent: var(--acf-accent);
-  --accent-foreground: var(--acf-neutral-900);
+  --primary: var(--acf-green);
+  --primary-foreground: var(--acf-ink);
+  --primary-border: var(--acf-ink);
+  --secondary: var(--acf-ink);
+  --secondary-foreground: var(--acf-white);
+  --muted: var(--acf-green-50);
+  --muted-foreground: var(--acf-ink-600);
+  --accent: var(--acf-green-100);
+  --accent-foreground: var(--acf-ink);
+  --brand: var(--acf-green);
+  --brand-foreground: var(--acf-ink);
+  --camo: var(--acf-green-100);
   --destructive: var(--acf-red-700);
-  --destructive-foreground: var(--acf-paper);
-  --success: var(--acf-green-700);
-  --success-foreground: var(--acf-paper);
+  --destructive-foreground: var(--acf-white);
+  --success: var(--acf-green-ok-700);
+  --success-foreground: var(--acf-white);
   --warning: var(--acf-amber-700);
-  --warning-foreground: var(--acf-paper);
+  --warning-foreground: var(--acf-white);
   --info: var(--acf-blue-700);
-  --info-foreground: var(--acf-paper);
-  --border: var(--acf-neutral-200);
-  --input: var(--acf-neutral-500);
-  --ring: var(--acf-neutral-600);
+  --info-foreground: var(--acf-white);
+  --border: var(--acf-ink-200);
+  --input: var(--acf-ink-500);
+  --ring: var(--acf-ink);
   --overlay: oklch(0 0 0 / 0.5);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-1: var(--acf-green);
+  --chart-2: var(--acf-ink);
+  --chart-3: oklch(0.6 0.118 184.704);
   --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
+  --chart-5: oklch(0.645 0.246 16.439);
+  /* The charter uses generous rounded corners. */
+  --radius: 1rem;
 
   /* Fonts: next/font variables are set on <html> (src/app/[locale]/layout.tsx). */
   --font-body: var(--font-latin), ui-sans-serif, system-ui, sans-serif;
@@ -91,37 +97,38 @@
 
 /* 2. Semantic tokens — dark theme */
 .dark {
-  --background: var(--acf-neutral-950);
-  --foreground: var(--acf-neutral-50);
-  --card: var(--acf-neutral-900);
-  --card-foreground: var(--acf-neutral-50);
-  --popover: var(--acf-neutral-900);
-  --popover-foreground: var(--acf-neutral-50);
-  --primary: var(--acf-neutral-200);
-  --primary-foreground: var(--acf-neutral-900);
-  --secondary: var(--acf-neutral-800);
-  --secondary-foreground: var(--acf-neutral-50);
-  --muted: var(--acf-neutral-800);
-  --muted-foreground: var(--acf-neutral-400);
-  --accent: var(--acf-neutral-800);
-  --accent-foreground: var(--acf-neutral-50);
+  --background: var(--acf-ink);
+  --foreground: var(--acf-white);
+  --card: var(--acf-ink-900);
+  --card-foreground: var(--acf-white);
+  --popover: var(--acf-ink-900);
+  --popover-foreground: var(--acf-white);
+  --primary: var(--acf-green);
+  --primary-foreground: var(--acf-ink);
+  --primary-border: var(--acf-green);
+  --secondary: var(--acf-white);
+  --secondary-foreground: var(--acf-ink);
+  --muted: var(--acf-ink-800);
+  --muted-foreground: var(--acf-ink-400);
+  --accent: var(--acf-green-800);
+  --accent-foreground: var(--acf-white);
+  --brand: var(--acf-green);
+  --brand-foreground: var(--acf-ink);
+  --camo: var(--acf-green-900);
   --destructive: var(--acf-red-400);
-  --destructive-foreground: var(--acf-neutral-950);
-  --success: var(--acf-green-400);
-  --success-foreground: var(--acf-neutral-950);
+  --destructive-foreground: var(--acf-ink);
+  --success: var(--acf-green);
+  --success-foreground: var(--acf-ink);
   --warning: var(--acf-amber-400);
-  --warning-foreground: var(--acf-neutral-950);
+  --warning-foreground: var(--acf-ink);
   --info: var(--acf-blue-400);
-  --info-foreground: var(--acf-neutral-950);
-  --border: var(--acf-neutral-800);
-  --input: var(--acf-neutral-500);
-  --ring: var(--acf-neutral-400);
+  --info-foreground: var(--acf-ink);
+  --border: var(--acf-ink-700);
+  --input: var(--acf-ink-500);
+  --ring: var(--acf-green);
   --overlay: oklch(0 0 0 / 0.7);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-1: var(--acf-green);
+  --chart-2: var(--acf-white);
 }
 
 /* 3. Tailwind theme. The default palette is removed so only token colours exist:
@@ -139,6 +146,10 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-border: var(--primary-border);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-camo: var(--camo);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -164,6 +175,7 @@
   --color-chart-5: var(--chart-5);
 
   --font-sans: var(--font-body);
+  --font-display: var(--font-body);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

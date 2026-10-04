@@ -3,8 +3,8 @@
 // Usage: npm run build && npm start   (in another terminal)
 //        npm run lighthouse            [BASE_URL=http://localhost:3000] [CHROME_PATH=/path/to/chrome]
 //
-// Lighthouse runs through npx at a pinned version instead of being a devDependency: installing it
-// pulls @opentelemetry/api into node_modules, which breaks the OpenNext Workers build (D-032).
+// Lighthouse runs through npx at a pinned version instead of being a devDependency: it is large and
+// only needed for this audit (D-033).
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

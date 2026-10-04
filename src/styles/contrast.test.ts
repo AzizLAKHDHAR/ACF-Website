@@ -10,7 +10,8 @@ const css = readFileSync(fileURLToPath(new URL('../app/globals.css', import.meta
 const TEXT = 4.5;
 const NON_TEXT = 3;
 
-const pairs: Array<[foreground: string, background: string, minimum: number]> = [
+// An optional fourth element limits a pair to one theme.
+const pairs: Array<[foreground: string, background: string, minimum: number, only?: Theme]> = [
   ['--foreground', '--background', TEXT],
   ['--card-foreground', '--card', TEXT],
   ['--popover-foreground', '--popover', TEXT],
@@ -25,7 +26,11 @@ const pairs: Array<[foreground: string, background: string, minimum: number]> = 
   ['--success-foreground', '--success', TEXT],
   ['--warning-foreground', '--warning', TEXT],
   ['--info-foreground', '--info', TEXT],
-  ['--primary', '--background', NON_TEXT],
+  ['--primary-border', '--background', NON_TEXT],
+  ['--primary', '--background', NON_TEXT, 'dark'],
+  ['--brand-foreground', '--brand', TEXT],
+  ['--foreground', '--camo', TEXT],
+  ['--foreground', '--muted', TEXT],
   ['--ring', '--background', NON_TEXT],
   ['--ring', '--card', NON_TEXT],
   ['--input', '--background', NON_TEXT],
@@ -34,14 +39,17 @@ const pairs: Array<[foreground: string, background: string, minimum: number]> = 
 describe.each<Theme>(['light', 'dark'])('%s theme token contrast', (theme) => {
   const tokens = resolveTokens(css, theme);
 
-  it.each(pairs)('%s on %s ≥ %s:1', (foreground, background, minimum) => {
-    const fg = parse(tokens.get(foreground) ?? '');
-    const bg = parse(tokens.get(background) ?? '');
-    expect(fg, `${foreground} must be a valid colour`).toBeDefined();
-    expect(bg, `${background} must be a valid colour`).toBeDefined();
-    if (!fg || !bg) return;
-    expect(fg.alpha ?? 1, `${foreground} must be opaque to be checked`).toBe(1);
-    expect(bg.alpha ?? 1, `${background} must be opaque to be checked`).toBe(1);
-    expect(wcagContrast(fg, bg)).toBeGreaterThanOrEqual(minimum);
-  });
+  it.each(pairs.filter((pair) => !pair[3] || pair[3] === theme))(
+    '%s on %s ≥ %s:1',
+    (foreground, background, minimum) => {
+      const fg = parse(tokens.get(foreground) ?? '');
+      const bg = parse(tokens.get(background) ?? '');
+      expect(fg, `${foreground} must be a valid colour`).toBeDefined();
+      expect(bg, `${background} must be a valid colour`).toBeDefined();
+      if (!fg || !bg) return;
+      expect(fg.alpha ?? 1, `${foreground} must be opaque to be checked`).toBe(1);
+      expect(bg.alpha ?? 1, `${background} must be opaque to be checked`).toBe(1);
+      expect(wcagContrast(fg, bg)).toBeGreaterThanOrEqual(minimum);
+    },
+  );
 });

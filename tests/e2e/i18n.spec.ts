@@ -17,11 +17,11 @@ test.describe('locale negotiation', () => {
     }
   });
 
-  test('falls back to Arabic when no locale matches', async ({ browser }) => {
+  test('falls back to French when no locale matches', async ({ browser }) => {
     const context = await browser.newContext({ locale: 'de-DE' });
     const page = await context.newPage();
     await page.goto('/');
-    await expect(page).toHaveURL(/\/ar$/);
+    await expect(page).toHaveURL(/\/fr$/);
     await context.close();
   });
 

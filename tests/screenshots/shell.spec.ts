@@ -3,12 +3,13 @@ import { expect, test, type Browser } from '@playwright/test';
 import { locales, messages, type Locale } from '../e2e/helpers';
 
 const RAW_DIR = 'test-results/screenshots';
-const SHEET_DIR = 'docs/screenshots/phase-1';
+const SHEET_DIR = process.env.SCREENSHOT_DIR ?? 'docs/screenshots/brand';
 
 const areas = [
   { name: 'public', path: '' },
   { name: 'member', path: '/member' },
   { name: 'board', path: '/board/finance' },
+  { name: 'about', path: '/about' },
   { name: 'admin', path: '/admin' },
 ] as const;
 

@@ -11,11 +11,11 @@ flowchart LR
   subgraph Browser
     U[Visitor / user]
   end
-  subgraph Edge["Cloudflare Workers (OpenNext) — or Vercel Hobby"]
-    P[middleware.ts · Edge<br/>locale routing + session refresh]
+  subgraph Host["Vercel"]
+    P[proxy.ts · Node<br/>locale routing + session refresh]
     RSC[Next.js App Router<br/>Server Components / Server Actions]
     API[Route handlers<br/>/api/cron/* · /api/webhooks/*]
-    C[(Incremental cache<br/>static assets → R2 from phase 3)]
+    C[(CDN + ISR cache)]
   end
   subgraph Supabase["Supabase (free)"]
     A[Auth]
@@ -50,7 +50,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 
 | Concern | Choice | Version at planning time | Notes |
 |---|---|---|---|
-| Framework | Next.js App Router | 16.3.8 | Edge `middleware.ts` rather than Node `proxy.ts` (D-031), React Server Components |
+| Framework | Next.js App Router | 16.3.8 | Node `proxy.ts` (D-042), React Server Components |
 | UI runtime | React | 19.x | |
 | Language | TypeScript | **6.0.x** | 7.0 is out, but `typescript-eslint` supports `<6.1`; revisit later |
 | Styling | Tailwind CSS v4 | 4.3.x | CSS-first `@theme`, logical properties for RTL |
@@ -61,7 +61,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 | Forms | React Hook Form + Zod resolver | | Server actions re-validate |
 | Email | Resend + React Email | | Also Supabase Auth custom SMTP |
 | Tests | Vitest (unit), Playwright (e2e), pgTAP via `supabase test db` (RLS) | | |
-| Deploy | `@opennextjs/cloudflare` on Workers (primary) / Vercel Hobby (fallback) | 1.20.x | See §10 |
+| Deploy | Vercel (Git integration) | — | See §10 (D-042) |
 | Package manager | npm | 10.x | One lockfile (`package-lock.json`) |
 | Node | 22 LTS | ≥ 20.9 required by Next 16 | |
 
@@ -72,7 +72,8 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 ├── CLAUDE.md                      Working agreement for humans and Claude
 ├── docs/                          vision, roles, architecture, brand, roadmap, decisions, audit
 ├── messages/                      ar.json · fr.json · en.json (UI strings, next-intl)
-├── public/                        static files (favicons, OG image template)
+├── brand/                         ACF charter and one-pager (source of truth for docs/brand.md)
+├── public/brand/                  logo masks cut from the charter
 ├── scripts/                       dev scripts (MCP wrappers, seed helpers)
 ├── supabase/
 │   ├── config.toml
@@ -95,9 +96,10 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 │   │   ├── robots.ts · sitemap.ts · manifest.ts
 │   ├── components/
 │   │   ├── ui/                    shadcn/ui (hand-ported v4 source, D-028)
-│   │   └── layout/                header, footer, nav, locale switcher, theme toggle, shells
+│   │   ├── brand/                 charter motifs and one-pager sections (camo, genres, values, axes)
+│   │   └── layout/                header, footer, nav, locale switcher, theme toggle, logo, shells
 │   ├── config/                    navigation.ts (every menu) · icons.ts
-│   ├── middleware.ts              next-intl locale negotiation (Edge, D-031)
+│   ├── proxy.ts                   next-intl locale negotiation (Node runtime, D-042)
 │   ├── styles/                    token parsing for the contrast test
 │   ├── features/<domain>/         profiles, events, posts, meetings, tasks, announcements,
 │   │                              polls, volunteering, documents, finance, correspondence, admin
@@ -113,7 +115,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 │   │   └── …                      utils, formatting (money in millimes, dates in Africa/Tunis)
 │   └── types/database.ts          generated: `supabase gen types typescript`
 ├── tests/e2e/                     Playwright
-└── .github/workflows/             ci.yml · deploy.yml · cron-*.yml · backup.yml · db-migrate.yml
+└── .github/workflows/             ci.yml · cron-*.yml · backup.yml · db-migrate.yml (deploys: Vercel Git integration)
 ```
 
 ## 4. Routing
@@ -152,7 +154,7 @@ locale versions of each page.
 ## 5. Internationalization and RTL
 
 - **next-intl** with `localePrefix: 'always'`. `/` negotiates from `Accept-Language` and a cookie,
-  falling back to the default locale (**`ar`**, assumption, see open questions).
+  falling back to the default locale, **`fr`** (D-043).
 - `<html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>` is set in `[locale]/layout.tsx`.
 - **Formatting** uses `Intl` with `ar-TN`, `fr-TN` and `en`. Times display in `Africa/Tunis` (UTC+1, no
   DST). Money is stored as integer **millimes** (1 TND = 1000 millimes) and formatted with 3 decimals.
@@ -434,7 +436,7 @@ Rules:
 ```mermaid
 sequenceDiagram
   actor U as User
-  participant P as middleware.ts
+  participant P as proxy.ts
   participant N as Next.js (RSC / Action)
   participant A as Supabase Auth
   participant DB as Postgres (RLS)
@@ -462,7 +464,7 @@ sequenceDiagram
 
 - **Methods:** email + password and email magic link/OTP. Google OAuth is optional (open question).
   Email confirmation is required.
-- **Session:** `@supabase/ssr` cookies. `middleware.ts` composes the next-intl middleware with Supabase
+- **Session:** `@supabase/ssr` cookies. `proxy.ts` composes the next-intl middleware with Supabase
   session refresh.
 - **Association access:** a user signs up normally. The admin then grants a role from `/admin/users`,
   or sends an invitation that attaches the role when the invited email signs in for the first time.
@@ -483,7 +485,7 @@ sequenceDiagram
 
 ### Email: Resend
 - One provider for both **Supabase Auth emails** (custom SMTP, which lifts the built-in SMTP's very low
-  rate limit) and **app emails** (Resend HTTP API via `fetch`, which works on Workers).
+  rate limit) and **app emails** (Resend HTTP API).
 - Templates in `src/emails/` (React Email), rendered in the recipient's `preferred_locale`; the
   Arabic version is `dir="rtl"`.
 - Requires a domain with SPF/DKIM records (open question: ACF domain).
@@ -531,13 +533,13 @@ constant time). Each job is idempotent (`notification_deliveries` unique keys) a
 Caveats: GitHub may delay scheduled runs, so jobs work on time windows, not exact minutes. Public
 repos disable schedules after 60 days without activity (the admin dashboard shows the last
 successful run of each job). The 15-minute job also keeps the free Supabase project from pausing
-after 7 days of inactivity. Fallbacks: Cloudflare Cron Triggers, or Supabase `pg_cron`.
+after 7 days of inactivity. Fallbacks: Supabase `pg_cron`, or Vercel Cron (Hobby allows daily schedules only).
 
 ### Analytics
 - **Operational metrics** come from SQL views on the admin dashboard: profiles by status/type,
   sign-ups per week, events per month, RSVP and volunteer rates, storage usage, cron health.
-- **Traffic**: Cloudflare Web Analytics (free, cookieless, so no consent banner), or Vercel Web
-  Analytics if deployed there.
+- **Traffic**: Vercel Web Analytics (cookieless, so no consent banner; the Hobby plan caps monthly
+  events, verify) or Cloudflare Web Analytics (free, cookieless, works with any host).
 
 ## 10. Environments and free-tier deployment plan
 
@@ -545,21 +547,30 @@ after 7 days of inactivity. Fallbacks: Cloudflare Cron Triggers, or Supabase `pg
 |---|---|---|---|
 | Local | `npm run dev` | Supabase **dev** project (or local Supabase via CLI + Docker) | — |
 | Preview | Per-PR preview deployment | Supabase **dev** project | PR opened/updated |
-| Production | Cloudflare Workers (`main`) | Supabase **prod** project | Merge to `main` |
+| Production | Vercel (`main`) | Supabase **prod** project | Merge to `main` |
 
-**Primary target: Cloudflare Workers via `@opennextjs/cloudflare`.** It allows non-commercial *and*
-commercial use, includes generous requests, uses R2 for the incremental cache, and serves static assets for free.
-Phase 1 confirmed it as the target (D-032): the Worker reads prerendered pages from the static-assets
-incremental cache (`open-next.config.ts`); phase 3 switches to the R2 cache when pages start revalidating.
+**Hosting: Vercel** (D-042), connected to the GitHub repository through Vercel's Git integration:
+`main` deploys to production and every pull request gets a preview URL. No deploy workflow or token
+lives in this repository. Pages are prerendered at build and served from Vercel's CDN; phase 3 adds
+on-demand revalidation by cache tag when content is published.
 
-**Fallback: Vercel Hobby.** It is the simplest option, but its terms limit Hobby to personal,
-non-commercial use (donations are fine; selling tickets or services is not). Kept as the fallback
-in case Workers limits bite. The app code stays portable: no platform-specific APIs outside `src/lib/platform/`.
+Vercel project settings (done once in the dashboard, never in git):
+- Framework preset Next.js, Node 22, install `npm ci`, build `npm run build`.
+- Environment variables per environment (Production / Preview / Development), starting with
+  `NEXT_PUBLIC_SITE_URL`; the Supabase, Resend, Discord and cron variables are added in their phases.
+  Preview points at the Supabase **dev** project, Production at **prod**.
+- Functions region next to the Supabase project's region (for example `fra1` for Supabase
+  `eu-central-1`), so server-side queries don't cross the Atlantic. The default is `iad1` (US East).
+
+**Plan.** Vercel Hobby is free but limited to personal, non-commercial use: an association's
+informational site fits; selling tickets, memberships or services on the site would require Pro.
+Which plan ACF uses is an open question.
 
 | Limit (free tier, verify at implementation) | Risk | Mitigation |
 |---|---|---|
-| Workers: **3 MB** compressed bundle | Next.js + deps may exceed it | Measure in phase 1 (`wrangler deploy --dry-run` in CI), keep server deps lean, fall back to Vercel |
-| Workers: **10 ms CPU** per request, 100k requests/day | Heavy SSR | Public pages served from the ISR cache; private pages are light; I/O wait doesn't count as CPU |
+| Vercel Hobby: non-commercial use only | Paid features (ticketing, paid memberships) | Link out to third-party ticketing; move to Pro before selling anything |
+| Vercel Hobby: monthly caps on data transfer, function invocations and CPU (about 100 GB transfer and 1M invocations at planning time) | Traffic spikes, heavy private pages | Public pages are static; images resized at upload; usage visible in the dashboard |
+| Vercel Hobby: cron jobs run at most once a day | Frequent jobs | Scheduling stays on GitHub Actions (§9) |
 | Supabase: 500 MB database, 1 GB storage, 5 GB egress, 50k MAU, 2 projects | Media growth | Image size limits, `next/image`-style resizing at upload, storage usage on the dashboard |
 | Supabase: pauses after 7 days idle; **no backups** on free | Outage, data loss | 15-minute cron traffic; nightly encrypted `pg_dump` |
 | Resend: about 100/day, 3,000/month | Reminder bursts | Digests, batching, Brevo fallback |
@@ -568,12 +579,10 @@ in case Workers limits bite. The app code stays portable: no platform-specific A
 ### CI/CD (GitHub Actions)
 - `ci.yml` on every PR and on `main` (**in place since phase 1**): install → lint → typecheck →
   format check → message-key parity → unit tests (incl. token contrast) → build → Playwright e2e
-  (desktop + mobile, three locales, axe) — and, in a parallel job, the OpenNext build plus the
-  Worker size budget (`npm run cf:size`, fails above 3 MiB gzip). Phase 2 adds the Supabase local
-  stack (`supabase start` → `db reset` → `supabase test db`, the pgTAP RLS suite).
-- `deploy.yml` (**in place, opt-in**): when the repository variable `CLOUDFLARE_DEPLOY_ENABLED=true`
-  and the `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets exist, `main` runs
-  `opennextjs-cloudflare deploy` and pull requests from this repository upload a preview version.
+  (desktop + mobile, three locales, axe). Phase 2 adds the Supabase local stack (`supabase start` →
+  `db reset` → `supabase test db`, the pgTAP RLS suite).
+- Deployments are not a workflow: Vercel builds `main` and every pull request itself and reports the
+  preview URL on the PR.
 - `db-migrate.yml`: applies `supabase/migrations` to **dev** automatically on merge, and to **prod**
   only after manual approval (GitHub Environment `production` with required reviewer).
 
@@ -594,11 +603,9 @@ in case Workers limits bite. The app code stays portable: no platform-specific A
 
 ## 11. Risks and open technical questions
 
-1. **Middleware convention.** Node `proxy.ts` on Workers is experimental in OpenNext and nearly
-   doubles the bundle, so the app uses the deprecated Edge `middleware.ts` (D-031). Revisit when either
-   side changes. Cache Components (`cacheComponents`) are not enabled yet.
-2. **Worker size and CPU.** Measured in phase 1: 1.54 MiB gzip (51% of the free limit), enforced in CI.
-   Real CPU time is still to be sampled on the first deploy (D-032).
+1. **Hosting plan.** Vercel Hobby forbids commercial use (D-042). Fine for the current scope; re-check
+   before any payment feature. Cache Components (`cacheComponents`) are not enabled yet.
+2. **Function region.** Must match the Supabase region once the projects exist (§10).
 3. **404 rendering.** Next 16.3 renders `notFound()` pages on the client from a recovery shell (D-036).
 4. **Arabic search quality** with `simple` FTS. Acceptable for names. Revisit if content search matters.
 5. **Legal validity of e-signatures** for the supervising authority (see open questions).

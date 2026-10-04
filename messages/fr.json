@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "siteName": "ACF",
-    "title": "ACF — la scène musicale et artistique tunisienne",
-    "description": "ACF est une association culturelle qui soutient la scène musicale et artistique en Tunisie : actualités, blogs, artistes, professionnels, salles, studios et événements."
+    "siteName": "Amplify Creative Foundation",
+    "title": "Amplify Creative Foundation — une maison pour la scène musicale alternative tunisienne",
+    "description": "L’ACF est une association tunisienne pour la musique qui vit hors du mainstream : rock, jazz, metal, funk et tous les sons alternatifs. Artistes, professionnels, salles, studios, événements et actualités."
   },
   "localeNames": {
     "ar": "العربية",
@@ -47,18 +47,19 @@
   },
   "footer": {
     "label": "Pied de page",
-    "tagline": "Une association culturelle qui soutient la scène musicale et artistique en Tunisie.",
+    "tagline": "Une maison pour la scène musicale alternative tunisienne.",
     "discover": "Découvrir",
     "association": "Association",
     "legal": "Mentions légales",
-    "rights": "© {year} ACF. Tous droits réservés."
+    "rights": "© {year} Amplify Creative Foundation (ACF). Tous droits réservés."
   },
   "home": {
-    "title": "Soutenir la scène musicale et artistique tunisienne",
-    "intro": "ACF rassemble artistes, professionnels, salles et studios. Vous trouverez bientôt ici l'actualité de la scène, des blogs, des annuaires et les prochains événements.",
+    "title": "Une maison pour la scène musicale alternative tunisienne.",
+    "intro": "L’ACF est une association tunisienne née d’un besoin : faire reconnaître la musique qui vit hors du mainstream. Le rap, le tarab et la pop arabe ont déjà leurs scènes. Le rock, le jazz, le metal, le funk et tous les sons alternatifs méritent la leur.",
     "ctaArtists": "Découvrir les artistes",
     "ctaEvents": "Voir les événements",
-    "sectionsTitle": "Explorer la scène"
+    "sectionsTitle": "Explorer la scène",
+    "ctaAbout": "À propos de l’ACF"
   },
   "pages": {
     "news": {
@@ -91,7 +92,7 @@
     },
     "about": {
       "title": "À propos d'ACF",
-      "description": "Qui nous sommes et ce que nous faisons."
+      "description": "Une association tunisienne pour la musique qui vit hors du mainstream."
     },
     "contact": {
       "title": "Contact",
@@ -250,5 +251,77 @@
     "description": "Une erreur inattendue s'est produite. Vous pouvez réessayer.",
     "retry": "Réessayer",
     "backHome": "Retour à l'accueil"
+  },
+  "brand": {
+    "genresLabel": "Les genres que nous soutenons",
+    "genres": {
+      "rock": "Rock",
+      "jazz": "Jazz",
+      "metal": "Metal",
+      "funk": "Funk",
+      "more": "& plus"
+    },
+    "whoTitle": "Qui sommes-nous",
+    "whoBody": "L’ACF est une association tunisienne née d’un besoin : faire reconnaître la musique qui vit hors du mainstream. Le rap, le tarab et la pop arabe ont déjà leurs scènes. Le rock, le jazz, le metal, le funk et tous les sons alternatifs méritent la leur.",
+    "valuesTitle": "Nos engagements",
+    "values": {
+      "inclusive": {
+        "title": "Inclusive.",
+        "body": "Une scène ouverte à toutes celles et ceux qui aiment ces genres."
+      },
+      "safe": {
+        "title": "Sûre et respectueuse.",
+        "body": "Tolérance zéro envers les abus sexuels et le harcèlement."
+      },
+      "fair": {
+        "title": "Juste envers les artistes.",
+        "body": "Payés, respectés, et informés de leurs droits et du droit d’auteur."
+      },
+      "autonomous": {
+        "title": "Autonome.",
+        "body": "Une scène qui s’autofinance, où de nouveaux mouvements émergent."
+      },
+      "decentralized": {
+        "title": "Décentralisée.",
+        "body": "Toucher toute la Tunisie, pas seulement la capitale."
+      }
+    },
+    "axesTitle": "Trois axes d’action",
+    "axes": {
+      "financial": {
+        "title": "Financier",
+        "body": "Nous générons nos propres revenus et les réinvestissons dans l’association."
+      },
+      "artistic": {
+        "title": "Artistique",
+        "body": "Une scène pour celles et ceux qui n’en ont pas les moyens : concerts, ateliers, résidences artistiques."
+      },
+      "educational": {
+        "title": "Éducatif",
+        "body": "Les clubs de musique universitaires, à commencer par Tunis, ont façonné la scène alternative. Nous les gardons vivants avec :"
+      }
+    },
+    "educationalItems": {
+      "aid": "Des aides financières",
+      "mentoring": "De l’encadrement",
+      "interviews": "Des interviews avec des pros de la scène",
+      "films": "La réalisation de courts-métrages",
+      "signature": "Une signature légale pour les concerts hors campus",
+      "blog": "Un blog pour chaque club sur notre site",
+      "coverage": "Articles et couverture médiatique des concerts",
+      "easterEgg": "Des programmes « easter egg » entre ingénierie et musique"
+    },
+    "membersTitle": "Nos membres",
+    "members": {
+      "individual": {
+        "title": "Membres physiques",
+        "body": "Des personnes qui soutiennent et construisent la scène."
+      },
+      "clubs": {
+        "title": "Membres clubs",
+        "body": "Les clubs de musique universitaires de Tunisie."
+      }
+    },
+    "joinTitle": "Nous rejoindre"
   }
 }

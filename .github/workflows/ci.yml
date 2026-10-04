@@ -60,23 +60,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
-
-  cloudflare-bundle:
-    name: Cloudflare Worker bundle size
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-
-      - name: OpenNext build
-        run: npm run cf:build
-
-      - name: Size against the Workers Free limit (3 MiB gzip)
-        run: npm run cf:size
