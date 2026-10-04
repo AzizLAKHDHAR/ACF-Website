@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@4.1.1"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "bash",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/scripts/mcp/playwright.sh", "@playwright/mcp@0.0.83"]
+    },
+    "shadcn": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "shadcn@4.21.1", "mcp"]
+    },
+    "supabase": {
+      "type": "stdio",
+      "command": "bash",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/scripts/mcp/supabase-dev.sh", "@supabase/mcp-server-supabase@0.13.0"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN:-}",
+        "SUPABASE_DEV_PROJECT_REF": "${SUPABASE_DEV_PROJECT_REF:-}"
+      }
+    }
+  }
+}
