@@ -1,177 +1,151 @@
 # Brand and design tokens
 
-> **Status: ACF's graphic charter is not in the repository.** The task asked to extract it from
-> `/brand`, but no `/brand` folder exists (checked this branch, `main` and the full history). Every
-> ACF value below is therefore **TODO**. The only identity assets in the repo belong to the
-> predecessor project, AltScene TN. They are recorded at the end as legacy reference and must
-> **not** be used as ACF's brand.
+> **Status: the charter is in [`/brand`](../brand) and implemented (D-041, D-044–D-046).**
+> ACF is the **Amplify Creative Foundation**. `/brand` holds the one-page graphic charter
+> (`charte.png`) and the association's one-pager in English (pages 1–2), French (3–4) and Arabic (5–6).
+> The charter gives three colours, two typefaces and the logo; everything else below (tints, dark theme,
+> web-font stand-ins) is derived here and listed as such. Still missing: a vector logo, web licences for
+> the charter fonts, and contact channels (see the TODO list at the end).
+
+## The charter at a glance
+
+| Element | Charter | On the web |
+|---|---|---|
+| Colours | Green `#72c71e`, ink `#181414`, white `#ffffff` | Exact values as primitives; tints derived for UI (below) |
+| Display type | **Rokiest**, tracking +40 | Stand-in: **Outfit** 800 (Google Fonts, OFL) — Rokiest is commercial (D-045) |
+| Body type | **GC Arturm Light** | Stand-in: **Outfit** (variable) for Latin, **Alexandria** (variable) for Arabic (D-045) |
+| Logo | "Amplify" wordmark in an outlined plate, "CREATIVE FOUNDATION" beneath, ® | Raster alpha masks traced from the one-pager, recoloured by CSS (D-046) |
+| Logo on colour | Ink wordmark on a green tile; white wordmark on an ink tile | Wordmark follows `currentColor`, so it works on every surface and theme |
+| Motif | Pixel camouflage in pale green; big rounded corners; outlined circles and boxes | Inline-SVG camo tile (`src/components/brand/camo-tile.ts`) tinted with `--camo`; `--radius: 1rem`; 2 px ink outlines |
 
 ## How tokens work in this project
 
-1. **The charter is the source of truth.** Put it in `/brand` (structure below).
+1. **The charter is the source of truth.** It lives in `/brand`.
 2. **`src/app/globals.css` implements it** as CSS custom properties, in two layers:
-   - *brand primitives*: the raw palette from the charter (`--acf-*`);
+   - *brand primitives*: the charter palette plus derived tints (`--acf-*`);
    - *semantic tokens*: what components use (`--background`, `--primary`, …), mapped onto the
      primitives for light and dark themes. These are the shadcn/ui variable names, so generated
      components pick them up without edits.
 3. **Tailwind v4 exposes the semantic tokens** through `@theme inline`, giving `bg-primary`,
-   `text-muted-foreground`, etc. Components never use raw hex values or Tailwind palette colors
-   (`bg-blue-500`) for brand surfaces.
+   `text-muted-foreground`, etc. Tailwind's default palette is removed (`--color-*: initial`), so classes
+   like `bg-blue-500` generate nothing and components can only use token classes.
 4. Changing the brand means changing primitives, never components.
 
-### Token template (phase 1 fills it in)
+`npm test` runs the contrast suite (`src/styles/contrast.test.ts`) over every token pair in both themes
+(WCAG AA: 4.5:1 for text, 3:1 for UI components and focus). Add a pair there whenever a new
+foreground/background combination is introduced.
 
-```css
-/* src/app/globals.css (excerpt) */
-@import "tailwindcss";
+## Colours
 
-:root {
-  /* Brand primitives: TODO from charter (HEX from the charter, converted to OKLCH) */
-  --acf-primary: TODO;        /* main brand color */
-  --acf-primary-ink: TODO;    /* text on primary, must reach 4.5:1 */
-  --acf-secondary: TODO;
-  --acf-accent: TODO;         /* highlight / call to action */
-  --acf-ink: TODO;            /* darkest neutral, body text */
-  --acf-paper: TODO;          /* lightest neutral, page background */
-  --acf-neutral-100 … 900: TODO; /* neutral scale, derived if the charter gives only 2 neutrals */
+### The green problem
 
-  /* Semantic tokens: shadcn/ui names */
-  --background: var(--acf-paper);
-  --foreground: var(--acf-ink);
-  --primary: var(--acf-primary);
-  --primary-foreground: var(--acf-primary-ink);
-  --secondary: var(--acf-secondary);
-  --secondary-foreground: TODO;
-  --accent: var(--acf-accent);
-  --accent-foreground: TODO;
-  --muted: TODO;  --muted-foreground: TODO;
-  --card: TODO;   --card-foreground: TODO;
-  --popover: TODO; --popover-foreground: TODO;
-  --border: TODO; --input: TODO; --ring: var(--acf-accent);
-  --destructive: TODO;            /* functional red, not from the charter unless it defines one */
-  --success: TODO; --warning: TODO; --info: TODO;  /* functional status colors */
-  --chart-1 … --chart-5: TODO;    /* admin analytics; must be distinguishable for color-blind users */
-  --radius: TODO;                 /* corner style from the charter (sharp / soft / round) */
+Charter green `#72c71e` against white is about **2.1:1**: it fails as text, as a link colour and even as a
+UI boundary (3:1). Against ink it is about **8.6:1**. So, in the light theme:
 
-  --font-sans: TODO;     /* Latin UI font  */
-  --font-arabic: TODO;   /* Arabic UI font */
-  --font-display: TODO;  /* optional headline font */
-}
+- green is a **surface** colour (buttons, tiles, value bullets, the "financial" circle), always with **ink**
+  text on it and a **2 px ink outline** where its edge must be visible (buttons, bullets), exactly like
+  the outlined shapes in the charter;
+- text and links on light backgrounds are **ink**; links are underlined;
+- the focus ring is ink in light mode and green in dark mode.
 
-.dark { /* TODO: dark theme mapping, if the charter allows a dark mode */ }
+In the dark theme green works directly against ink, so it also serves as the outline and focus colour.
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  /* … one line per semantic token … */
-  --font-sans: var(--font-sans);
-  --radius-lg: var(--radius);
-}
+### Primitives (`--acf-*`)
 
-:lang(ar) { font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif; }
-```
-
-**Implemented in phase 1 (placeholder).** `src/app/globals.css` follows this template exactly, with a
-neutral grey scale as the brand primitives (marked `PLACEHOLDER — replace with ACF charter`), so layout
-work isn't blocked and the predecessor's identity isn't carried over (D-022, D-029). Tailwind's default
-palette is removed, so only token classes exist. Placeholder values that differ from shadcn's neutral
-defaults, to pass WCAG AA:
-
-| Token | Light | Dark | Why |
+| Primitive | Value | Origin | Used for |
 |---|---|---|---|
-| `--muted-foreground` | neutral-600 `oklch(0.439 0 0)` | neutral-400 `oklch(0.708 0 0)` | shadcn's light value is 4.3:1 on `--muted` |
-| `--ring` | neutral-600 | neutral-400 | focus outline needs 3:1 against the page |
-| `--input` | neutral-500 | neutral-500 | input borders need 3:1 (1.4.11) |
-| `--destructive` | red-700 | red-400 | readable as text on the background |
+| `--acf-green` | `#72c71e` | Charter | Primary buttons, brand surfaces, charts |
+| `--acf-ink` | `#181414` | Charter | Text (light), page background (dark), secondary surfaces |
+| `--acf-white` | `#ffffff` | Charter | Page background (light), text (dark) |
+| `--acf-green-50` | `#f3faeb` | Derived | `muted` sections (light) |
+| `--acf-green-100` | `#e3f4d1` | Derived | `accent` hover, camo motif (light) |
+| `--acf-green-200` | `#c8e9a4` | Derived | Reserved for borders on green surfaces |
+| `--acf-green-800` | `#2a4512` | Derived | `accent` hover (dark) |
+| `--acf-green-900` | `#1f2c14` | Derived | Camo motif (dark) |
+| `--acf-ink-900` … `--acf-ink-100` | `#221d1d` … `#f3f0f0` | Derived | Warm greys from the ink: cards, borders, muted text, inputs |
+| Red / amber / blue / green-ok | OKLCH | Functional, not in the charter | Errors, warnings, info, success |
 
-`npm test` runs the contrast suite (`src/styles/contrast.test.ts`) over 18 pairs per theme; add a pair
-there whenever a new foreground/background combination is introduced.
+### Semantic mapping
 
-## Colors
+| Token | Light | Dark |
+|---|---|---|
+| `background` / `foreground` | white / ink | ink / white |
+| `card`, `popover` | white | ink-900 |
+| `primary` / `primary-foreground` | green / ink | green / ink |
+| `primary-border` (outline of green elements) | ink | green |
+| `secondary` / `secondary-foreground` | ink / white | white / ink |
+| `muted` / `muted-foreground` | green-50 / ink-600 | ink-800 / ink-400 |
+| `accent` / `accent-foreground` | green-100 / ink | green-800 / white |
+| `brand` / `brand-foreground` (decorative green surfaces) | green / ink | green / ink |
+| `camo` (motif tint) | green-100 | green-900 |
+| `border` / `input` / `ring` | ink-200 / ink-500 / ink | ink-700 / ink-500 / green |
+| `destructive`, `success`, `warning`, `info` | 700 shades, white text | 400 shades, ink text |
+| `chart-1` / `chart-2` | green / ink | green / white |
+| `radius` | `1rem` | `1rem` |
 
-| Token | ACF value | Usage | Status |
-|---|---|---|---|
-| Primary | **TODO** | Header, primary buttons, links | Needs charter |
-| Primary ink | **TODO** | Text/icons on primary | Needs charter + contrast check |
-| Secondary | **TODO** | Secondary surfaces, tags | Needs charter |
-| Accent | **TODO** | Highlights, focus ring, CTAs | Needs charter |
-| Ink (dark neutral) | **TODO** | Body text | Needs charter |
-| Paper (light neutral) | **TODO** | Page background | Needs charter |
-| Neutral scale | **TODO** | Borders, muted text, cards | Derived from ink/paper if not specified |
-| Destructive / success / warning / info | **TODO** | Form errors, status badges | Functional; pick accessible defaults if the charter is silent |
-| Profile-type colors (artist, professional, venue, studio, blog) | **TODO** | Catalogue badges, map pins | Optional; must not rely on color alone |
-| Dark theme | **TODO** (placeholder implemented) | — | Light/dark/system themes ship in phase 1 (D-034); ACF to confirm and provide dark colours |
-
-Accessibility requirement (WCAG 2.2 AA): text contrast ≥ 4.5:1 (≥ 3:1 for large text), UI component
-and focus-indicator contrast ≥ 3:1, in every theme. Phase 1 adds an automated contrast check over the
-token pairs, and if a charter color fails, a darker or lighter *tint for UI use* is derived and documented here.
+**Dark mode** (D-034, confirmed by ACF): light, dark and system themes, defaulting to the visitor's system
+setting. The dark theme inverts the charter's own "white wordmark on an ink tile" variant: ink page,
+white text, green for actions and outlines.
 
 ## Typography
 
-| Role | ACF font | Status | Notes |
+| Role | Charter font | Web font in use | Notes |
 |---|---|---|---|
-| Arabic UI/body | **TODO** | Needs charter | Must have good Arabic shaping, several weights, and an open license for web use |
-| Latin UI/body (fr/en) | **TODO** | Needs charter | Must include French diacritics |
-| Display/headlines | **TODO** | Optional | Only if the charter defines one; also needs an Arabic counterpart |
+| Display / headlines | Rokiest (commercial) | Outfit 800, `--font-display` | Rokiest is a heavy geometric grotesque; Outfit is the closest open-licence match. The charter's +40 tracking belongs to Rokiest and is not applied to the stand-in |
+| Latin body (fr/en) | GC Arturm Light (commercial) | Outfit (variable), `--font-latin` | Geometric, light weights available, French diacritics |
+| Arabic body and headlines | — (the charter has no Arabic face) | Alexandria (variable), `--font-arabic` | Geometric Kufi-style Arabic that sits well next to Outfit; `:lang(ar)` switches the body font |
 
-**Placeholder in use (phase 1, D-030):** IBM Plex Sans (variable, Latin) + IBM Plex Sans Arabic 400/600, via
-`next/font/google` (self-hosted at build), exposed as `--font-latin` / `--font-arabic`.
+All fonts load through `next/font/google`: downloaded at build time and self-hosted, so visitors make no
+requests to Google. If ACF buys web licences for Rokiest and GC Arturm, add the files under
+`src/fonts/` and switch to `next/font/local`; only `src/app/[locale]/layout.tsx` changes.
 
-If the charter doesn't specify web fonts, here are proposals to pick from (all open-license, on Google Fonts, loadable
-with `next/font` so they're self-hosted):
-- **IBM Plex Sans Arabic + IBM Plex Sans**: designed as a pair, neutral and institutional.
-- **Readex Pro**: one variable family covering both Arabic and Latin, contemporary.
-- **Noto Kufi Arabic + Inter**: geometric Arabic with a very legible Latin UI font.
-
-Rules: Arabic text gets a slightly larger size and line height than Latin at the same step
-(type scale TODO), no letter-spacing on Arabic, no synthetic bold or italics in Arabic.
+Rules: no letter-spacing on Arabic, no synthetic bold or italics in Arabic, Arabic text gets a slightly
+larger line height than Latin.
 
 ## Logo
 
 | Item | Status |
 |---|---|
-| Primary logo (SVG) | **TODO**, not in repo. Placeholder: the text "ACF" in a primary-coloured box (`src/components/layout/logo.tsx`) and `src/app/icon.svg` |
-| Variants: horizontal / stacked / symbol only | **TODO** |
-| Monochrome black and white versions | **TODO** |
-| Arabic and Latin lockups (if the name is written differently per language) | **TODO** |
-| Clear-space rule (minimum margin around the logo) | **TODO** |
-| Minimum size (screen) | **TODO** |
-| Allowed backgrounds / forbidden uses (stretch, recolor, effects) | **TODO** |
-| Favicon set (SVG + 32 px ICO + 180 px Apple touch + 192/512 px PWA) | **TODO**, generated from the symbol |
-| Social share image template (1200×630) per locale | **TODO** |
+| Wordmark ("Amplify" plate) | **Raster mask** `public/brand/amplify-wordmark.png` (460×159), traced from the one-pager; header and footer (`Wordmark` in `src/components/layout/logo.tsx`) |
+| Full lockup (wordmark + CREATIVE FOUNDATION) | **Raster mask** `public/brand/amplify-lockup.png` (1652×665); About hero (`Lockup`) |
+| Favicon / Apple touch icon | `src/app/icon.png` (512) and `src/app/apple-icon.png` (180): green rounded square with an ink "A" — a stand-in until a symbol is designed |
+| Vector logo (SVG) | **TODO** — needed for crisp rendering at every size and for print; replaces the masks with no component changes |
+| Symbol-only mark | **TODO** — the favicon would use it |
+| Clear space, minimum size, forbidden uses | **TODO** — not in the charter. Working rule until ACF defines one (proposed): keep the width of the "A" clear around the wordmark and never show it below 24 px high (the header uses 32 px) |
+| Arabic lockup | Not needed: the brand name stays "Amplify" in Latin script on the Arabic site (the one-pager does the same) |
+| Social share image (1200×630) per locale | **TODO** (phase 9) |
 
-RTL note: **logos are never mirrored** in the Arabic layout; only their position in the header
-moves (start ↔ end). Directional icons (arrows, chevrons, "back") are mirrored.
+The masks are single-colour alpha masks, so the logo takes the text colour of wherever it sits (ink on
+white and green, white on ink) — the same two variants the charter shows. **Logos are never mirrored** in
+the Arabic layout; only their position in the header moves (start ↔ end).
 
 ## Imagery, iconography, tone
 
 | Item | Status |
 |---|---|
-| Photo style (color/black & white, grain, crops) | **TODO** |
-| Illustration or pattern elements (e.g. a Tunisian motif) | **TODO** |
-| Icon set | Proposal: `lucide-react` (already used by shadcn/ui), stroke width to match the charter |
-| Voice and tone in ar / fr / en (formal "vous" vs informal "tu"; Modern Standard Arabic vs Tunisian dialect in UI copy) | **TODO**, decision needed |
+| Motif | Pixel camouflage, pale green on white (charter); dark green on ink in dark mode. Decorative, `aria-hidden` |
+| Shapes | Big rounded corners (`rounded-2xl` cards, pill buttons), 2 px outlines, filled/outlined circles for the three axes, square bullets for values |
+| Photo style | **TODO** — the charter shows a grain texture; photos arrive with the catalogue (phase 3) |
+| Icon set | `lucide-react`, stroke width default |
+| Voice and tone | Follow the one-pager: short, direct sentences, first person plural ("we", "nous", "نحن"); Arabic in Modern Standard Arabic. Interface copy addresses visitors politely (*vous*, plural Arabic forms) |
+| Official copy | The About page and home use the one-pager text verbatim in each language (D-041) |
 
-## What to put in `/brand`
+## What is in `/brand`
 
 ```
 brand/
-├── charter.pdf                 the graphic charter (source of truth)
-├── logo/
-│   ├── acf-logo-primary.svg
-│   ├── acf-logo-stacked.svg
-│   ├── acf-symbol.svg
-│   ├── acf-logo-mono-black.svg
-│   ├── acf-logo-mono-white.svg
-│   └── acf-logo-{ar,fr}.svg    only if lockups differ per language
-├── colors.md                   name, HEX, RGB (and CMYK/Pantone if print matters)
-├── fonts.md                    font names, weights, license / source (or the font files + licenses)
-└── templates/                  social post / poster / OG image templates (optional)
+├── charte.png                      the graphic charter: logo, fonts, colours, logo on colour
+├── ACF one-pager_page-0001.jpg     English, page 1 (who we are, values, members)
+├── ACF one-pager_page-0002.jpg     English, page 2 (three axes, join us)
+├── ACF one-pager_page-0003.jpg     French, page 1
+├── ACF one-pager_page-0004.jpg     French, page 2
+├── ACF one-pager_page-0005.jpg     Arabic, page 1
+└── ACF one-pager_page-0006.jpg     Arabic, page 2
 ```
 
-SVG is strongly preferred for logos (PNG at ≥ 1024 px is the fallback).
+Still wanted: `logo/*.svg` (primary, stacked, symbol, mono black, mono white), font licence details, and
+the association's email, website and Instagram (the one-pager prints `[EMAIL]`, `[WEBSITE]`, `[INSTAGRAM]`
+placeholders).
 
 ## Legacy reference: AltScene TN (do **not** use as ACF brand)
 

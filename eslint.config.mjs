@@ -55,10 +55,7 @@ export default defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
-    '.open-next/**',
-    '.wrangler/**',
     'playwright-report/**',
     'test-results/**',
-    'cloudflare-env.d.ts',
   ]),
 ]);

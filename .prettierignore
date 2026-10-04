@@ -1,11 +1,8 @@
 # Generated / vendored
 .next/
-.open-next/
-.wrangler/
 node_modules/
 package-lock.json
 next-env.d.ts
-cloudflare-env.d.ts
 playwright-report/
 test-results/
 coverage/

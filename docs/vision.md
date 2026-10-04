@@ -2,9 +2,14 @@
 
 ## Who we are
 
-**ACF** is a cultural association based in Tunisia that supports the music and arts scene. The
-association works under the oversight of a supervising authority, referred to here as
-**"al wichah thakafi"** (official name and spelling to be confirmed).
+**ACF — Amplify Creative Foundation** is a Tunisian association and *a home for Tunisia's alternative
+music scene*. In its own words ([`/brand`](../brand) one-pager): it was born from a need to recognize
+the music that lives outside the mainstream — rap, tarab and Arab pop already have their stages; rock,
+jazz, metal, funk and every alternative sound deserve theirs. It stands for an inclusive, safe, fair,
+autonomous and decentralized scene, acts on three axes (financial, artistic, educational) and counts
+individuals and university music clubs among its members. The association works under the oversight of
+a supervising authority, referred to here as **"al wichah thakafi"** (official name and spelling to be
+confirmed).
 
 This repository used to host *Tunisia Music Scene / AltScene TN*, a community archive of Tunisian
 artists. ACF is taking it over and rebuilding it around a new vision, a new graphic charter and a

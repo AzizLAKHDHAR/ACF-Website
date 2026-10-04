@@ -12,14 +12,11 @@ dist
 dist-ssr
 *.local
 
-# Next.js / OpenNext / Wrangler
+# Next.js / Vercel
 .next/
 out/
-.open-next/
-.wrangler/
-.dev.vars*
+.vercel/
 next-env.d.ts
-cloudflare-env.d.ts
 *.tsbuildinfo
 
 # Tests
