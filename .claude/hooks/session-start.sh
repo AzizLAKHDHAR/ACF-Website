@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # SessionStart hook: make a fresh Claude Code cloud session ready to work.
 #   1. install JS dependencies with the package manager matching the lockfile
-#   2. pre-fetch the MCP server packages pinned in .mcp.json so they start fast
+#   2. export the pre-installed Chromium path for Playwright
+#   3. pre-fetch the MCP server packages pinned in .mcp.json so they start fast
 #
 # Idempotent and non-interactive. Runs only in Claude Code on the web
 # (CLAUDE_CODE_REMOTE=true); locally, install dependencies yourself.
@@ -31,7 +32,13 @@ if [[ -f package.json ]]; then
   fi
 fi
 
-# 2. Warm the npx cache for every `package@version` spec in .mcp.json.
+# 2. Point Playwright (tests, screenshots) at the container's pre-installed Chromium, whose
+#    revision may differ from the one @playwright/test expects (see playwright.config.ts).
+if [[ -x /opt/pw-browsers/chromium && -n "${CLAUDE_ENV_FILE:-}" ]]; then
+  echo 'export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/opt/pw-browsers/chromium' >> "$CLAUDE_ENV_FILE"
+fi
+
+# 3. Warm the npx cache for every `package@version` spec in .mcp.json.
 #    Best effort: a failure here must not block the session.
 if [[ -f .mcp.json ]]; then
   specs=$(node -e '

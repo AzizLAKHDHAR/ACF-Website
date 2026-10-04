@@ -15,52 +15,63 @@ scene. It has four access levels: public · members · board · admin. Read thes
 
 ## Current state
 
-**Phase 0 (planning) is done. Phase 1 is next.** `src/` still contains the legacy *AltScene TN* Vite SPA
-(see the audit). **Don't extend or fix it**; phase 1 deletes it. Update this section at the end of every phase.
+**Phase 1 (foundation) is done; phase 2 (data model, auth, RLS, seed) is next.** The app is a
+trilingual Next.js shell with placeholder pages for every route. There is no database and no auth
+yet: `src/lib/auth/guards.ts` is a stub that makes every hidden area answer 404 (dev-only preview
+with `ACF_PREVIEW_HIDDEN_AREAS=1`). Colours, fonts and logo are placeholders until the ACF charter
+lands in `/brand`. Update this section at the end of every phase.
 
 ## Stack
 
-Next.js 16 (App Router, `proxy.ts`) · React 19 · TypeScript 6.0 (`strict`) · Tailwind CSS v4 · shadcn/ui ·
+Next.js 16 (App Router; Edge `middleware.ts`, not `proxy.ts` — D-031) · React 19 · TypeScript 6.0 (`strict`) · Tailwind CSS v4 · shadcn/ui ·
 next-intl (`ar` RTL, `fr`, `en`) · Supabase (Postgres + RLS, Auth, Storage) · Zod · React Hook Form ·
-Resend + React Email · Vitest · Playwright · pgTAP · deploy with `@opennextjs/cloudflare` (Workers), or Vercel Hobby as fallback.
-Package manager: **npm** only. Node 22.
+Resend + React Email · Vitest · Playwright + axe · pgTAP · next-themes (light/dark/system) · deploy with
+`@opennextjs/cloudflare` on Workers (D-032). ESLint 9 (not 10: `eslint-config-next` plugins). Package manager: **npm** only. Node 22.
 
 ## Commands
 
-Target commands (created in phase 1/2; keep this table true):
+Keep this table true. Rows marked *phase 2* don't exist yet.
 
 | Command | Does |
 |---|---|
-| `npm run dev` | Dev server |
+| `npm run dev` | Dev server (Turbopack). `ACF_PREVIEW_HIDDEN_AREAS=1` shows the hidden shells |
 | `npm run build` / `npm start` | Production build / serve |
-| `npm run lint` | ESLint (zero warnings) |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest unit tests |
-| `npm run test:e2e` | Playwright (all three locales) |
-| `npm run i18n:check` | Message files have identical keys |
-| `npx supabase start` / `db reset` | Local stack / rebuild schema + seed (needs Docker) |
-| `npx supabase migration new <name>` | New migration file (the only way to change the schema) |
-| `npx supabase test db` | pgTAP RLS suite |
-| `npm run db:types` | Regenerate `src/types/database.ts` |
-| `npm run preview:cf` | OpenNext build + local Workers preview |
+| `npm run lint` | ESLint, zero warnings (bans physical-direction classes and JSX text literals in `src/`) |
+| `npm run typecheck` | `next typegen && tsc --noEmit` (route types like `PageProps` are generated) |
+| `npm run format` / `format:check` | Prettier + Tailwind class sorting |
+| `npm test` | Vitest: unit tests, token contrast (AA), config ↔ messages, `.env.example` completeness |
+| `npm run test:e2e` | Playwright on the production build: desktop + mobile, ar/fr/en, axe |
+| `npm run i18n:check` | Message files have identical keys and placeholders |
+| `npm run screenshots` | Shell screenshots, every locale × theme × viewport → `docs/screenshots/phase-1/` |
+| `npm run lighthouse` | Mobile Lighthouse on the home pages (needs `npm start`), fails below 90 |
+| `npm run cf:build` / `cf:size` | OpenNext Workers build / size vs the 3 MiB free limit |
+| `npm run preview:cf` / `deploy:cf` | Run the Worker locally in workerd / deploy (needs credentials) |
+| `npx supabase start` / `db reset` | *phase 2* — local stack / rebuild schema + seed (needs Docker) |
+| `npx supabase migration new <name>` | *phase 2* — new migration (the only way to change the schema) |
+| `npx supabase test db` | *phase 2* — pgTAP RLS suite |
+| `npm run db:types` | *phase 2* — regenerate `src/types/database.ts` |
 
-Legacy commands that work **today**: `npm run dev` (Vite, port 8080) and `npm run build`. `npm run lint` currently crashes and
-there are no tests (see the audit).
+Before pushing: `npm run lint && npm run typecheck && npm run format:check && npm run i18n:check && npm test && npm run build && npm run test:e2e`.
 
 ## Folder conventions
 
 ```
 src/app/[locale]/(public|auth|account|member|board|admin)/…   routes only, thin
-src/app/api/cron/[job] · src/app/api/webhooks/…               service-role code lives ONLY here
-src/features/<domain>/{components,queries.ts,actions.ts,schemas.ts}
-src/components/ui        shadcn/ui (generated; restyle through tokens, not edits)
-src/components/layout    header, footer, nav, locale switcher
-src/lib/supabase/        server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role, server-only)
-src/lib/auth/guards.ts   requireUser() · requireRole()
-src/i18n/ · messages/{ar,fr,en}.json · src/emails/
-supabase/migrations · supabase/tests · supabase/seed.sql
-tests/e2e · docs/ · scripts/
+src/app/api/cron/[job] · src/app/api/webhooks/…               service-role code lives ONLY here (phase 2+)
+src/features/<domain>/{components,queries.ts,actions.ts,schemas.ts}   from phase 3
+src/components/ui        shadcn/ui (hand-ported v4 source; restyle through tokens, not edits)
+src/components/layout    header, footer, nav, locale switcher, theme toggle, shells
+src/config/              navigation.ts (every menu) · icons.ts
+src/lib/                 auth/guards.ts · metadata.ts · i18n-params.ts · env.ts · routes/ (page factories)
+src/lib/supabase/        server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role) — phase 2
+src/i18n/ · messages/{ar,fr,en}.json · src/middleware.ts · src/emails/ (phase 2+)
+supabase/migrations · supabase/tests · supabase/seed.sql                  — phase 2
+tests/e2e · tests/screenshots · docs/ · scripts/
 ```
+
+Every layout and page under `app/[locale]` starts with `await resolveLocaleParam(params)`
+(validates the locale and keeps the route static). Page copy lives in `messages/*.json`; menus come
+from `src/config/navigation.ts`.
 
 Naming: files and folders `kebab-case`, React components `PascalCase`, TS identifiers `camelCase`, SQL `snake_case`.
 Unit tests sit next to the code (`*.test.ts`).
@@ -161,8 +172,20 @@ Versions are pinned in `.mcp.json`. The wrappers live in `scripts/mcp/`. Cloud s
 ## Cloud environment notes
 
 - The environment's network policy may block hosts (currently `context7.com`, `ui.shadcn.com`,
-  `supabase.com`, `api.supabase.com`, `nextjs.org`, `opennext.js.org`). If you hit a 403 from the proxy,
-  report the host. Don't work around it.
-- Chromium is pre-installed at `/opt/pw-browsers`. Don't run `playwright install`. Use
-  `executablePath: '/opt/pw-browsers/chromium'` if a pinned Playwright version wants another build.
+  `supabase.com`, `api.supabase.com`, `api.cloudflare.com`, `nextjs.org`, `opennext.js.org`). If you hit a
+  403 from the proxy, report the host. Don't work around it. Next.js docs ship in `node_modules/next/dist/docs/`.
+- Chromium is pre-installed at `/opt/pw-browsers`. Don't run `playwright install`; the session hook exports
+  `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`, which `playwright.config.ts` uses.
+- Don't add `lighthouse` (or anything pulling `@opentelemetry/api`) as a dependency: it breaks the OpenNext
+  build (D-033). `npm run lighthouse` runs it through `npx`.
 - The container is ephemeral: anything not committed and pushed is lost.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

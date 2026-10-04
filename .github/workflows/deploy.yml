@@ -1,0 +1,60 @@
+name: Deploy (Cloudflare Workers)
+
+# Opt-in: set the repository variable CLOUDFLARE_DEPLOY_ENABLED=true and the secrets
+# CLOUDFLARE_API_TOKEN (Workers Scripts: Edit) and CLOUDFLARE_ACCOUNT_ID. Set the variable SITE_URL too,
+# otherwise canonical URLs, hreflang and the sitemap point at http://localhost:3000.
+# main → production Worker; pull requests from this repository → preview version (URL in the job summary).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL }}
+
+jobs:
+  deploy:
+    if: >-
+      vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' &&
+      (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.event_name == 'push' && 'production' || 'preview' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: OpenNext build
+        run: npm run cf:build
+
+      - name: Deploy production
+        if: github.event_name == 'push'
+        run: npx opennextjs-cloudflare deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Upload preview version
+        if: github.event_name == 'pull_request'
+        run: |
+          npx opennextjs-cloudflare upload | tee upload.log
+          url=$(grep -Eo 'https://[^ ]+workers\.dev' upload.log | head -1 || true)
+          echo "Preview: ${url:-see the upload log}" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

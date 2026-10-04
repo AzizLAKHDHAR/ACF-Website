@@ -1,0 +1,254 @@
+{
+  "metadata": {
+    "siteName": "ACF",
+    "title": "ACF — Tunisia's music and arts scene",
+    "description": "ACF is a cultural association supporting Tunisia's music and arts scene: news, blogs, artists, professionals, venues, studios and events."
+  },
+  "localeNames": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English"
+  },
+  "common": {
+    "skipToContent": "Skip to main content",
+    "home": "Home",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu",
+    "language": "Language",
+    "changeLanguage": "Change language",
+    "theme": {
+      "label": "Theme",
+      "toggle": "Change theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "signIn": "Sign in",
+    "backToSite": "Back to the public site",
+    "comingSoon": "Coming soon",
+    "placeholderNotice": "This page is a placeholder. Its content arrives in a later phase of the rebuild."
+  },
+  "nav": {
+    "primary": "Main navigation",
+    "home": "Home",
+    "news": "News",
+    "events": "Events",
+    "discover": "Discover",
+    "artists": "Artists",
+    "professionals": "Professionals",
+    "venues": "Venues",
+    "studios": "Studios",
+    "blogs": "Blogs",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms of use"
+  },
+  "footer": {
+    "label": "Footer",
+    "tagline": "A cultural association supporting Tunisia's music and arts scene.",
+    "discover": "Discover",
+    "association": "Association",
+    "legal": "Legal",
+    "rights": "© {year} ACF. All rights reserved."
+  },
+  "home": {
+    "title": "Supporting Tunisia's music and arts scene",
+    "intro": "ACF brings together artists, professionals, venues and studios. Soon you will find here the news of the scene, blogs, catalogues and upcoming events.",
+    "ctaArtists": "Discover artists",
+    "ctaEvents": "See events",
+    "sectionsTitle": "Explore the scene"
+  },
+  "pages": {
+    "news": {
+      "title": "News",
+      "description": "News from the Tunisian music and arts scene."
+    },
+    "events": {
+      "title": "Events",
+      "description": "Concerts, festivals and gatherings across Tunisia."
+    },
+    "artists": {
+      "title": "Artists",
+      "description": "Musicians, bands, collectives and DJs."
+    },
+    "professionals": {
+      "title": "Professionals",
+      "description": "Sound engineers, technicians, managers and other professionals of the scene."
+    },
+    "venues": {
+      "title": "Venues",
+      "description": "Places that host live music and performances."
+    },
+    "studios": {
+      "title": "Studios",
+      "description": "Recording, mixing, mastering and rehearsal studios."
+    },
+    "blogs": {
+      "title": "Blogs",
+      "description": "Writing about the scene by independent blog owners."
+    },
+    "about": {
+      "title": "About ACF",
+      "description": "Who we are and what we do."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "How to reach the association."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "How we collect and protect personal data."
+    },
+    "terms": {
+      "title": "Terms of use",
+      "description": "The rules for using this website."
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Access your account and your association space."
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Create an account to manage a public profile."
+    },
+    "account": {
+      "title": "My account",
+      "description": "Your account settings and public profiles."
+    }
+  },
+  "areas": {
+    "label": "Section navigation",
+    "member": {
+      "name": "Members' space",
+      "sections": {
+        "dashboard": {
+          "title": "Dashboard",
+          "description": "Your next meetings, tasks, announcements and open polls."
+        },
+        "meetings": {
+          "title": "Meetings",
+          "description": "Upcoming meetings and your RSVP."
+        },
+        "tasks": {
+          "title": "Tasks",
+          "description": "Tasks assigned to you and tasks open to volunteers."
+        },
+        "announcements": {
+          "title": "Announcements",
+          "description": "Board posts and messages from the Discord channel."
+        },
+        "polls": {
+          "title": "Availability polls",
+          "description": "Vote on dates and options."
+        },
+        "volunteer": {
+          "title": "Volunteering",
+          "description": "Sign up for shifts at upcoming events."
+        },
+        "documents": {
+          "title": "Documents",
+          "description": "The association's document library."
+        },
+        "directory": {
+          "title": "Members",
+          "description": "The members' directory."
+        }
+      }
+    },
+    "board": {
+      "name": "Board space",
+      "sections": {
+        "overview": {
+          "title": "Overview",
+          "description": "The board's dashboard."
+        },
+        "tasks": {
+          "title": "Tasks",
+          "description": "Create and assign tasks."
+        },
+        "meetings": {
+          "title": "Meetings",
+          "description": "Plan meetings and follow attendance."
+        },
+        "announcements": {
+          "title": "Announcements",
+          "description": "Write announcements and post them to Discord."
+        },
+        "polls": {
+          "title": "Polls",
+          "description": "Create availability polls."
+        },
+        "volunteering": {
+          "title": "Volunteering",
+          "description": "Organise volunteer shifts for events."
+        },
+        "news": {
+          "title": "News",
+          "description": "Write and publish ACF news."
+        },
+        "events": {
+          "title": "Events",
+          "description": "Review event proposals and publish events."
+        },
+        "finance": {
+          "title": "Finances",
+          "description": "Ledger, budgets per project, receipts and exports."
+        },
+        "vault": {
+          "title": "Legal vault",
+          "description": "Statutes, minutes and other legal documents."
+        },
+        "correspondence": {
+          "title": "Correspondence",
+          "description": "Exchanges with the supervising authority, from draft to archive."
+        }
+      }
+    },
+    "admin": {
+      "name": "Administration",
+      "sections": {
+        "overview": {
+          "title": "Overview",
+          "description": "Key figures and platform health."
+        },
+        "users": {
+          "title": "Users and roles",
+          "description": "Grant roles and send invitations."
+        },
+        "approvals": {
+          "title": "Approvals",
+          "description": "Public profiles waiting for review."
+        },
+        "moderation": {
+          "title": "Moderation",
+          "description": "Reports and content to review."
+        },
+        "audit": {
+          "title": "Audit log",
+          "description": "Every privileged action, in order."
+        },
+        "settings": {
+          "title": "Site settings",
+          "description": "Public information and site options."
+        },
+        "integrations": {
+          "title": "Integrations",
+          "description": "Email, Discord, e-signature and scheduled jobs."
+        }
+      }
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to home"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. You can try again.",
+    "retry": "Try again",
+    "backHome": "Back to home"
+  }
+}

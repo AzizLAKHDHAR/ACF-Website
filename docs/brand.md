@@ -73,9 +73,21 @@
 :lang(ar) { font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif; }
 ```
 
-**Until the charter arrives**, phase 1 uses shadcn/ui's neutral base palette as a clearly-labelled
-placeholder (`/* PLACEHOLDER — replace with ACF charter */`), so layout work isn't blocked and the
-predecessor's identity isn't carried over.
+**Implemented in phase 1 (placeholder).** `src/app/globals.css` follows this template exactly, with a
+neutral grey scale as the brand primitives (marked `PLACEHOLDER — replace with ACF charter`), so layout
+work isn't blocked and the predecessor's identity isn't carried over (D-022, D-029). Tailwind's default
+palette is removed, so only token classes exist. Placeholder values that differ from shadcn's neutral
+defaults, to pass WCAG AA:
+
+| Token | Light | Dark | Why |
+|---|---|---|---|
+| `--muted-foreground` | neutral-600 `oklch(0.439 0 0)` | neutral-400 `oklch(0.708 0 0)` | shadcn's light value is 4.3:1 on `--muted` |
+| `--ring` | neutral-600 | neutral-400 | focus outline needs 3:1 against the page |
+| `--input` | neutral-500 | neutral-500 | input borders need 3:1 (1.4.11) |
+| `--destructive` | red-700 | red-400 | readable as text on the background |
+
+`npm test` runs the contrast suite (`src/styles/contrast.test.ts`) over 18 pairs per theme; add a pair
+there whenever a new foreground/background combination is introduced.
 
 ## Colors
 
@@ -90,7 +102,7 @@ predecessor's identity isn't carried over.
 | Neutral scale | **TODO** | Borders, muted text, cards | Derived from ink/paper if not specified |
 | Destructive / success / warning / info | **TODO** | Form errors, status badges | Functional; pick accessible defaults if the charter is silent |
 | Profile-type colors (artist, professional, venue, studio, blog) | **TODO** | Catalogue badges, map pins | Optional; must not rely on color alone |
-| Dark theme | **TODO** | — | Decide: does ACF want a dark mode? |
+| Dark theme | **TODO** (placeholder implemented) | — | Light/dark/system themes ship in phase 1 (D-034); ACF to confirm and provide dark colours |
 
 Accessibility requirement (WCAG 2.2 AA): text contrast ≥ 4.5:1 (≥ 3:1 for large text), UI component
 and focus-indicator contrast ≥ 3:1, in every theme. Phase 1 adds an automated contrast check over the
@@ -103,6 +115,9 @@ token pairs, and if a charter color fails, a darker or lighter *tint for UI use*
 | Arabic UI/body | **TODO** | Needs charter | Must have good Arabic shaping, several weights, and an open license for web use |
 | Latin UI/body (fr/en) | **TODO** | Needs charter | Must include French diacritics |
 | Display/headlines | **TODO** | Optional | Only if the charter defines one; also needs an Arabic counterpart |
+
+**Placeholder in use (phase 1, D-030):** IBM Plex Sans (variable, Latin) + IBM Plex Sans Arabic 400/600, via
+`next/font/google` (self-hosted at build), exposed as `--font-latin` / `--font-arabic`.
 
 If the charter doesn't specify web fonts, here are proposals to pick from (all open-license, on Google Fonts, loadable
 with `next/font` so they're self-hosted):
@@ -117,7 +132,7 @@ Rules: Arabic text gets a slightly larger size and line height than Latin at the
 
 | Item | Status |
 |---|---|
-| Primary logo (SVG) | **TODO**, not in repo |
+| Primary logo (SVG) | **TODO**, not in repo. Placeholder: the text "ACF" in a primary-coloured box (`src/components/layout/logo.tsx`) and `src/app/icon.svg` |
 | Variants: horizontal / stacked / symbol only | **TODO** |
 | Monochrome black and white versions | **TODO** |
 | Arabic and Latin lockups (if the name is written differently per language) | **TODO** |

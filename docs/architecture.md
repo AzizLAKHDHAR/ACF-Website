@@ -12,10 +12,10 @@ flowchart LR
     U[Visitor / user]
   end
   subgraph Edge["Cloudflare Workers (OpenNext) — or Vercel Hobby"]
-    P[proxy.ts<br/>locale routing + session refresh]
+    P[middleware.ts · Edge<br/>locale routing + session refresh]
     RSC[Next.js App Router<br/>Server Components / Server Actions]
     API[Route handlers<br/>/api/cron/* · /api/webhooks/*]
-    C[(Incremental cache<br/>R2)]
+    C[(Incremental cache<br/>static assets → R2 from phase 3)]
   end
   subgraph Supabase["Supabase (free)"]
     A[Auth]
@@ -50,7 +50,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 
 | Concern | Choice | Version at planning time | Notes |
 |---|---|---|---|
-| Framework | Next.js App Router | 16.3.x | `proxy.ts` (replaces `middleware.ts` in 16), React Server Components |
+| Framework | Next.js App Router | 16.3.8 | Edge `middleware.ts` rather than Node `proxy.ts` (D-031), React Server Components |
 | UI runtime | React | 19.x | |
 | Language | TypeScript | **6.0.x** | 7.0 is out, but `typescript-eslint` supports `<6.1`; revisit later |
 | Styling | Tailwind CSS v4 | 4.3.x | CSS-first `@theme`, logical properties for RTL |
@@ -94,8 +94,11 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 │   │   │   └── webhooks/signature/[provider]/route.ts
 │   │   ├── robots.ts · sitemap.ts · manifest.ts
 │   ├── components/
-│   │   ├── ui/                    shadcn/ui (generated)
-│   │   └── layout/                header, footer, nav, locale switcher, shells
+│   │   ├── ui/                    shadcn/ui (hand-ported v4 source, D-028)
+│   │   └── layout/                header, footer, nav, locale switcher, theme toggle, shells
+│   ├── config/                    navigation.ts (every menu) · icons.ts
+│   ├── middleware.ts              next-intl locale negotiation (Edge, D-031)
+│   ├── styles/                    token parsing for the contrast test
 │   ├── features/<domain>/         profiles, events, posts, meetings, tasks, announcements,
 │   │                              polls, volunteering, documents, finance, correspondence, admin
 │   │   ├── components/            domain UI
@@ -127,7 +130,8 @@ change URLs. They give each access level its own layout, and the layout runs its
 | `(board)` | `/{locale}/board/…` | `requireRole('board')` | Dynamic, `noindex` |
 | `(admin)` | `/{locale}/admin/…` | `requireRole('admin')` | Dynamic, `noindex` |
 
-Guard behaviour: not signed in → redirect to `/{locale}/login?next=…`. Signed in without the
+Guard behaviour (from phase 2; in phase 1 the stub guards always answer 404, with a development-only
+preview via `ACF_PREVIEW_HIDDEN_AREAS=1`, D-035): not signed in → redirect to `/{locale}/login?next=…`. Signed in without the
 required role → `notFound()`, so hidden areas don't reveal that they exist. `robots.ts` disallows
 `/*/member`, `/*/board`, `/*/admin`, `/*/account`.
 
@@ -430,7 +434,7 @@ Rules:
 ```mermaid
 sequenceDiagram
   actor U as User
-  participant P as proxy.ts
+  participant P as middleware.ts
   participant N as Next.js (RSC / Action)
   participant A as Supabase Auth
   participant DB as Postgres (RLS)
@@ -458,7 +462,7 @@ sequenceDiagram
 
 - **Methods:** email + password and email magic link/OTP. Google OAuth is optional (open question).
   Email confirmation is required.
-- **Session:** `@supabase/ssr` cookies. `proxy.ts` composes the next-intl middleware with Supabase
+- **Session:** `@supabase/ssr` cookies. `middleware.ts` composes the next-intl middleware with Supabase
   session refresh.
 - **Association access:** a user signs up normally. The admin then grants a role from `/admin/users`,
   or sends an invitation that attaches the role when the invited email signs in for the first time.
@@ -545,6 +549,8 @@ after 7 days of inactivity. Fallbacks: Cloudflare Cron Triggers, or Supabase `pg
 
 **Primary target: Cloudflare Workers via `@opennextjs/cloudflare`.** It allows non-commercial *and*
 commercial use, includes generous requests, uses R2 for the incremental cache, and serves static assets for free.
+Phase 1 confirmed it as the target (D-032): the Worker reads prerendered pages from the static-assets
+incremental cache (`open-next.config.ts`); phase 3 switches to the R2 cache when pages start revalidating.
 
 **Fallback: Vercel Hobby.** It is the simplest option, but its terms limit Hobby to personal,
 non-commercial use (donations are fine; selling tickets or services is not). Kept as the fallback
@@ -560,11 +566,14 @@ in case Workers limits bite. The app code stays portable: no platform-specific A
 | GitHub Actions: free on public repos (2,000 min/month if private) | Repo made private | Keep CI lean, cache npm |
 
 ### CI/CD (GitHub Actions)
-- `ci.yml` on every PR: install → lint → typecheck → message-key parity check → unit tests →
-  build → Supabase local stack (`supabase start`) → `supabase db reset` → `supabase test db` (pgTAP
-  RLS suite) → Playwright e2e against the built app → bundle-size check.
-- `deploy.yml`: on push to `main`, OpenNext build and `wrangler deploy` with `CLOUDFLARE_API_TOKEN`.
-  PR previews via `wrangler versions upload`.
+- `ci.yml` on every PR and on `main` (**in place since phase 1**): install → lint → typecheck →
+  format check → message-key parity → unit tests (incl. token contrast) → build → Playwright e2e
+  (desktop + mobile, three locales, axe) — and, in a parallel job, the OpenNext build plus the
+  Worker size budget (`npm run cf:size`, fails above 3 MiB gzip). Phase 2 adds the Supabase local
+  stack (`supabase start` → `db reset` → `supabase test db`, the pgTAP RLS suite).
+- `deploy.yml` (**in place, opt-in**): when the repository variable `CLOUDFLARE_DEPLOY_ENABLED=true`
+  and the `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets exist, `main` runs
+  `opennextjs-cloudflare deploy` and pull requests from this repository upload a preview version.
 - `db-migrate.yml`: applies `supabase/migrations` to **dev** automatically on merge, and to **prod**
   only after manual approval (GitHub Environment `production` with required reviewer).
 
@@ -579,16 +588,19 @@ in case Workers limits bite. The app code stays portable: no platform-specific A
 | `DISCORD_BOT_TOKEN`, `DISCORD_ANNOUNCEMENTS_CHANNEL_ID`, `DISCORD_WEBHOOK_URL_ANNOUNCEMENTS`, `DISCORD_WEBHOOK_URL_EVENTS` | server | Discord sync |
 | `CRON_SECRET` | server + GitHub secret | Authenticates cron calls |
 | `SIGNATURE_PROVIDER` (`manual`/`documenso`/`docuseal`), `SIGNATURE_API_URL`, `SIGNATURE_API_KEY`, `SIGNATURE_WEBHOOK_SECRET` | server | E-signature |
-| `TURNSTILE_SITE_KEY` (public), `TURNSTILE_SECRET_KEY` | mixed | Bot protection |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public), `TURNSTILE_SECRET_KEY` | mixed | Bot protection |
 | `BACKUP_AGE_RECIPIENT` | GitHub secret | Public key for encrypting backups |
 | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DEV_PROJECT_REF` | developer machine / Claude env only | Supabase MCP server (dev project) |
 
 ## 11. Risks and open technical questions
 
-1. **OpenNext + Next 16 `proxy.ts` / Cache Components support.** Verify in phase 1 with a deployed
-   shell before building on it.
-2. **Worker size limit.** Decide primary platform at the end of phase 1 based on measured size and CPU.
-3. **Arabic search quality** with `simple` FTS. Acceptable for names. Revisit if content search matters.
-4. **Legal validity of e-signatures** for the supervising authority (see open questions).
-5. **Personal data** (Tunisian data protection law, INPDP): privacy policy, consent for seeded
+1. **Middleware convention.** Node `proxy.ts` on Workers is experimental in OpenNext and nearly
+   doubles the bundle, so the app uses the deprecated Edge `middleware.ts` (D-031). Revisit when either
+   side changes. Cache Components (`cacheComponents`) are not enabled yet.
+2. **Worker size and CPU.** Measured in phase 1: 1.54 MiB gzip (51% of the free limit), enforced in CI.
+   Real CPU time is still to be sampled on the first deploy (D-032).
+3. **404 rendering.** Next 16.3 renders `notFound()` pages on the client from a recovery shell (D-036).
+4. **Arabic search quality** with `simple` FTS. Acceptable for names. Revisit if content search matters.
+5. **Legal validity of e-signatures** for the supervising authority (see open questions).
+6. **Personal data** (Tunisian data protection law, INPDP): privacy policy, consent for seeded
    profiles, retention of member data, location of hosting (EU regions). To be reviewed in phase 9.

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- PLACEHOLDER icon until the ACF symbol is provided (docs/brand.md → Logo). -->
+  <rect width="64" height="64" rx="12" fill="#171717"/>
+  <text x="32" y="41" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="1" fill="#fafafa">ACF</text>
+</svg>

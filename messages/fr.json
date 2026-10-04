@@ -1,0 +1,254 @@
+{
+  "metadata": {
+    "siteName": "ACF",
+    "title": "ACF — la scène musicale et artistique tunisienne",
+    "description": "ACF est une association culturelle qui soutient la scène musicale et artistique en Tunisie : actualités, blogs, artistes, professionnels, salles, studios et événements."
+  },
+  "localeNames": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English"
+  },
+  "common": {
+    "skipToContent": "Aller au contenu principal",
+    "home": "Accueil",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "menu": "Menu",
+    "language": "Langue",
+    "changeLanguage": "Changer de langue",
+    "theme": {
+      "label": "Thème",
+      "toggle": "Changer de thème",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "signIn": "Se connecter",
+    "backToSite": "Retour au site public",
+    "comingSoon": "Bientôt disponible",
+    "placeholderNotice": "Cette page est provisoire. Son contenu arrivera lors d'une prochaine phase de la refonte."
+  },
+  "nav": {
+    "primary": "Navigation principale",
+    "home": "Accueil",
+    "news": "Actualités",
+    "events": "Événements",
+    "discover": "Découvrir",
+    "artists": "Artistes",
+    "professionals": "Professionnels",
+    "venues": "Salles",
+    "studios": "Studios",
+    "blogs": "Blogs",
+    "about": "À propos",
+    "contact": "Contact",
+    "privacy": "Confidentialité",
+    "terms": "Conditions d'utilisation"
+  },
+  "footer": {
+    "label": "Pied de page",
+    "tagline": "Une association culturelle qui soutient la scène musicale et artistique en Tunisie.",
+    "discover": "Découvrir",
+    "association": "Association",
+    "legal": "Mentions légales",
+    "rights": "© {year} ACF. Tous droits réservés."
+  },
+  "home": {
+    "title": "Soutenir la scène musicale et artistique tunisienne",
+    "intro": "ACF rassemble artistes, professionnels, salles et studios. Vous trouverez bientôt ici l'actualité de la scène, des blogs, des annuaires et les prochains événements.",
+    "ctaArtists": "Découvrir les artistes",
+    "ctaEvents": "Voir les événements",
+    "sectionsTitle": "Explorer la scène"
+  },
+  "pages": {
+    "news": {
+      "title": "Actualités",
+      "description": "L'actualité de la scène musicale et artistique tunisienne."
+    },
+    "events": {
+      "title": "Événements",
+      "description": "Concerts, festivals et rencontres partout en Tunisie."
+    },
+    "artists": {
+      "title": "Artistes",
+      "description": "Musiciens, groupes, collectifs et DJ."
+    },
+    "professionals": {
+      "title": "Professionnels",
+      "description": "Ingénieurs du son, techniciens, managers et autres professionnels de la scène."
+    },
+    "venues": {
+      "title": "Salles",
+      "description": "Les lieux qui accueillent concerts et spectacles."
+    },
+    "studios": {
+      "title": "Studios",
+      "description": "Studios d'enregistrement, de mixage, de mastering et de répétition."
+    },
+    "blogs": {
+      "title": "Blogs",
+      "description": "Des blogs indépendants qui écrivent sur la scène."
+    },
+    "about": {
+      "title": "À propos d'ACF",
+      "description": "Qui nous sommes et ce que nous faisons."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Comment joindre l'association."
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "description": "Comment nous collectons et protégeons les données personnelles."
+    },
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "description": "Les règles d'utilisation de ce site."
+    },
+    "login": {
+      "title": "Se connecter",
+      "description": "Accédez à votre compte et à votre espace associatif."
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "description": "Créez un compte pour gérer un profil public."
+    },
+    "account": {
+      "title": "Mon compte",
+      "description": "Les paramètres de votre compte et vos profils publics."
+    }
+  },
+  "areas": {
+    "label": "Navigation de la section",
+    "member": {
+      "name": "Espace membres",
+      "sections": {
+        "dashboard": {
+          "title": "Tableau de bord",
+          "description": "Vos prochaines réunions, tâches, annonces et sondages ouverts."
+        },
+        "meetings": {
+          "title": "Réunions",
+          "description": "Les prochaines réunions et votre réponse."
+        },
+        "tasks": {
+          "title": "Tâches",
+          "description": "Les tâches qui vous sont attribuées et celles ouvertes aux bénévoles."
+        },
+        "announcements": {
+          "title": "Annonces",
+          "description": "Les messages du bureau et du salon Discord."
+        },
+        "polls": {
+          "title": "Sondages de disponibilité",
+          "description": "Votez pour des dates et des options."
+        },
+        "volunteer": {
+          "title": "Bénévolat",
+          "description": "Inscrivez-vous à des créneaux lors des prochains événements."
+        },
+        "documents": {
+          "title": "Documents",
+          "description": "La bibliothèque de documents de l'association."
+        },
+        "directory": {
+          "title": "Membres",
+          "description": "L'annuaire des membres."
+        }
+      }
+    },
+    "board": {
+      "name": "Espace bureau",
+      "sections": {
+        "overview": {
+          "title": "Vue d'ensemble",
+          "description": "Le tableau de bord du bureau."
+        },
+        "tasks": {
+          "title": "Tâches",
+          "description": "Créer et attribuer des tâches."
+        },
+        "meetings": {
+          "title": "Réunions",
+          "description": "Planifier les réunions et suivre les présences."
+        },
+        "announcements": {
+          "title": "Annonces",
+          "description": "Rédiger des annonces et les publier sur Discord."
+        },
+        "polls": {
+          "title": "Sondages",
+          "description": "Créer des sondages de disponibilité."
+        },
+        "volunteering": {
+          "title": "Bénévolat",
+          "description": "Organiser les créneaux de bénévoles pour les événements."
+        },
+        "news": {
+          "title": "Actualités",
+          "description": "Rédiger et publier les actualités d'ACF."
+        },
+        "events": {
+          "title": "Événements",
+          "description": "Examiner les propositions et publier les événements."
+        },
+        "finance": {
+          "title": "Finances",
+          "description": "Grand livre, budgets par projet, justificatifs et exports."
+        },
+        "vault": {
+          "title": "Coffre juridique",
+          "description": "Statuts, procès-verbaux et autres documents juridiques."
+        },
+        "correspondence": {
+          "title": "Correspondance",
+          "description": "Les échanges avec l'autorité de tutelle, du brouillon à l'archive."
+        }
+      }
+    },
+    "admin": {
+      "name": "Administration",
+      "sections": {
+        "overview": {
+          "title": "Vue d'ensemble",
+          "description": "Chiffres clés et état de la plateforme."
+        },
+        "users": {
+          "title": "Utilisateurs et rôles",
+          "description": "Attribuer des rôles et envoyer des invitations."
+        },
+        "approvals": {
+          "title": "Validations",
+          "description": "Les profils publics en attente d'examen."
+        },
+        "moderation": {
+          "title": "Modération",
+          "description": "Signalements et contenus à examiner."
+        },
+        "audit": {
+          "title": "Journal d'audit",
+          "description": "Toutes les actions privilégiées, dans l'ordre."
+        },
+        "settings": {
+          "title": "Paramètres du site",
+          "description": "Informations publiques et options du site."
+        },
+        "integrations": {
+          "title": "Intégrations",
+          "description": "E-mail, Discord, signature électronique et tâches planifiées."
+        }
+      }
+    }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil"
+  },
+  "error": {
+    "title": "Une erreur est survenue",
+    "description": "Une erreur inattendue s'est produite. Vous pouvez réessayer.",
+    "retry": "Réessayer",
+    "backHome": "Retour à l'accueil"
+  }
+}

@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+// Mobile Lighthouse audit of the home page in every locale (roadmap phase 1: all categories ≥ 90).
+// Usage: npm run build && npm start   (in another terminal)
+//        npm run lighthouse            [BASE_URL=http://localhost:3000] [CHROME_PATH=/path/to/chrome]
+//
+// Lighthouse runs through npx at a pinned version instead of being a devDependency: installing it
+// pulls @opentelemetry/api into node_modules, which breaks the OpenNext Workers build (D-032).
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const LIGHTHOUSE = 'lighthouse@13.5.0';
+const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
+const LOCALES = ['ar', 'fr', 'en'];
+const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
+const MINIMUM = 90;
+const outDir = fileURLToPath(new URL('../.lighthouse/', import.meta.url));
+
+mkdirSync(outDir, { recursive: true });
+
+const rows = [];
+let failed = false;
+
+for (const locale of LOCALES) {
+  const url = `${BASE_URL}/${locale}`;
+  const base = `${outDir}home-${locale}`;
+  execFileSync(
+    'npx',
+    [
+      '--yes',
+      LIGHTHOUSE,
+      url,
+      '--quiet',
+      '--form-factor=mobile',
+      `--only-categories=${CATEGORIES.join(',')}`,
+      '--output=json',
+      '--output=html',
+      `--output-path=${base}`,
+      '--chrome-flags=--headless=new --no-sandbox --disable-gpu',
+    ],
+    { stdio: ['ignore', 'ignore', 'inherit'], env: process.env },
+  );
+
+  const lhr = JSON.parse(readFileSync(`${base}.report.json`, 'utf8'));
+  const scores = Object.fromEntries(
+    CATEGORIES.map((id) => [id, Math.round((lhr.categories[id]?.score ?? 0) * 100)]),
+  );
+  if (Object.values(scores).some((score) => score < MINIMUM)) failed = true;
+  rows.push({ page: `/${locale}`, ...scores });
+}
+
+console.table(rows);
+console.log(`Reports: ${outDir}`);
+if (failed) {
+  console.error(`At least one category is below ${MINIMUM}.`);
+  process.exit(1);
+}
