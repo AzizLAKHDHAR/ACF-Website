@@ -12,6 +12,22 @@ dist
 dist-ssr
 *.local
 
+# Next.js / OpenNext / Wrangler
+.next/
+out/
+.open-next/
+.wrangler/
+.dev.vars*
+next-env.d.ts
+cloudflare-env.d.ts
+*.tsbuildinfo
+
+# Tests
+playwright-report/
+test-results/
+coverage/
+.lighthouse/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

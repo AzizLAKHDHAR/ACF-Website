@@ -14,12 +14,12 @@ continues the same phase.
 - [ ] Decisions appended to [`decisions.md`](decisions.md).
 - [ ] PR opened with summary, verification steps, assumptions and open questions.
 
-## Phase 0: Planning and configuration ✅ (this PR)
+## Phase 0: Planning and configuration ✅ (AzizLAKHDHAR/ACF-Website#1)
 
 Audit, `CLAUDE.md`, vision, roles, architecture, brand, roadmap, decisions log, MCP servers, session
 setup hook.
 
-## Phase 1: Foundation
+## Phase 1: Foundation ✅ (except the live Workers deploy — see D-032)
 
 **Goal:** replace the legacy Vite SPA with an empty but production-shaped Next.js app: trilingual,
 RTL-ready, themed, deployable.
@@ -30,19 +30,20 @@ in yet); layout shell; route-group skeletons; ESLint + Prettier; Vitest + Playwr
 workflow; deployment spike on Cloudflare Workers; delete legacy files (list in [`audit.md`](audit.md)).
 
 Acceptance criteria:
-- [ ] `npm run dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:e2e` exist and pass locally and in CI.
-- [ ] All Vite / GitHub Pages files and the dead code listed in the audit are removed. One lockfile (`package-lock.json`).
-- [ ] `tsconfig.json` has `"strict": true`. No `any` in app code. ESLint has no warnings.
-- [ ] `/` redirects to a locale. `/ar` renders `<html lang="ar" dir="rtl">`; `/fr` and `/en` render LTR.
-- [ ] The locale switcher keeps the current path and persists the choice (cookie).
-- [ ] `messages/ar.json`, `fr.json` and `en.json` have identical key sets (CI check). The shell has no hard-coded UI strings.
-- [ ] Design tokens live in `globals.css` (primitives → semantic → `@theme inline`). Components use only token classes. An automated check covers token-pair contrast (AA).
-- [ ] Layout shell: header with public navigation, mobile drawer, footer, skip link, visible focus states. Menus work with keyboard and touch. Correct in RTL (Playwright screenshots in `ar` and `fr`).
-- [ ] Route groups `(public)`, `(auth)`, `(account)`, `(member)`, `(board)`, `(admin)` exist with placeholder pages. Hidden areas are `noindex` and return 404 until auth lands in phase 2.
-- [ ] Localized `not-found` and `error` pages.
-- [ ] Lighthouse (mobile) ≥ 90 for Performance, Accessibility, Best Practices and SEO on the home page, in all three locales.
+- [x] `npm run dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:e2e` exist and pass locally and in CI (`.github/workflows/ci.yml`).
+- [x] All Vite / GitHub Pages files and the dead code listed in the audit are removed. One lockfile (`package-lock.json`). The artist list and memorial image moved to `docs/legacy/` pending decisions.
+- [x] `tsconfig.json` has `"strict": true` (plus `noUncheckedIndexedAccess`). No `any` in app code (lint rule). ESLint has no warnings.
+- [x] `/` redirects to a locale. `/ar` renders `<html lang="ar" dir="rtl">`; `/fr` and `/en` render LTR.
+- [x] The locale switcher keeps the current path and persists the choice (`NEXT_LOCALE`, one year).
+- [x] `messages/ar.json`, `fr.json` and `en.json` have identical key sets (CI check). The shell has no hard-coded UI strings (lint rule).
+- [x] Design tokens live in `globals.css` (primitives → semantic → `@theme inline`). Components use only token classes (default palette removed). An automated check covers token-pair contrast (AA).
+- [x] Layout shell: header with public navigation, mobile drawer, footer, skip link, visible focus states. Menus work with keyboard and touch. Correct in RTL (screenshots in `docs/screenshots/phase-1/`).
+- [x] Route groups `(public)`, `(auth)`, `(account)`, `(member)`, `(board)`, `(admin)` exist with placeholder pages. Hidden areas are `noindex` and return 404 until auth lands in phase 2.
+- [x] Localized `not-found` and `error` pages (404 content renders client-side in Next 16.3 — D-036).
+- [x] Lighthouse (mobile) ≥ 90 for Performance, Accessibility, Best Practices and SEO on the home page, in all three locales (scores in D-032).
 - [ ] The shell is deployed to Cloudflare Workers via OpenNext (preview URL in the PR). Compressed bundle size and a CPU-time sample are recorded in `decisions.md`, along with the **final hosting decision** (Workers or Vercel Hobby).
-- [ ] `.env.example` lists every variable from [`architecture.md`](architecture.md#configuration-envexample-in-phase-1). README rewritten for ACF.
+  *Partly done:* bundle size (1.54 MiB gzip), a local `workerd` run and the hosting decision are recorded (D-031, D-032); the live deploy and a real CPU-time sample need a Cloudflare account (deploy workflow ready).
+- [x] `.env.example` lists every variable from [`architecture.md`](architecture.md#configuration-envexample-in-phase-1) (unit-tested). README rewritten for ACF.
 
 Inputs needed: brand charter (or OK to proceed with placeholders), default locale, Cloudflare account.
 

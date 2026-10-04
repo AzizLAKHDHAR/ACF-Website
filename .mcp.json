@@ -18,7 +18,10 @@
     "supabase": {
       "type": "stdio",
       "command": "bash",
-      "args": ["${CLAUDE_PROJECT_DIR:-.}/scripts/mcp/supabase-dev.sh", "@supabase/mcp-server-supabase@0.13.0"],
+      "args": [
+        "${CLAUDE_PROJECT_DIR:-.}/scripts/mcp/supabase-dev.sh",
+        "@supabase/mcp-server-supabase@0.13.0"
+      ],
       "env": {
         "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN:-}",
         "SUPABASE_DEV_PROJECT_REF": "${SUPABASE_DEV_PROJECT_REF:-}"

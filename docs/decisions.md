@@ -109,7 +109,7 @@ Format:
 - Consequences: Adding a state (e.g. `cancelled`) needs a migration and a decision entry.
 
 ## D-013: Hosting: Cloudflare Workers via OpenNext first, Vercel Hobby as fallback
-- Date: 2026-10-04 · Phase: 0 · Status: proposed (final call at the end of phase 1)
+- Date: 2026-10-04 · Phase: 0 · Status: superseded by D-032
 - Context: Both are free. Vercel Hobby is limited to non-commercial use. Workers Free has a 3 MB compressed
   bundle limit and 10 ms CPU per request.
 - Decision: Build for Workers (`@opennextjs/cloudflare`), serve public pages from the ISR cache, keep
@@ -206,3 +206,124 @@ Format:
 - Date: 2026-10-04 · Phase: 0 · Status: accepted
 - Decision: One phase ≈ one session ≈ one PR. Each PR appends its decisions here and updates the docs it
   invalidates. Recorded as a rule in `CLAUDE.md`.
+
+## D-027: Phase 1 versions: Next 16.3.8, React 19.3, TypeScript 6.0.3, Tailwind 4.3, ESLint 9
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Context: Latest stable versions at the time of the session. ESLint 10 is out (and npm now flags 9 as
+  unsupported), but `eslint-plugin-react`, `jsx-a11y` and `import`, which `eslint-config-next` depends on,
+  only declare support up to ESLint 9.
+- Decision: Next 16.3.8, React 19.3, next-intl 4.14, TypeScript `~6.0.3` (D-002), Tailwind 4.3, ESLint 9.39
+  with `eslint-config-next` flat config (`next lint` no longer exists in Next 16), Vitest 5, Playwright 1.63.
+- Consequences: Move to ESLint 10 when `eslint-config-next`'s plugins support it.
+
+## D-028: shadcn/ui components hand-ported from the v4 source
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Context: The shadcn registry (`ui.shadcn.com`) is blocked by this environment's network policy, so
+  `npx shadcn add` can't run.
+- Decision: Port only what the shell needs (Button, Sheet, DropdownMenu) by hand from shadcn v4 (new-york, `radix-ui`
+  package), adapted for RTL (logical sides, `start`/`end` drawers), token-only colours, a localized close label and the
+  shared focus outline. `components.json` is configured so the CLI works once the host is allowed.
+- Consequences: When adding components with the CLI later, re-apply the same adaptations (they're commented in each file).
+
+## D-029: Design tokens in three layers; Tailwind's default palette removed
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Decision: `src/app/globals.css` defines brand primitives (`--acf-*`, placeholder neutral scale) → semantic
+  shadcn tokens for light and dark → `@theme inline`. `@theme { --color-*: initial; }` removes Tailwind's palette,
+  so classes like `bg-blue-500` generate nothing and only token classes work. A Vitest suite parses the CSS and
+  checks 18 token pairs per theme against WCAG AA (4.5:1 text, 3:1 UI and focus). Placeholder values were adjusted
+  where shadcn's defaults fail AA (muted text, focus ring, input border).
+- Consequences: The charter only changes layer 1. Any new token pair used for text must be added to the contrast test.
+
+## D-030: Placeholder fonts: IBM Plex Sans + IBM Plex Sans Arabic
+- Date: 2026-10-04 · Phase: 1 · Status: proposed (replace with the charter's fonts)
+- Context: The charter is missing; Arabic needs a real web font (system fallbacks render poorly and inconsistently).
+- Decision: The first proposal from `brand.md`, loaded with `next/font/google` (downloaded at build, self-hosted,
+  no runtime Google requests): Plex Sans (variable, Latin) and Plex Sans Arabic 400/600, exposed as `--font-latin`
+  and `--font-arabic`; `:lang(ar)` switches the body font and line height.
+- Consequences: About 140 KB of fonts per first visit; revisit when the charter names its typefaces.
+
+## D-031: Edge `middleware.ts` instead of Next 16's `proxy.ts`; static-assets cache on Workers
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Context: Next 16 renames middleware to `proxy.ts`, which always runs on Node.js. OpenNext bundles Node middleware for
+  Workers only experimentally ("not officially maintained"), and measured on this app it produces a 2.70 MiB gzipped
+  Worker (it drags in Next's `@vercel/og` wasm) against 1.54 MiB with the Edge `middleware.ts`. The free plan allows 3 MiB.
+  It also failed to build at all whenever `@opentelemetry/api` was installed (D-033).
+- Decision: Keep the deprecated-but-supported Edge `src/middleware.ts` for next-intl (and Supabase session refresh in
+  phase 2). Phase 1 uses OpenNext's static-assets incremental cache (every page is prerendered; no R2 bucket needed) with
+  cache interception enabled. Phase 3 switches to the R2 cache when pages revalidate.
+- Consequences: `next build` prints a deprecation warning. Revisit when OpenNext supports Node middleware or Next removes
+  `middleware.ts` (a future major); the CI bundle-size job will show the cost of switching.
+
+## D-032: Hosting: Cloudflare Workers confirmed as the primary target (provisional until the first deploy)
+- Date: 2026-10-04 · Phase: 1 · Status: accepted (CPU confirmation pending), supersedes the "proposed" status of D-013
+- Context: The phase 1 spike couldn't deploy: there is no Cloudflare account or token in this environment and
+  `api.cloudflare.com` is blocked. Measured locally instead:
+  - Worker bundle (`wrangler deploy --dry-run`): **7.93 MiB raw, 1.54 MiB gzip = 51% of the 3 MiB free limit**.
+  - The OpenNext build runs on `workerd` (`wrangler dev`) with identical behaviour to `next start`: locale redirects,
+    `lang`/`dir`, 404 + `X-Robots-Tag` on hidden areas, sitemap, robots.
+  - Local wall-clock latency ≈ 90–100 ms per page (not CPU time; workerd doesn't enforce or report the 10 ms CPU
+    limit locally). Prerendered pages are served from the cache with interception, so CPU per request should be small.
+  - Lighthouse (mobile, `next start`, three runs): performance `/ar` 92–95, `/fr` 96–97, `/en` 93–94; accessibility,
+    best practices and SEO 100 everywhere.
+- Decision: Stay on Workers Free. CI fails a PR if the gzipped Worker exceeds 3 MiB (`npm run cf:size`).
+  `.github/workflows/deploy.yml` deploys `main` and uploads PR previews once `CLOUDFLARE_DEPLOY_ENABLED=true` and the
+  `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets exist. Fall back to Vercel Hobby only if real CPU time exceeds
+  the free limit.
+- Consequences: The first real deploy must record CPU time p50/p99 (Cloudflare dashboard → Workers → Metrics) here.
+
+## D-033: Lighthouse runs through npx, never as a dependency
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Context: Installing `lighthouse` pulls `@opentelemetry/api` into `node_modules`. Next's tracer then `require`s it, and
+  OpenNext's trace copies only part of that package, so the Workers build fails to bundle.
+- Decision: `npm run lighthouse` calls `npx lighthouse@13.5.0` and parses the JSON reports. The lockfile was regenerated so
+  the optional peer is no longer installed.
+- Consequences: Anything that adds `@opentelemetry/api` (e.g. some monitoring SDKs) will break `cf:build`; CI catches it.
+
+## D-034: Light, dark and system themes
+- Date: 2026-10-04 · Phase: 1 · Status: proposed (needs ACF confirmation, open question 3)
+- Decision: `next-themes` with the `.dark` class, default `system`, a three-option menu in every header. Both themes are
+  contrast-tested and screenshotted.
+- Consequences: The charter must provide (or approve derived) dark-theme colours.
+
+## D-035: Phase 1 guards deny everything; dev-only preview of hidden shells
+- Date: 2026-10-04 · Phase: 1 · Status: accepted (replaced in phase 2)
+- Decision: `requireUser()` / `requireRole()` in `src/lib/auth/guards.ts` call `notFound()` because no user can be signed
+  in yet. `ACF_PREVIEW_HIDDEN_AREAS=1` lets them pass **only** when `NODE_ENV === 'development'` (inlined at build, so
+  production bundles always deny); `npm run screenshots` uses it. Hidden-area sections are one `[section]` placeholder
+  per area with `dynamicParams = false`; real routes replace them in phases 5–7. Hidden areas also get
+  `X-Robots-Tag: noindex, nofollow` from `next.config.ts`.
+- Consequences: Phase 2 keeps the function signatures and replaces their bodies with Supabase checks.
+
+## D-036: Known limitation: Next 16.3 serves `notFound()` pages as a client-rendered recovery shell
+- Date: 2026-10-04 · Phase: 1 · Status: accepted (framework behaviour)
+- Context: Responses for `notFound()` (unknown paths, hidden areas) come back as Next's `__next_error__` shell: status
+  404, `noindex` and the correct `<head>` are set, but the localized not-found UI renders on the client from the RSC
+  payload. Reproduced in a vanilla Next 16.3.8 app, so it is not caused by this codebase.
+- Decision: Accept it. With JavaScript, visitors get the localized 404 page (e2e-tested in all locales); crawlers get a 404.
+- Consequences: Re-check on each Next upgrade; without JavaScript the 404 page is blank.
+
+## D-037: Conventions enforced by tooling, not just documentation
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Decision: ESLint fails on physical-direction Tailwind classes (`ml-`, `pr-`, `left-`, `text-right`, …) and on JSX text
+  literals in `src/`; `next-intl`'s `AppConfig` is augmented so every message key is type-checked; `npm run i18n:check`
+  compares keys and ICU placeholders across locales; a unit test checks that every menu entry and hidden-area section has
+  copy and an icon in all three locales, and that `.env.example` lists every variable in `architecture.md`.
+- Consequences: Allowed literals (`·`, `/`, `©`, `404`…) are listed in `eslint.config.mjs`.
+
+## D-038: Keep the agent rules block that `next dev` writes into CLAUDE.md
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Context: Next 16.3 appends (and re-adds) a block telling agents to read `node_modules/next/dist/docs/`. Following it
+  caught real API changes this session (`error.tsx` receives `retry`, `next lint` removed, `proxy.ts`).
+- Decision: Commit the block as written; don't set `agentRules: false`.
+
+## D-039: Security headers now, CSP in phase 9
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Decision: `next.config.ts` sends `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options: DENY` and a restrictive
+  `Permissions-Policy` on every route, and drops `X-Powered-By`. A nonce-based CSP needs dynamic rendering, which conflicts
+  with the static pages, so it is designed in the phase 9 security review.
+
+## D-040: Screenshots committed as contact sheets
+- Date: 2026-10-04 · Phase: 1 · Status: accepted
+- Decision: `npm run screenshots` captures every area × locale × theme × viewport (54 PNGs in `test-results/`, not
+  committed) and composes one JPEG contact sheet per area into `docs/screenshots/phase-1/` (about 700 KB total).
+- Consequences: Each later phase adds its own folder rather than overwriting history.

@@ -1,0 +1,213 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design tokens (docs/brand.md). Three layers:
+ *   1. brand primitives  --acf-*        raw palette from the ACF charter
+ *   2. semantic tokens   --background…  what components use (shadcn/ui names), per theme
+ *   3. @theme inline                    exposes the semantic tokens as Tailwind classes
+ *
+ * PLACEHOLDER — replace with ACF charter (D-022). Until the charter is in /brand, the primitives
+ * are a neutral grey scale. Changing the brand means editing layer 1 only.
+ * Token pairs are contrast-checked (WCAG AA) by src/styles/contrast.test.ts.
+ */
+
+/* 1. Brand primitives — PLACEHOLDER */
+:root {
+  --acf-neutral-50: oklch(0.985 0 0);
+  --acf-neutral-100: oklch(0.97 0 0);
+  --acf-neutral-200: oklch(0.922 0 0);
+  --acf-neutral-300: oklch(0.87 0 0);
+  --acf-neutral-400: oklch(0.708 0 0);
+  --acf-neutral-500: oklch(0.556 0 0);
+  --acf-neutral-600: oklch(0.439 0 0);
+  --acf-neutral-700: oklch(0.371 0 0);
+  --acf-neutral-800: oklch(0.269 0 0);
+  --acf-neutral-900: oklch(0.205 0 0);
+  --acf-neutral-950: oklch(0.145 0 0);
+
+  --acf-ink: var(--acf-neutral-950);
+  --acf-paper: oklch(1 0 0);
+  --acf-primary: var(--acf-neutral-900);
+  --acf-primary-ink: var(--acf-neutral-50);
+  --acf-secondary: var(--acf-neutral-100);
+  --acf-accent: var(--acf-neutral-100);
+
+  /* Functional colours (not from the charter): errors and statuses. */
+  --acf-red-700: oklch(0.505 0.213 27.518);
+  --acf-red-400: oklch(0.704 0.191 22.216);
+  --acf-green-700: oklch(0.527 0.154 150.069);
+  --acf-green-400: oklch(0.792 0.209 151.711);
+  --acf-amber-700: oklch(0.555 0.163 48.998);
+  --acf-amber-400: oklch(0.828 0.189 84.429);
+  --acf-blue-700: oklch(0.488 0.243 264.376);
+  --acf-blue-400: oklch(0.707 0.165 254.624);
+}
+
+/* 2. Semantic tokens — light theme */
+:root {
+  --background: var(--acf-paper);
+  --foreground: var(--acf-ink);
+  --card: var(--acf-paper);
+  --card-foreground: var(--acf-ink);
+  --popover: var(--acf-paper);
+  --popover-foreground: var(--acf-ink);
+  --primary: var(--acf-primary);
+  --primary-foreground: var(--acf-primary-ink);
+  --secondary: var(--acf-secondary);
+  --secondary-foreground: var(--acf-neutral-900);
+  --muted: var(--acf-neutral-100);
+  --muted-foreground: var(--acf-neutral-600);
+  --accent: var(--acf-accent);
+  --accent-foreground: var(--acf-neutral-900);
+  --destructive: var(--acf-red-700);
+  --destructive-foreground: var(--acf-paper);
+  --success: var(--acf-green-700);
+  --success-foreground: var(--acf-paper);
+  --warning: var(--acf-amber-700);
+  --warning-foreground: var(--acf-paper);
+  --info: var(--acf-blue-700);
+  --info-foreground: var(--acf-paper);
+  --border: var(--acf-neutral-200);
+  --input: var(--acf-neutral-500);
+  --ring: var(--acf-neutral-600);
+  --overlay: oklch(0 0 0 / 0.5);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+
+  /* Fonts: next/font variables are set on <html> (src/app/[locale]/layout.tsx). */
+  --font-body: var(--font-latin), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root:lang(ar) {
+  --font-body: var(--font-arabic), var(--font-latin), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* 2. Semantic tokens — dark theme */
+.dark {
+  --background: var(--acf-neutral-950);
+  --foreground: var(--acf-neutral-50);
+  --card: var(--acf-neutral-900);
+  --card-foreground: var(--acf-neutral-50);
+  --popover: var(--acf-neutral-900);
+  --popover-foreground: var(--acf-neutral-50);
+  --primary: var(--acf-neutral-200);
+  --primary-foreground: var(--acf-neutral-900);
+  --secondary: var(--acf-neutral-800);
+  --secondary-foreground: var(--acf-neutral-50);
+  --muted: var(--acf-neutral-800);
+  --muted-foreground: var(--acf-neutral-400);
+  --accent: var(--acf-neutral-800);
+  --accent-foreground: var(--acf-neutral-50);
+  --destructive: var(--acf-red-400);
+  --destructive-foreground: var(--acf-neutral-950);
+  --success: var(--acf-green-400);
+  --success-foreground: var(--acf-neutral-950);
+  --warning: var(--acf-amber-400);
+  --warning-foreground: var(--acf-neutral-950);
+  --info: var(--acf-blue-400);
+  --info-foreground: var(--acf-neutral-950);
+  --border: var(--acf-neutral-800);
+  --input: var(--acf-neutral-500);
+  --ring: var(--acf-neutral-400);
+  --overlay: oklch(0 0 0 / 0.7);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+}
+
+/* 3. Tailwind theme. The default palette is removed so only token colours exist:
+ *    `bg-blue-500` generates nothing, `bg-primary` works. */
+@theme {
+  --color-*: initial;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --font-sans: var(--font-body);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  /* Arabic reads better with more generous line height (docs/brand.md → Typography). */
+  :lang(ar) body {
+    line-height: 1.75;
+  }
+
+  /* One visible focus style everywhere (WCAG 2.2: 2.4.7 / 2.4.13). */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

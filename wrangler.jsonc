@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "acf-website",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      // Self-reference used by OpenNext for caching; must match "name".
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "acf-website",
+    },
+  ],
+  "observability": {
+    "enabled": true,
+  },
+}
