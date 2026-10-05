@@ -8,21 +8,21 @@ scene. It has four access levels: public · members · board · admin. Read thes
 | [`docs/vision.md`](docs/vision.md) | What we're building and why |
 | [`docs/roles.md`](docs/roles.md) | **Permission matrix**: the source of truth for every RLS policy |
 | [`docs/architecture.md`](docs/architecture.md) | Routes, data model, auth, integrations, deployment |
-| [`docs/brand.md`](docs/brand.md) | Design tokens (ACF charter still TODO) |
+| [`docs/brand.md`](docs/brand.md) | The ACF charter, design tokens, fonts and logo |
 | [`docs/roadmap.md`](docs/roadmap.md) | Phases 1–9 with acceptance criteria |
 | [`docs/decisions.md`](docs/decisions.md) | Append-only decisions log |
 | [`docs/audit.md`](docs/audit.md) | State of the legacy code before the rebuild |
 
 ## Current state
 
-**Phase 1 (foundation) is done, including the ACF brand; phase 2 (data model, auth, RLS, seed) is
-next.** The app is a trilingual Next.js shell (French by default) styled with the Amplify Creative
-Foundation charter from `/brand` (D-041–D-047): the home and About pages carry the official one-pager
-copy, every other route is a placeholder. There is no database and no auth yet:
-`src/lib/auth/guards.ts` is a stub that makes every hidden area answer 404 (dev-only preview with
-`ACF_PREVIEW_HIDDEN_AREAS=1`). Hosting is Vercel (D-042); the Vercel and Supabase projects still have
-to be created by ACF. Still provisional: the fonts (open-licence stand-ins) and the logo (raster masks until an SVG
-exists). Update this section at the end of every phase.
+**Phases 1 (foundation, ACF brand) and 2 (data model, auth, RLS, seed) are done; phase 3 (public site) is
+next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
+pgTAP suite that encodes `docs/roles.md` (`npm run db:test`). Authentication works end to end: sign-up with email
+confirmation, password and magic-link sign-in, password reset, sign-out. `requireUser` / `requireRole` guard the
+account, member, board and admin layouts (signed out → sign-in; wrong role → 404). Pages other than home, About,
+the auth pages and the account page are still placeholders. Local development uses the Supabase stack in Docker
+(`npm run db:start`, seeded with fictional demo users `*@acf.test`, password `demo-password-1`). The Vercel and
+Supabase projects still have to be created by ACF; fonts and logo are still stand-ins. Update this section at the end of every phase.
 
 ## Stack
 
@@ -33,7 +33,7 @@ Resend + React Email · Vitest · Playwright + axe · pgTAP · next-themes (ligh
 
 ## Commands
 
-Keep this table true. Rows marked *phase 2* don't exist yet.
+Keep this table true.
 
 | Command | Does |
 |---|---|
@@ -47,27 +47,30 @@ Keep this table true. Rows marked *phase 2* don't exist yet.
 | `npm run i18n:check` | Message files have identical keys and placeholders |
 | `npm run screenshots` | Shell screenshots, every locale × theme × viewport → `docs/screenshots/brand/` (or `$SCREENSHOT_DIR`) |
 | `npm run lighthouse` | Mobile Lighthouse on the home pages (needs `npm start`), fails below 90 |
-| `npx supabase start` / `db reset` | *phase 2* — local stack / rebuild schema + seed (needs Docker) |
-| `npx supabase migration new <name>` | *phase 2* — new migration (the only way to change the schema) |
-| `npx supabase test db` | *phase 2* — pgTAP RLS suite |
-| `npm run db:types` | *phase 2* — regenerate `src/types/database.ts` |
+| `npm run db:start` / `db:stop` | Local Supabase stack in Docker (Postgres, Auth, Storage, Mailpit on :54324) |
+| `npm run db:env` | Write the local stack's URL and keys into `.env.local` (needed by `dev`, `build`, e2e) |
+| `npm run db:reset` | Rebuild the local database from migrations + `supabase/seed.sql` |
+| `npx supabase migration new <name>` | New migration (the only way to change the schema) |
+| `npm run db:test` | pgTAP RLS suite (`supabase/tests/database`) + the concurrency test |
+| `npm run db:lint` | plpgsql_check + Supabase security/performance advisors, failing on warnings |
+| `npm run db:types` | Regenerate `src/types/database.ts` (CI fails if it's stale) |
 
-Before pushing: `npm run lint && npm run typecheck && npm run format:check && npm run i18n:check && npm test && npm run build && npm run test:e2e`.
+Before pushing: `npm run db:lint && npm run db:test && npm run lint && npm run typecheck && npm run format:check && npm run i18n:check && npm test && npm run build && npm run test:e2e` (the local stack must be running).
 
 ## Folder conventions
 
 ```
 src/app/[locale]/(public|auth|account|member|board|admin)/…   routes only, thin
 src/app/api/cron/[job] · src/app/api/webhooks/…               service-role code lives ONLY here (phase 2+)
-src/features/<domain>/{components,queries.ts,actions.ts,schemas.ts}   from phase 3
+src/features/<domain>/{components,queries.ts,actions.ts,schemas.ts}   (auth since phase 2)
 src/components/ui        shadcn/ui (hand-ported v4 source; restyle through tokens, not edits)
 src/components/layout    header, footer, nav, locale switcher, theme toggle, logo, shells
 src/components/brand     charter motifs and one-pager sections (camo, genres, values, axes, members)
 src/config/              navigation.ts (every menu) · icons.ts
 src/lib/                 auth/guards.ts · metadata.ts · i18n-params.ts · env.ts · routes/ (page factories)
-src/lib/supabase/        server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role) — phase 2
+src/lib/supabase/        server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role) · proxy.ts (session refresh)
 src/i18n/ · messages/{ar,fr,en}.json · src/proxy.ts · src/emails/ (phase 2+)
-supabase/migrations · supabase/tests · supabase/seed.sql                  — phase 2
+supabase/migrations · supabase/tests/{database,concurrency} · supabase/seed.sql · supabase/templates (auth emails)
 tests/e2e · tests/screenshots · docs/ · scripts/
 ```
 
@@ -179,6 +182,8 @@ Versions are pinned in `.mcp.json`. The wrappers live in `scripts/mcp/`. Cloud s
   `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`, which `playwright.config.ts` uses.
 - `npm run lighthouse` runs Lighthouse through `npx` (not a dependency, D-033/D-048); point it at Chromium with
   `CHROME_PATH=/opt/pw-browsers/chromium`.
+- Docker isn't started by the container itself; the session hook starts `dockerd` (if `docker info` fails, run
+  `dockerd > /tmp/dockerd.log 2>&1 &`). Then `npm run db:start && npm run db:env`. Image pulls work through the proxy.
 - The container is ephemeral: anything not committed and pushed is lost.
 
 <!-- BEGIN:nextjs-agent-rules -->

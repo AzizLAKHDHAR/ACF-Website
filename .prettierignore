@@ -11,3 +11,8 @@ coverage/
 *.md
 docs/
 public/
+
+# Go templates rendered by Supabase Auth (not valid HTML for Prettier)
+supabase/templates/
+supabase/.temp/
+supabase/.branches/

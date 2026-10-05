@@ -117,6 +117,14 @@
     "account": {
       "title": "حسابي",
       "description": "إعدادات حسابكم وملفاتكم التعريفية العامة."
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة المرور",
+      "description": "احصلوا على رابط لاختيار كلمة مرور جديدة."
+    },
+    "resetPassword": {
+      "title": "كلمة مرور جديدة",
+      "description": "اختاروا كلمة مرور جديدة لحسابكم."
     }
   },
   "areas": {
@@ -323,5 +331,68 @@
       }
     },
     "joinTitle": "انضموا إلينا"
+  },
+  "auth": {
+    "emailLabel": "البريد الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "newPasswordLabel": "كلمة المرور الجديدة",
+    "confirmPasswordLabel": "تأكيد كلمة المرور",
+    "displayNameLabel": "الاسم المعروض",
+    "passwordHint": "8 أحرف على الأقل، تتضمن حروفًا وأرقامًا.",
+    "signInButton": "تسجيل الدخول",
+    "signUpButton": "إنشاء حسابي",
+    "magicLinkButton": "أرسلوا لي رابط تسجيل الدخول",
+    "sendResetButton": "إرسال الرابط",
+    "savePasswordButton": "حفظ كلمة المرور",
+    "signOutButton": "تسجيل الخروج",
+    "pending": "يرجى الانتظار…",
+    "passwordTab": "كلمة المرور",
+    "magicLinkTab": "رابط بالبريد",
+    "methodLabel": "طريقة تسجيل الدخول",
+    "magicLinkIntro": "سنرسل إليكم رابط تسجيل دخول صالحًا لمرة واحدة.",
+    "forgotPasswordLink": "نسيتم كلمة المرور؟",
+    "noAccount": "ليس لديكم حساب بعد؟",
+    "createAccountLink": "إنشاء حساب",
+    "haveAccount": "لديكم حساب؟",
+    "signInLink": "تسجيل الدخول",
+    "backToSignIn": "العودة إلى تسجيل الدخول",
+    "captchaLabel": "التحقق الأمني",
+    "accountLink": "حسابي",
+    "notices": {
+      "checkEmail": "تفقدوا بريدكم: أرسلنا إليكم رابطًا تنتهي صلاحيته بعد ساعة.",
+      "passwordUpdated": "تم تحديث كلمة المرور.",
+      "linkInvalid": "هذا الرابط غير صالح أو انتهت صلاحيته. اطلبوا رابطًا جديدًا."
+    },
+    "errors": {
+      "invalidInput": "تحققوا من الحقول المشار إليها.",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      "emailNotConfirmed": "أكّدوا بريدكم الإلكتروني أولًا عبر الرابط الذي أرسلناه.",
+      "weakPassword": "كلمة المرور هذه ضعيفة جدًا.",
+      "samePassword": "اختاروا كلمة مرور مختلفة عن الحالية.",
+      "rateLimited": "محاولات كثيرة. حاولوا مجددًا بعد بضع دقائق.",
+      "captchaFailed": "فشل التحقق الأمني. حاولوا مجددًا.",
+      "sessionExpired": "انتهت صلاحية الجلسة. سجّلوا الدخول من جديد.",
+      "generic": "حدث خطأ. حاولوا مجددًا."
+    },
+    "fieldErrors": {
+      "required": "هذا الحقل إلزامي.",
+      "invalidEmail": "أدخلوا بريدًا إلكترونيًا صالحًا.",
+      "weakPassword": "8 أحرف على الأقل، تتضمن حروفًا وأرقامًا.",
+      "tooLong": "هذا الحقل طويل جدًا.",
+      "mismatch": "كلمتا المرور غير متطابقتين."
+    },
+    "account": {
+      "signedInAs": "متصل بحساب {email}",
+      "displayName": "الاسم المعروض",
+      "role": "الدور في الجمعية",
+      "noRole": "لا يوجد دور حاليًا",
+      "roles": {
+        "member": "عضو",
+        "board": "الهيئة المديرة",
+        "admin": "الإدارة"
+      },
+      "spaces": "فضاءاتكم",
+      "changePassword": "تغيير كلمة المرور"
+    }
   }
 }

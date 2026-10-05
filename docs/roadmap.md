@@ -50,7 +50,7 @@ Acceptance criteria:
 Inputs received: brand charter (`/brand`), default locale (French), hosting (Vercel). Still needed: the Vercel
 project, a vector logo, font licences (optional).
 
-## Phase 2: Data model, auth, RLS, seed data
+## Phase 2: Data model, auth, RLS, seed data ✅ (Turnstile keys and production SMTP wait on ACF)
 
 **Goal:** the complete v1 schema, secured and tested, with working authentication.
 
@@ -60,21 +60,22 @@ Scope: Supabase CLI setup; migrations for all tables, enums, functions, triggers
 (server/browser/public/admin); auth pages and flows; `proxy.ts`; route guards; Turnstile; seed data.
 
 Acceptance criteria:
-- [ ] `supabase db reset` builds the schema from scratch and seeds it without errors.
-- [ ] A pgTAP test proves **every** table in `public` has RLS enabled with policies.
-- [ ] The pgTAP RLS matrix covers every row of `roles.md` for anonymous, registered, profile manager, member, board and admin, with both allowed and denied cases, and runs green in CI.
-- [ ] Guard rails are tested: no self-escalation, last-admin protection, audit-log immutability, correspondence transitions, closed ledger periods, volunteer capacity under concurrent sign-ups.
-- [ ] Storage policies are tested: public bucket writes only into own folder; private buckets unreadable by lower roles.
-- [ ] `src/types/database.ts` is generated and committed. A CI step fails if it's stale.
-- [ ] Sign-up (with email confirmation), sign-in (password and magic link), sign-out and password reset work end to end (Playwright, mailbox mocked or Inbucket locally).
-- [ ] An `accounts` row is created automatically on sign-up with the sign-up locale.
-- [ ] `requireUser` / `requireRole` guard all `(account)`, `(member)`, `(board)` and `(admin)` layouts. E2E proves a registered user gets 404 on `/member`, a member gets 404 on `/board`, and a board user gets 404 on `/admin`.
-- [ ] Lint rule: the service-role client can't be imported outside the allowed paths.
-- [ ] Supabase database linter / security advisors report no errors.
-- [ ] Seed: real taxonomies (11 genres, professions, 24 governorates in 3 languages) and **clearly fictional** demo users for each role with sample content in 3 languages. No real personal data in seed.
-- [ ] Admin bootstrap documented (how the first admin is created).
+- [x] `supabase db reset` builds the schema from scratch and seeds it without errors (10 migrations, `supabase/seed.sql`).
+- [x] A pgTAP test proves **every** table in `public` has RLS enabled with policies (`001-structure`; `notification_deliveries` is the documented deny-all table).
+- [x] The pgTAP RLS matrix covers every row of `roles.md` for anonymous, registered, profile manager, member, board and admin, with both allowed and denied cases, and runs green in CI (389 assertions, map in `roles.md` → Enforcement).
+- [x] Guard rails are tested: no self-escalation, last-admin protection, audit-log immutability, correspondence transitions, closed ledger periods, volunteer capacity under concurrent sign-ups (a real two-session race).
+- [x] Storage policies are tested: public bucket writes only into own folder; private buckets unreadable by lower roles (`060-storage`).
+- [x] `src/types/database.ts` is generated and committed. A CI step fails if it's stale.
+- [x] Sign-up (with email confirmation), sign-in (password and magic link), sign-out and password reset work end to end (Playwright reading Mailpit, `tests/e2e/auth.spec.ts`).
+- [x] An `accounts` row is created automatically on sign-up with the sign-up locale (pgTAP `020-account`, e2e in fr and ar).
+- [x] `requireUser` / `requireRole` guard all `(account)`, `(member)`, `(board)` and `(admin)` layouts. E2E proves a registered user gets 404 on `/member`, a member gets 404 on `/board`, and a board user gets 404 on `/admin`.
+- [x] Lint rule: the service-role client can't be imported outside the allowed paths (unit-tested, D-058).
+- [x] Supabase database linter / security advisors report no errors (no warnings either; `npm run db:lint` fails on warnings in CI).
+- [x] Seed: real taxonomies (11 genres + funk, 16 professions, 24 governorates in 3 languages) and **clearly fictional** demo users for each role with sample content in 3 languages. No real personal data in seed (D-053; genre and profession lists to confirm).
+- [x] Admin bootstrap documented (how the first admin is created): architecture → Admin bootstrap.
 
 Inputs needed: Supabase dev project and access token, Resend domain (or accept the default SMTP limits on dev), Turnstile keys.
+Done without them: everything runs against the local stack; Turnstile renders only once its site key is set.
 
 ## Phase 3: Public site
 

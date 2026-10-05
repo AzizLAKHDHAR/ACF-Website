@@ -17,9 +17,9 @@ env:
 
 jobs:
   checks:
-    name: Lint, types, unit, build, e2e
+    name: Database, lint, types, unit, build, e2e
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
 
@@ -29,6 +29,24 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # Local Supabase stack (Docker): migrations + seed, Auth, Storage and Mailpit for the e2e emails.
+      - name: Start Supabase
+        run: npx supabase start
+
+      - name: Database linter and security/performance advisors
+        run: npm run db:lint
+
+      - name: pgTAP RLS suite and concurrency test
+        run: npm run db:test
+
+      - name: Generated database types are up to date
+        run: |
+          npm run db:types
+          git diff --exit-code src/types/database.ts || (echo "::error::src/types/database.ts is stale: run npm run db:types and commit it" && exit 1)
+
+      - name: Point the app at the local stack
+        run: node scripts/supabase-env.mjs --print >> "$GITHUB_ENV"
 
       - name: Lint
         run: npm run lint
@@ -51,7 +69,7 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: End-to-end tests (desktop + mobile, ar/fr/en, axe)
+      - name: End-to-end tests (desktop + mobile, ar/fr/en, axe, auth journeys)
         run: npm run test:e2e
 
       - uses: actions/upload-artifact@v4

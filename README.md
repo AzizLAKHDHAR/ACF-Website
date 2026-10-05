@@ -11,10 +11,11 @@ mainstream. Trilingual — **French (default), Arabic (RTL) and English** — wi
 | **Board** (hidden) | Task assignment, finances, legal vault, correspondence with the supervising authority |
 | **Admin** (hidden) | Users and roles, profile approvals, moderation, audit log, analytics, settings |
 
-> **Status: phase 1 of 9 — foundation, in ACF's brand.** The trilingual layout shell uses the
-> charter in `/brand` (green, ink and white, pixel camo, the Amplify wordmark) in light and dark
-> themes. Home and About carry the official one-pager copy; other routes are placeholders until data and
-> auth arrive in the next phases ([roadmap](docs/roadmap.md), [brand](docs/brand.md)).
+> **Status: phase 2 of 9 done — data model, auth and RLS.** The trilingual site uses the charter in
+> `/brand` in light and dark themes. The full database schema is in place with row-level security tested
+> against the [permission matrix](docs/roles.md), and accounts work end to end (sign-up with email
+> confirmation, password or magic-link sign-in, password reset). Public pages other than home and About
+> are placeholders until phase 3 ([roadmap](docs/roadmap.md)).
 
 ![Home page in French, Arabic and English, light and dark, desktop and mobile](docs/screenshots/brand/public.jpg)
 
@@ -31,16 +32,21 @@ More screenshots: [about](docs/screenshots/brand/about.jpg) · [member](docs/scr
 
 ## Getting started
 
-Requirements: **Node.js 22** and npm.
+Requirements: **Node.js 22**, npm and **Docker** (for the local Supabase stack).
 
 ```bash
 npm install
-cp .env.example .env.local   # optional in phase 1 — every variable has a safe default or is unused yet
+npm run db:start             # Postgres, Auth, Storage and Mailpit in Docker; applies migrations + seed
+npm run db:env               # writes the local Supabase URL and keys into .env.local
 npm run dev                  # http://localhost:3000 → redirects to /fr (or /ar, /en from your browser language)
 ```
 
-The hidden areas (`/member`, `/board`, `/admin`, `/account`) answer **404** until authentication
-lands in phase 2. To review their layout locally:
+Sign in with a fictional demo account (password `demo-password-1`): `admin@acf.test`, `board@acf.test`,
+`member@acf.test`, `artist@acf.test`, `venue@acf.test` or `registered@acf.test`. Emails sent by the app (confirmation,
+magic links, password reset) land in Mailpit at http://127.0.0.1:54324.
+
+Signed-out visitors to `/member`, `/board`, `/admin` and `/account` are sent to sign in; signed-in users without
+the role get a 404. To look at the hidden shells without a database:
 
 ```bash
 ACF_PREVIEW_HIDDEN_AREAS=1 npm run dev   # development only — production builds always deny
@@ -60,6 +66,10 @@ ACF_PREVIEW_HIDDEN_AREAS=1 npm run dev   # development only — production build
 | `npm run i18n:check` | `messages/ar.json`, `fr.json`, `en.json` have identical keys and placeholders |
 | `npm run screenshots` | Screenshots in every locale × theme × viewport → `docs/screenshots/brand/` (override with `SCREENSHOT_DIR`) |
 | `npm run lighthouse` | Mobile Lighthouse on `/ar`, `/fr`, `/en` (needs `npm start` running); fails below 90 |
+| `npm run db:start` / `db:stop` / `db:reset` | Local Supabase stack; `db:reset` rebuilds it from migrations + seed |
+| `npm run db:test` | pgTAP row-level-security suite + concurrency test |
+| `npm run db:lint` | Database linter and Supabase security/performance advisors |
+| `npm run db:types` / `db:env` | Regenerate `src/types/database.ts` / write local keys to `.env.local` |
 
 Playwright uses its own Chromium (`npx playwright install chromium`), or the browser in
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` if set.
@@ -70,14 +80,18 @@ Playwright uses its own Chromium (`npx playwright install chromium`), or the bro
 messages/                 UI strings: ar.json · fr.json · en.json
 src/
 ├── app/[locale]/         routes — (public) (auth) (account) (member) (board) (admin)
+├── features/auth/        sign-up, sign-in, magic link, password reset (Server Actions, forms)
 ├── components/ui/        shadcn/ui primitives (restyled through tokens only)
 ├── components/brand/     charter motifs and one-pager sections (camo, genres, values, axes)
 ├── components/layout/    header, footer, navigation, locale switcher, theme toggle, logo, shells
 ├── config/               navigation and icons (single source for menus)
 ├── i18n/                 next-intl routing, request config, locale helpers
 ├── lib/                  guards, metadata, env, route factories, utilities
-├── proxy.ts              locale negotiation (French by default — docs/decisions.md D-043)
+├── lib/supabase/         server, browser, public and service-role clients; session refresh
+├── types/database.ts     generated from the schema (npm run db:types)
+├── proxy.ts              locale negotiation (French by default) + Supabase session refresh
 └── styles/               token parsing used by the contrast test
+supabase/                 migrations, pgTAP tests, seed, auth email templates, config.toml
 tests/e2e/                Playwright specs · tests/screenshots/ screenshot matrix
 brand/                    ACF's graphic charter and one-pager (source of truth for the design)
 public/brand/             logo masks cut from the charter

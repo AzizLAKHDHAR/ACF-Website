@@ -1,8 +1,19 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { locales } from './helpers';
+import { locales, messages } from './helpers';
+import { demoUsers, signIn } from './supabase';
 
-const pages = ['', '/events', '/legal/privacy', '/this/does/not/exist'];
+const pages = [
+  '',
+  '/events',
+  '/legal/privacy',
+  '/this/does/not/exist',
+  '/login',
+  '/signup',
+  '/forgot-password',
+];
+const signedInPages = ['/account', '/reset-password', '/member'];
+const wcag = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 test.describe('accessibility (axe, WCAG 2.2 A/AA)', () => {
   for (const colorScheme of ['light', 'dark'] as const) {
@@ -13,9 +24,7 @@ test.describe('accessibility (axe, WCAG 2.2 A/AA)', () => {
         for (const path of pages) {
           await page.goto(`/${locale}${path}`);
           await expect(page.locator('h1')).toBeVisible();
-          const results = await new AxeBuilder({ page })
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-            .analyze();
+          const results = await new AxeBuilder({ page }).withTags(wcag).analyze();
           const summary = results.violations.map(
             (v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`,
           );
@@ -25,6 +34,40 @@ test.describe('accessibility (axe, WCAG 2.2 A/AA)', () => {
       });
     }
   }
+});
+
+test.describe('accessibility of signed-in pages and form errors', () => {
+  for (const colorScheme of ['light', 'dark'] as const) {
+    test(`member pages, ar and fr, ${colorScheme}`, async ({ browser, isMobile, viewport }) => {
+      const context = await browser.newContext({ colorScheme, isMobile, viewport });
+      const page = await context.newPage();
+      await signIn(page, demoUsers.member);
+      await expect(page).toHaveURL('/fr/account');
+      for (const locale of ['ar', 'fr'] as const) {
+        for (const path of signedInPages) {
+          await page.goto(`/${locale}${path}`);
+          await expect(page.locator('h1')).toBeVisible();
+          const results = await new AxeBuilder({ page }).withTags(wcag).analyze();
+          expect(
+            results.violations.map(
+              (v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`,
+            ),
+            `${locale}${path}`,
+          ).toEqual([]);
+        }
+      }
+      await context.close();
+    });
+  }
+
+  test('a sign-up form showing validation errors (ar)', async ({ page }) => {
+    await page.goto('/ar/signup');
+    await page.getByRole('button', { name: messages.ar.auth.signUpButton }).click();
+    await expect(page.locator('main').getByRole('alert')).toBeVisible();
+    await expect(page.locator('[aria-invalid="true"]').first()).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(wcag).analyze();
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
 });
 
 test.describe('SEO', () => {

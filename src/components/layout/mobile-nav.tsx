@@ -14,6 +14,7 @@ import {
 import { infoPages, publicHref, publicSections, type PublicPage } from '@/config/navigation';
 import { publicSectionIcons } from '@/config/icons';
 import { Link, usePathname } from '@/i18n/navigation';
+import { AuthLink } from './auth-link';
 import { cn } from '@/lib/utils';
 
 /** Small-screen navigation in a drawer that opens from the inline end (right in LTR, left in RTL). */
@@ -68,7 +69,7 @@ export function MobileNav({ className }: { className?: string }) {
           <div className="mt-6 px-3">
             <Button asChild className="w-full">
               <SheetClose asChild>
-                <Link href="/login">{t('common.signIn')}</Link>
+                <AuthLink />
               </SheetClose>
             </Button>
           </div>

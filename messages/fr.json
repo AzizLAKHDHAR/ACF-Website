@@ -117,6 +117,14 @@
     "account": {
       "title": "Mon compte",
       "description": "Les paramètres de votre compte et vos profils publics."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Recevez un lien pour choisir un nouveau mot de passe."
+    },
+    "resetPassword": {
+      "title": "Nouveau mot de passe",
+      "description": "Choisissez un nouveau mot de passe pour votre compte."
     }
   },
   "areas": {
@@ -323,5 +331,68 @@
       }
     },
     "joinTitle": "Nous rejoindre"
+  },
+  "auth": {
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "displayNameLabel": "Nom affiché",
+    "passwordHint": "Au moins 8 caractères, avec des lettres et des chiffres.",
+    "signInButton": "Se connecter",
+    "signUpButton": "Créer mon compte",
+    "magicLinkButton": "Recevoir un lien de connexion",
+    "sendResetButton": "Envoyer le lien",
+    "savePasswordButton": "Enregistrer le mot de passe",
+    "signOutButton": "Se déconnecter",
+    "pending": "Patientez…",
+    "passwordTab": "Mot de passe",
+    "magicLinkTab": "Lien par e-mail",
+    "methodLabel": "Méthode de connexion",
+    "magicLinkIntro": "Nous vous envoyons un lien de connexion à usage unique.",
+    "forgotPasswordLink": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "createAccountLink": "Créer un compte",
+    "haveAccount": "Déjà inscrit·e ?",
+    "signInLink": "Se connecter",
+    "backToSignIn": "Retour à la connexion",
+    "captchaLabel": "Vérification de sécurité",
+    "accountLink": "Mon compte",
+    "notices": {
+      "checkEmail": "Vérifiez votre boîte mail : nous vous avons envoyé un lien. Il expire dans une heure.",
+      "passwordUpdated": "Votre mot de passe a été mis à jour.",
+      "linkInvalid": "Ce lien est invalide ou a expiré. Demandez-en un nouveau."
+    },
+    "errors": {
+      "invalidInput": "Vérifiez les champs signalés.",
+      "invalidCredentials": "Adresse e-mail ou mot de passe incorrect.",
+      "emailNotConfirmed": "Confirmez d’abord votre adresse e-mail grâce au lien reçu.",
+      "weakPassword": "Ce mot de passe est trop faible.",
+      "samePassword": "Choisissez un mot de passe différent de l’actuel.",
+      "rateLimited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "captchaFailed": "La vérification de sécurité a échoué. Réessayez.",
+      "sessionExpired": "Votre session a expiré. Reconnectez-vous.",
+      "generic": "Une erreur est survenue. Réessayez."
+    },
+    "fieldErrors": {
+      "required": "Ce champ est obligatoire.",
+      "invalidEmail": "Saisissez une adresse e-mail valide.",
+      "weakPassword": "Au moins 8 caractères, avec des lettres et des chiffres.",
+      "tooLong": "Ce champ est trop long.",
+      "mismatch": "Les mots de passe ne correspondent pas."
+    },
+    "account": {
+      "signedInAs": "Connecté·e en tant que {email}",
+      "displayName": "Nom affiché",
+      "role": "Rôle dans l’association",
+      "noRole": "Aucun rôle pour le moment",
+      "roles": {
+        "member": "Membre",
+        "board": "Bureau",
+        "admin": "Administration"
+      },
+      "spaces": "Vos espaces",
+      "changePassword": "Changer de mot de passe"
+    }
   }
 }

@@ -1,0 +1,15 @@
+<!doctype html>
+{{- $locale := or .Data.locale "fr" -}}
+<html lang="{{ $locale }}" dir="{{ if eq $locale "ar" }}rtl{{ else }}ltr{{ end }}">
+  <body style="margin:0;padding:24px;background:#ffffff;color:#181414;font-family:Arial,Helvetica,sans-serif;line-height:1.5">
+    <!-- Trilingual on purpose: the visitor's locale (user metadata) comes first, the other two follow. -->
+    <p style="font-size:20px;font-weight:bold;margin:0 0 16px">Amplify Creative Foundation</p>
+    {{ if eq $locale "ar" }}<p dir="rtl">أكّدوا بريدكم الإلكتروني الجديد.</p>{{ else if eq $locale "en" }}<p>Confirm your new email address.</p>{{ else }}<p>Confirmez votre nouvelle adresse e-mail.</p>{{ end }}
+    <p style="margin:24px 0">
+      <a href="{{ .SiteURL }}/{{ $locale }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email_change"
+         style="display:inline-block;padding:12px 20px;border:2px solid #181414;border-radius:999px;background:#72c71e;color:#181414;font-weight:bold;text-decoration:none">Confirmer · Confirm · تأكيد</a>
+    </p>
+    <hr style="border:0;border-top:1px solid #e4dfdf;margin:24px 0">
+    <p style="font-size:13px;color:#5e5656">Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail. · If you didn’t ask for this, ignore this email. · إذا لم تطلبوا ذلك، تجاهلوا هذه الرسالة.</p>
+  </body>
+</html>

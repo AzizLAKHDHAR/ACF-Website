@@ -286,7 +286,7 @@ Format:
 - Consequences: The charter must provide (or approve derived) dark-theme colours.
 
 ## D-035: Phase 1 guards deny everything; dev-only preview of hidden shells
-- Date: 2026-10-04 · Phase: 1 · Status: accepted (replaced in phase 2)
+- Date: 2026-10-04 · Phase: 1 · Status: superseded by D-052
 - Decision: `requireUser()` / `requireRole()` in `src/lib/auth/guards.ts` call `notFound()` because no user can be signed
   in yet. `ACF_PREVIEW_HIDDEN_AREAS=1` lets them pass **only** when `NODE_ENV === 'development'` (inlined at build, so
   production bundles always deny); `npm run screenshots` uses it. Hidden-area sections are one `[section]` placeholder
@@ -403,3 +403,109 @@ Format:
   running through `npx` (D-033): without OpenNext it no longer breaks the build, but it is a large tool needed only
   for audits. Mobile scores after the brand: performance 93 (`/ar`), 94 (`/fr`), 96 (`/en`); accessibility, best
   practices and SEO 100.
+
+## D-049: Explicit grants for the API roles; nothing is exposed by default
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Context: Supabase's default privileges hand `anon`/`authenticated` either full access to every new table in
+  `public` (cloud default) or, with `auto_expose_new_tables = false`, `TRUNCATE`, `REFERENCES` and `TRIGGER` — and
+  `TRUNCATE` ignores RLS. Column-level control (status, author, audit columns) is impossible while table-wide
+  `UPDATE` is granted.
+- Decision: The foundation migration revokes the default privileges; `20261004230800_grants.sql` revokes everything
+  again and grants table by table: `anon` selects the public catalogue only; `authenticated` gets `SELECT` plus the
+  exact `INSERT`/`UPDATE` columns each role needs (RLS narrows the rows). Status columns, `*_by` stamps,
+  `deactivated_at` and `closed_at` are never granted; they change through SECURITY DEFINER functions or triggers.
+  `supabase/config.toml` sets `auto_expose_new_tables = false`. pgTAP fails on any TRUNCATE/REFERENCES/TRIGGER grant,
+  on any anon privilege outside the list, and on a SECURITY DEFINER function without `search_path`.
+- Consequences: Every new table needs grants in its migration (or the build's tests fail). Production projects must
+  run these migrations as-is; the dashboard "auto expose" setting no longer matters.
+
+## D-050: How the roles.md matrix is enforced
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: Helpers live in the non-exposed `private` schema: `role_rank`, `current_app_role` (active membership **and**
+  account not deactivated), `has_role`, `manages_profile`, `owns_profile`, `manages_approved_profile` and per-domain
+  readers. Privileged changes are RPCs that re-check the caller: `create_profile`, `submit_profile`,
+  `review_profile`, `set_post_status`, `propose_event`, `set_event_status`, `set_task_status`,
+  `transition_correspondence`, `set_ledger_period_closed`, `set_account_deactivated`, `request_account_deletion`.
+  `private.audit_row()` writes `audit_log` for every table listed in architecture §6. Session-derived columns
+  (`author_id`, `created_by`, `granted_by`, `reporter_id`, …) are overwritten by triggers. Policies are split per
+  command (no `FOR ALL`) so each table has one SELECT policy per role (performance advisor).
+- Consequences: Clarifications of roles.md made while implementing (no rule changed): co-managers see each other and
+  anyone may leave a profile (never its last owner); internal review notes live in `review_event_notes` (admin);
+  project descriptions moved into `project_budgets.notes` so members really read names only; `account_private` holds
+  only the phone; `profile_claims` is deferred until ACF decides about seeding unclaimed profiles.
+
+## D-051: Auth flows: server-verified email links, trilingual templates, no account enumeration
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: Email + password (8+ characters with letters and digits) with mandatory confirmation, and magic links
+  for existing accounts. Every auth email links to `/{locale}/auth/confirm?token_hash=…&type=…`, a route handler that
+  calls `verifyOtp` server-side (PKCE-free, works across devices) and redirects: recovery → `/reset-password`,
+  magic link → the page that asked (short-lived `acf-auth-next` cookie), otherwise `/account`. Templates in
+  `supabase/templates/` pick the language from the sign-up locale stored in user metadata. Sign-up, magic link and
+  password reset answer "check your email" whether or not the address has an account. Server Actions use
+  `useActionState` and Zod; React Hook Form waits until a form needs client-side behaviour. Turnstile is the
+  implicit widget (no dependency), rendered only when `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is set; Supabase verifies it
+  once captcha is enabled in the project.
+- Consequences: The production project needs: Site URL, redirect URLs, the four templates (pasted from
+  `supabase/templates/`), custom SMTP (Resend) and the captcha secret — listed in architecture §10.
+
+## D-052: Signed-out visitors are sent to sign in; signed-in users without the role get 404
+- Date: 2026-10-05 · Phase: 2 · Status: accepted (implements D-010; replaces the phase 1 stub D-035)
+- Decision: Layouts call `requireUser({ returnTo })` / `requireRole(min, { returnTo })`. Signed out → 307 to
+  `/{locale}/login?next=/area`, and back there after signing in. Signed in without the role → `notFound()`. Identity
+  comes from `getClaims()`; the role from the user's own `memberships` row through RLS. `/reset-password` sits in the
+  `(account)` group because a recovery link signs the user in. The dev-only `ACF_PREVIEW_HIDDEN_AREAS` escape hatch
+  stays for screenshots.
+- Consequences: The phase 1 e2e test "hidden areas answer 404" became "signed-out visitors are redirected";
+  `auth.spec.ts` proves the 404 ladder (registered → /member, member → /board, board → /admin).
+
+## D-053: Seed: real taxonomies, fictional demo world, SQL admin bootstrap
+- Date: 2026-10-05 · Phase: 2 · Status: proposed (genre list and professions to confirm with ACF)
+- Decision: 24 governorates (ISO 3166-2:TN) in ar/fr/en; the 11 legacy genres plus **funk**, which ACF names on its
+  one-pager (12 rows); 16 professions drafted from vision.md. Demo users `admin|board|member|artist|venue|registered@acf.test`
+  (password `demo-password-1`, reserved `.test` domain) with obviously fictional profiles, posts, events, tasks,
+  ledger lines and correspondence. The first production admin is granted by one SQL statement (architecture → Admin
+  bootstrap). The legacy artist list is **not** seeded (consent question still open).
+- Consequences: `supabase db push` never runs the seed; production starts empty except for migrations.
+
+## D-054: pgTAP suite layout and the concurrency test
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: `supabase/tests/database/000-helpers` installs a `tests` schema (personas, `tests.as()`, row counters,
+  a fixture of every persona and one row of nearly everything); each test file runs in a rolled-back transaction and
+  truncates the domain tables first, so the suite is independent of the seed; `999-teardown` drops the helpers.
+  Files follow roles.md: structure, public content, account, member space, board space, admin + guard rails,
+  storage (389 assertions). Storage deletes set `storage.allow_delete_query` exactly as the Storage API does.
+  Volunteer capacity under concurrency is a real two-session race (`supabase/tests/concurrency/volunteer-capacity.sh`)
+  that fails without the row lock (verified by removing it).
+- Consequences: `npm run db:test` runs both; CI runs them on every PR.
+
+## D-055: Local Supabase stack in development and CI
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: The Supabase CLI is a pinned devDependency (`supabase@2.119`). `npm run db:start` (Docker) runs Postgres
+  17, Auth, Storage and Mailpit; Studio, Realtime, Edge Functions and Logflare are disabled to keep it light.
+  `npm run db:env` writes the local URL/keys into `.env.local`. CI starts the same stack, runs `db:lint`
+  (plpgsql_check + security/performance advisors, failing on warnings), `db:test`, a stale-types check, then the app
+  checks and e2e (auth journeys read their emails from Mailpit).
+- Consequences: Contributors need Docker. In Claude cloud sessions the daemon must be started first (`dockerd &`).
+
+## D-056: Session refresh in the proxy only when an auth cookie exists; static public pages stay static
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: `src/proxy.ts` runs next-intl, then `updateSession()` (createServerClient + `getClaims()`), which writes
+  rotated cookies and no-cache headers onto the next-intl response. It returns immediately when no `sb-*` cookie is
+  present. The header's "Sign in / My account" link is a client island that only checks for the auth cookie, so the
+  public pages keep prerendering; the cookie-less `createPublicClient()` serves future public reads.
+- Consequences: Public pages are still `●` (SSG) in the build output; hidden areas and auth pages are dynamic.
+
+## D-057: Correspondence references and transitions
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: References are `ACF-YYYY-NNN`, numbered per calendar year (Tunis time) under an advisory lock. Forward
+  moves may skip steps (e.g. `sent → signed` when the authority signs on paper); backward moves are admin-only.
+  `transition_correspondence()` sets a transaction-local flag that the guard trigger requires for any status change;
+  archived items are read-only, and the timeline rows are immutable.
+- Consequences: If ACF wants strictly sequential moves, it is a one-line change in the function.
+
+## D-058: Unit-tested lint rules for the service-role client and getSession
+- Date: 2026-10-05 · Phase: 2 · Status: accepted
+- Decision: `no-restricted-imports` forbids `@/lib/supabase/admin` everywhere except `src/app/api/cron/**`,
+  `src/app/api/webhooks/**` and `src/features/account/delete-account.ts`; `no-restricted-syntax` forbids
+  `.getSession()` in `src/`. `src/lib/supabase/admin-import.test.ts` runs ESLint on sample files to prove both
+  directions.
