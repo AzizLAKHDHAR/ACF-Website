@@ -117,6 +117,14 @@
     "account": {
       "title": "My account",
       "description": "Your account settings and public profiles."
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Get a link to choose a new password."
+    },
+    "resetPassword": {
+      "title": "New password",
+      "description": "Choose a new password for your account."
     }
   },
   "areas": {
@@ -323,5 +331,68 @@
       }
     },
     "joinTitle": "Join us"
+  },
+  "auth": {
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "newPasswordLabel": "New password",
+    "confirmPasswordLabel": "Confirm password",
+    "displayNameLabel": "Display name",
+    "passwordHint": "At least 8 characters, with letters and digits.",
+    "signInButton": "Sign in",
+    "signUpButton": "Create my account",
+    "magicLinkButton": "Email me a sign-in link",
+    "sendResetButton": "Send the link",
+    "savePasswordButton": "Save password",
+    "signOutButton": "Sign out",
+    "pending": "Please wait…",
+    "passwordTab": "Password",
+    "magicLinkTab": "Email link",
+    "methodLabel": "Sign-in method",
+    "magicLinkIntro": "We’ll email you a one-time sign-in link.",
+    "forgotPasswordLink": "Forgot your password?",
+    "noAccount": "No account yet?",
+    "createAccountLink": "Create an account",
+    "haveAccount": "Already registered?",
+    "signInLink": "Sign in",
+    "backToSignIn": "Back to sign in",
+    "captchaLabel": "Security check",
+    "accountLink": "My account",
+    "notices": {
+      "checkEmail": "Check your inbox: we sent you a link. It expires in one hour.",
+      "passwordUpdated": "Your password has been updated.",
+      "linkInvalid": "This link is invalid or has expired. Request a new one."
+    },
+    "errors": {
+      "invalidInput": "Check the highlighted fields.",
+      "invalidCredentials": "Wrong email address or password.",
+      "emailNotConfirmed": "Confirm your email address first, using the link we sent you.",
+      "weakPassword": "This password is too weak.",
+      "samePassword": "Choose a password different from your current one.",
+      "rateLimited": "Too many attempts. Try again in a few minutes.",
+      "captchaFailed": "The security check failed. Try again.",
+      "sessionExpired": "Your session has expired. Sign in again.",
+      "generic": "Something went wrong. Try again."
+    },
+    "fieldErrors": {
+      "required": "This field is required.",
+      "invalidEmail": "Enter a valid email address.",
+      "weakPassword": "At least 8 characters, with letters and digits.",
+      "tooLong": "This field is too long.",
+      "mismatch": "The passwords don’t match."
+    },
+    "account": {
+      "signedInAs": "Signed in as {email}",
+      "displayName": "Display name",
+      "role": "Association role",
+      "noRole": "No role yet",
+      "roles": {
+        "member": "Member",
+        "board": "Board",
+        "admin": "Administration"
+      },
+      "spaces": "Your spaces",
+      "changePassword": "Change password"
+    }
   }
 }

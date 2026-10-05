@@ -3,6 +3,7 @@
 #   1. install JS dependencies with the package manager matching the lockfile
 #   2. export the pre-installed Chromium path for Playwright
 #   3. pre-fetch the MCP server packages pinned in .mcp.json so they start fast
+#   4. start the Docker daemon, which the local Supabase stack needs (npm run db:start)
 #
 # Idempotent and non-interactive. Runs only in Claude Code on the web
 # (CLAUDE_CODE_REMOTE=true); locally, install dependencies yourself.
@@ -54,6 +55,13 @@ if [[ -f .mcp.json ]]; then
     timeout 120 npx -y "$spec" --version </dev/null >/dev/null 2>&1 \
       || log "could not pre-fetch ${spec} (will be fetched on first use)"
   done
+fi
+
+# 4. Docker daemon for `npm run db:start` (not started automatically in cloud containers).
+#    Best effort and non-blocking: the stack itself is started on demand.
+if command -v dockerd >/dev/null 2>&1 && ! docker info >/dev/null 2>&1; then
+  log "starting the Docker daemon"
+  (dockerd >/tmp/dockerd.log 2>&1 &) || log "could not start dockerd (see /tmp/dockerd.log)"
 fi
 
 log "done"

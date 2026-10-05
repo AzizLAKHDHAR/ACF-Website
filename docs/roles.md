@@ -142,6 +142,26 @@ admin may move an item back (audited). `archived` is read-only.
 7. **Sensitive board data may require MFA.** *Planned (open question):* finance, legal vault and
    correspondence policies also require `aal2`, i.e. a TOTP second factor.
 
+## Enforcement and tests
+
+Every cell above is enforced in `supabase/migrations/` (policies, column grants, SECURITY DEFINER functions and
+triggers; see architecture §7) and tested for allowed **and** denied access in `supabase/tests/database/`:
+
+| Section | Test file |
+|---|---|
+| RLS on every table, grants, hardened functions, buckets | `001-structure.test.sql` |
+| §1 Public content | `010-public-content.test.sql` |
+| §2 Account (incl. invitations) | `020-account.test.sql` |
+| §3 Member space (incl. suspended and deactivated members) | `030-member-space.test.sql` |
+| §4 Board space | `040-board-space.test.sql` |
+| §5 Admin space and Guard rails 1–6 | `050-admin-and-guard-rails.test.sql` |
+| Storage buckets | `060-storage.test.sql` |
+| Volunteer capacity under concurrent sign-ups | `supabase/tests/concurrency/volunteer-capacity.sh` |
+
+Implementation details that the matrix leaves open: co-managers of a profile see each other, and any manager may
+leave a profile (never its last owner); internal review notes are admin-only (`review_event_notes`); members read
+project names, dates and status, while descriptions and amounts are board-only (`project_budgets`).
+
 ## System actor (service role): allowed uses
 
 The service-role key bypasses RLS. It may be used only in these places, and only in server-only modules:

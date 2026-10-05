@@ -7,6 +7,6 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function MemberLayout({ children, params }: LayoutProps<'/[locale]/member'>) {
   await resolveLocaleParam(params);
-  await requireRole('member');
+  await requireRole('member', { returnTo: '/member' });
   return <AreaShell area="member">{children}</AreaShell>;
 }

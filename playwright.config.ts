@@ -1,4 +1,8 @@
+import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
+
+// The auth specs talk to the local Supabase stack; `npm run db:env` writes its URL and keys here.
+if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
 const PORT = Number(process.env.PORT ?? 3000);
 const baseURL = `http://localhost:${PORT}`;

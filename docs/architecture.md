@@ -1,7 +1,7 @@
 # Architecture
 
-Status: **draft for phase 1–2**. Names and columns are a starting point. The migrations written in
-phase 2 are authoritative once merged, and this document is updated to match them. Authorization
+Status: **phase 2 implemented**. The migrations in `supabase/migrations/` are authoritative; §6–8 describe
+them. Authorization
 rules live in [`roles.md`](roles.md); this document describes how they are implemented.
 
 ## 1. Overview
@@ -256,8 +256,8 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `accounts` | `id` (= `auth.users.id`), `display_name`, `avatar_path`, `preferred_locale`, `deactivated_at` | Created by trigger on `auth.users` insert. Readable by self, members+ (directory), admin |
-| `account_private` | `account_id`, `phone`, `notes` | Self, board+ |
+| `accounts` | `id` (= `auth.users.id`), `display_name`, `avatar_path`, `preferred_locale`, `deactivated_at`, `deletion_requested_at` | Created by trigger on `auth.users` insert with the sign-up locale and name. Readable by self, members+ (directory), admin |
+| `account_private` | `account_id`, `phone` | Self (R, U), board+ (R). Created with the account |
 | `memberships` | `user_id` PK, `role app_role`, `status`, `joined_on`, `granted_by` | **One row per user**; hierarchy via rank. Only admin writes. Last-admin trigger |
 | `invitations` | `email`, `role`, `token_hash`, `invited_by`, `expires_at`, `accepted_at` | Admin only. Membership attached on first sign-in with the matching *verified* email |
 
@@ -268,7 +268,7 @@ erDiagram
 | `public_profiles` | `type`, `slug` (unique), `status`, `display_name`, `tagline jsonb`, `bio jsonb`, `governorate_code`, `city`, `avatar_path`, `cover_path`, `links jsonb` (`[{kind,url}]`), `public_contact jsonb`, `submitted_at`, `approved_at`, `approved_by`, `search tsvector` (generated) | Anonymous users read `status='approved'` only |
 | `profile_private` | `profile_id`, `contact_email`, `contact_phone` | Managers + admin |
 | `profile_managers` | `profile_id`, `user_id`, `role` (`owner`/`editor`) | Created atomically with the profile by `create_profile()` RPC |
-| `profile_claims` | `profile_id`, `user_id`, `message`, `status`, `reviewed_by` | Only if ACF seeds unclaimed profiles (open question) |
+| `profile_claims` | `profile_id`, `user_id`, `message`, `status`, `reviewed_by` | **Not created yet**: only if ACF seeds unclaimed profiles (open question, D-050) |
 | `artist_details` | `profile_id`, `kind` (`solo`/`band`/`collective`/`dj`), `formed_year` | |
 | `professional_details` | `profile_id`, `years_experience`, `available_for_hire` | |
 | `venue_details` | `profile_id`, `address`, `lat`, `lng`, `capacity`, `venue_kind`, `has_backline`, `accessibility jsonb` | Map link to OpenStreetMap (no API key) |
@@ -306,7 +306,7 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `projects` | `name`, `description`, `status`, `starts_on`, `ends_on` | Members can read names (task context) |
+| `projects` | `name`, `status`, `starts_on`, `ends_on` | Members can read them (task context); the description lives in `project_budgets.notes` (board) |
 | `project_budgets` | `project_id`, `total_planned_millimes`, `notes` | Board only (private columns split out of `projects`) |
 | `budget_lines` | `project_id`, `category`, `label`, `planned_millimes` | |
 | `ledger_periods` | `label`, `starts_on`, `ends_on`, `closed_at`, `closed_by` | Closed period ⇒ its entries are immutable |
@@ -320,7 +320,8 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `review_events` | `target_type` (`profile`/`event`/`post`), `target_id`, `action`, `actor_id`, `note_public`, `note_internal` | Approval history; owners see `note_public` through a view |
+| `review_events` | `target_type` (`profile`/`event`/`post`), `target_id`, `action`, `actor_id`, `note_public` | Approval history, written by the workflow RPCs; admins, the board (events/posts) and the people concerned read it |
+| `review_event_notes` | `review_event_id`, `note_internal` | Admin only (private column split out, Guard rail 3) |
 | `moderation_reports` | `target_type`, `target_id`, `reason`, `details`, `reporter_id`, `status`, `resolved_by`, `resolution_note` | |
 | `notifications` | `user_id`, `kind`, `payload jsonb`, `read_at` | In-app notifications |
 | `notification_deliveries` | `kind`, `target_id`, `user_id`, `channel`, `sent_at` | Unique key makes cron jobs idempotent |
@@ -399,6 +400,26 @@ create policy "profiles: managers read own" on public.public_profiles
   using ((select private.manages_profile(id)));
 ```
 
+### Privileges (D-049)
+
+RLS decides which *rows*; grants decide which *operations and columns* exist. `20261004230800_grants.sql` revokes
+everything from `anon`/`authenticated` and grants explicitly: `anon` may only `SELECT` the public catalogue
+(taxonomies, profiles and their details, posts, events, line-ups, public settings); `authenticated` gets `SELECT`
+everywhere except the delivery log, plus column-level `INSERT`/`UPDATE`. Status, `*_by`, `deactivated_at` and
+`closed_at` columns are never granted. They change through these SECURITY DEFINER RPCs, each re-checking the caller:
+
+| RPC | Who |
+|---|---|
+| `create_profile(type, slug, display_name)` / `submit_profile(id)` | any signed-in user / the profile's managers |
+| `review_profile(id, approved\|rejected\|suspended\|reinstated, note_public, note_internal)` | admin |
+| `set_post_status(id, status, note)` | board (news); managers of an approved blog; admin (unpublish only) |
+| `propose_event(as_profile, …)` / `set_event_status(id, status, note)` | managers of an approved artist or venue / board |
+| `set_task_status(id, status)` | assignees and board |
+| `meeting_rsvp_counts(id)` / `volunteer_shift_counts(event)` | members (counts only) |
+| `transition_correspondence(id, to_status, note)` | board forward, admin backward |
+| `set_ledger_period_closed(id, closed)` / `set_account_deactivated(id, bool)` | admin |
+| `request_account_deletion()` | any signed-in user (processing is a service-role job) |
+
 Rules:
 - **RLS on every table, no exceptions.** A pgTAP test fails CI if any table in `public` has
   `rowsecurity = false`, or has RLS enabled but no policies (unless it is explicitly listed as deny-all).
@@ -464,8 +485,27 @@ sequenceDiagram
 
 - **Methods:** email + password and email magic link/OTP. Google OAuth is optional (open question).
   Email confirmation is required.
-- **Session:** `@supabase/ssr` cookies. `proxy.ts` composes the next-intl middleware with Supabase
-  session refresh.
+- **Session:** `@supabase/ssr` cookies. `proxy.ts` runs the next-intl middleware, then refreshes the session
+  (`getClaims()`) only when an `sb-*` cookie is present, so anonymous requests to static pages cost nothing (D-056).
+
+### Admin bootstrap
+
+The first admin can't be granted through the app (only admins grant roles). After the person has signed up and
+confirmed their email on the production site, a project owner runs once, in the Supabase SQL editor:
+
+```sql
+insert into public.memberships (user_id, role)
+select id, 'admin' from auth.users where email = 'first.admin@example.org';
+```
+
+The statement runs as the table owner (RLS doesn't apply) and is recorded in `audit_log` with no actor. From then on,
+admins grant roles from `/admin/users` (phase 7), and the last-admin trigger keeps at least one active admin. Locally
+the seed makes `admin@acf.test` the admin.
+- **Email links:** every template in `supabase/templates/` (confirmation, magic link, recovery, email change) links to
+  `/{locale}/auth/confirm?token_hash=…&type=…`. That route handler verifies the token server-side (`verifyOtp`), which
+  sets the session cookies, then redirects: recovery → `/reset-password`, magic link → the page that asked for it,
+  otherwise `/account`. The language follows the sign-up locale stored in user metadata (D-051).
+- **No account enumeration:** sign-up, magic link and password reset always answer "check your email".
 - **Association access:** a user signs up normally. The admin then grants a role from `/admin/users`,
   or sends an invitation that attaches the role when the invited email signs in for the first time.
   There is no self-service path to a role.
@@ -545,7 +585,7 @@ after 7 days of inactivity. Fallbacks: Supabase `pg_cron`, or Vercel Cron (Hobby
 
 | Environment | App | Database | Trigger |
 |---|---|---|---|
-| Local | `npm run dev` | Supabase **dev** project (or local Supabase via CLI + Docker) | — |
+| Local | `npm run dev` | Local Supabase stack (`npm run db:start`, Docker), seeded | — |
 | Preview | Per-PR preview deployment | Supabase **dev** project | PR opened/updated |
 | Production | Vercel (`main`) | Supabase **prod** project | Merge to `main` |
 
@@ -561,6 +601,15 @@ Vercel project settings (done once in the dashboard, never in git):
   Preview points at the Supabase **dev** project, Production at **prod**.
 - Functions region next to the Supabase project's region (for example `fra1` for Supabase
   `eu-central-1`), so server-side queries don't cross the Atlantic. The default is `iad1` (US East).
+
+**Supabase project settings** (dev and prod, once, in the dashboard; schema changes still only by migration):
+- Auth → URL configuration: Site URL = `NEXT_PUBLIC_SITE_URL`; redirect URLs `https://<domain>/**` (and the Vercel
+  preview pattern on **dev** only).
+- Auth → Email templates: paste the four files from `supabase/templates/` (subjects in `config.toml`).
+- Auth → Providers → Email: confirm email on; minimum password length 8 with letters and digits.
+- Auth → SMTP: Resend (phase 2 input), otherwise Supabase's built-in sender is limited to a few emails per hour.
+- Auth → Bot protection: Turnstile secret, and `NEXT_PUBLIC_TURNSTILE_SITE_KEY` in Vercel.
+- Apply migrations with `supabase db push` (never the seed).
 
 **Plan.** Vercel Hobby is free but limited to personal, non-commercial use: an association's
 informational site fits; selling tickets, memberships or services on the site would require Pro.
@@ -579,8 +628,8 @@ Which plan ACF uses is an open question.
 ### CI/CD (GitHub Actions)
 - `ci.yml` on every PR and on `main` (**in place since phase 1**): install → lint → typecheck →
   format check → message-key parity → unit tests (incl. token contrast) → build → Playwright e2e
-  (desktop + mobile, three locales, axe). Phase 2 adds the Supabase local stack (`supabase start` →
-  `db reset` → `supabase test db`, the pgTAP RLS suite).
+  (desktop + mobile, three locales, axe, auth journeys). Since phase 2 it first starts the local Supabase stack and
+  runs `db:lint` (linter + advisors), `db:test` (pgTAP + concurrency) and a stale-types check (D-055).
 - Deployments are not a workflow: Vercel builds `main` and every pull request itself and reports the
   preview URL on the PR.
 - `db-migrate.yml`: applies `supabase/migrations` to **dev** automatically on merge, and to **prod**

@@ -7,6 +7,6 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AdminLayout({ children, params }: LayoutProps<'/[locale]/admin'>) {
   await resolveLocaleParam(params);
-  await requireRole('admin');
+  await requireRole('admin', { returnTo: '/admin' });
   return <AreaShell area="admin">{children}</AreaShell>;
 }

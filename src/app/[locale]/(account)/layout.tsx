@@ -7,6 +7,6 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AccountLayout({ children, params }: LayoutProps<'/[locale]'>) {
   await resolveLocaleParam(params);
-  await requireUser();
+  await requireUser({ returnTo: '/account' });
   return <PublicShell>{children}</PublicShell>;
 }
