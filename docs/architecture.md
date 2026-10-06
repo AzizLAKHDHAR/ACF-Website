@@ -141,12 +141,12 @@ required role → `notFound()`, so hidden areas don't reveal that they exist. `r
 
 | Area | Routes |
 |---|---|
-| Public | `/` home · `/news`, `/news/[slug]` · `/blogs`, `/blogs/[blog]`, `/blogs/[blog]/[slug]` · `/artists`, `/artists/[slug]` · `/professionals`, `/professionals/[slug]` · `/venues`, `/venues/[slug]` · `/studios`, `/studios/[slug]` · `/events`, `/events/[slug]` · `/about` · `/contact` · `/legal/privacy` · `/legal/terms` |
+| Public | `/` home · `/news`, `/news/[slug]` · `/blogs`, `/blogs/[blog]`, `/blogs/[blog]/[slug]` · `/artists`, `/artists/[slug]` · `/professionals`, `/professionals/[slug]` · `/venues`, `/venues/[slug]` · `/studios`, `/studios/[slug]` · `/events`, `/events/[slug]` · `/search?q=` (noindex) · `/about` · `/contact` · `/legal/privacy` · `/legal/terms` |
 | Account | `/account` · `/account/settings` (name, locale, avatar, password, MFA) · `/account/profiles` · `/account/profiles/new?type=…` · `/account/profiles/[id]` (edit, submit, managers) · `/account/events/new` (approved artists/venues) · `/account/blog/posts…` (approved blog owners) |
 | Member | `/member` (dashboard: next meetings, my tasks, latest announcements, open polls) · `/member/meetings`, `/member/meetings/[id]` · `/member/tasks` · `/member/announcements` · `/member/polls`, `/member/polls/[id]` · `/member/volunteer` · `/member/documents` · `/member/directory` |
 | Board | `/board` · `/board/tasks` (create/assign) · `/board/meetings` (create) · `/board/announcements` (compose, push to Discord) · `/board/polls` · `/board/volunteering` · `/board/news` · `/board/events` (proposals, publish) · `/board/finance` (ledger) · `/board/finance/projects/[id]` (budgets) · `/board/finance/receipts` · `/board/finance/exports` · `/board/vault` · `/board/correspondence`, `/board/correspondence/[id]` |
 | Admin | `/admin` (analytics) · `/admin/users` (roles, invitations) · `/admin/approvals` · `/admin/moderation` · `/admin/audit` · `/admin/settings` · `/admin/integrations` |
-| API | `POST /api/cron/[job]` · `POST /api/webhooks/signature/[provider]` |
+| API | `POST /api/cron/[job]` · `POST /api/webhooks/content` (cache revalidation, D-062) · `POST /api/webhooks/signature/[provider]` |
 
 Slugs are Latin (transliterated) and shared across locales; `hreflang` alternates link the three
 locale versions of each page.
@@ -347,9 +347,21 @@ tier's 1 GB of storage is tracked on the admin dashboard.
 
 ### Search
 
-Postgres full-text search with the `simple` configuration plus `unaccent` and `pg_trgm` for fuzzy
-matching across Arabic and Latin scripts, via a generated `search` column on `public_profiles` and
-`events`. No external search service.
+Postgres full-text search with the `simple` configuration via a generated `search` column on
+`public_profiles` (name, city, tagline) and `events` (title, venue). Both the column and the query go
+through the same folding (`private.search_normalize()` / `src/lib/content/search.ts`, D-061): Latin
+accents stripped, Arabic alef forms, taa marbuta and alef maqsura unified, harakat and tatweel dropped.
+Queries are prefix matches (`term:*`). No external search service; `pg_trgm` stays available for fuzzy
+matching if needed.
+
+### Public reads and caching (phase 3)
+
+Public pages read through `src/lib/supabase/public.ts` (anon key, no cookies, so RLS returns only
+approved and published rows) with a tagged fetch cache: `profiles`, `events`, `posts`, `taxonomies`,
+`settings`, 5-minute expiry. Queries live in `src/features/{catalogue,events,posts}/queries.ts`.
+`POST /api/webhooks/content` expires tags by table name (D-062); configure a Supabase Database Webhook
+on the content tables with `Authorization: Bearer $CONTENT_WEBHOOK_SECRET`. Detail pages are ISR on
+first visit; lists render per request from the cached data.
 
 ## 7. Security model
 
@@ -524,6 +536,8 @@ the seed makes `admin@acf.test` the admin.
 ## 9. Integrations
 
 ### Email: Resend
+- Phase 3: the contact form sends plain text through the HTTP API to `CONTACT_EMAIL_TO` and stores
+  nothing (D-064).
 - One provider for both **Supabase Auth emails** (custom SMTP, which lifts the built-in SMTP's very low
   rate limit) and **app emails** (Resend HTTP API).
 - Templates in `src/emails/` (React Email), rendered in the recipient's `preferred_locale`; the
@@ -649,6 +663,8 @@ Which plan ACF uses is an open question.
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public | Browser/server client (RLS applies) |
 | `SUPABASE_SECRET_KEY` | **server only** | Service role, only for cron/webhooks/account deletion |
 | `RESEND_API_KEY`, `EMAIL_FROM` | server | Transactional email |
+| `CONTACT_EMAIL_TO`, `RESEND_API_URL` (tests only) | server | Contact form recipient; Resend endpoint override for the e2e mock |
+| `CONTENT_WEBHOOK_SECRET` | server + Supabase webhook | Authenticates `POST /api/webhooks/content` (cache revalidation, D-062) |
 | `DISCORD_BOT_TOKEN`, `DISCORD_ANNOUNCEMENTS_CHANNEL_ID`, `DISCORD_WEBHOOK_URL_ANNOUNCEMENTS`, `DISCORD_WEBHOOK_URL_EVENTS` | server | Discord sync |
 | `CRON_SECRET` | server + GitHub secret | Authenticates cron calls |
 | `SIGNATURE_PROVIDER` (`manual`/`documenso`/`docuseal`), `SIGNATURE_API_URL`, `SIGNATURE_API_KEY`, `SIGNATURE_WEBHOOK_SECRET` | server | E-signature |

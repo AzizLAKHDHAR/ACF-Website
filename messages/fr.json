@@ -521,7 +521,58 @@
     },
     "legal": {
       "draft": "Brouillon à faire valider par l’ACF : ce texte n’a pas encore de valeur juridique.",
-      "updated": "Dernière mise à jour : {date}"
+      "privacy": {
+        "s1": {
+          "title": "Qui sommes-nous",
+          "body": "Ce site est publié par l’association ACF (Tunisie). Pour toute question sur vos données, utilisez la page Contact."
+        },
+        "s2": {
+          "title": "Données collectées",
+          "body": "Pour un compte : adresse e-mail, nom affiché et langue préférée. Pour un profil public : les informations que vous choisissez de publier. Pour le formulaire de contact : votre nom, votre e-mail et votre message, transmis par e-mail et non conservés sur le site."
+        },
+        "s3": {
+          "title": "Finalités",
+          "body": "Gérer votre compte, publier les profils et contenus approuvés, répondre à vos messages et assurer la sécurité du site. Aucune publicité, aucune revente de données."
+        },
+        "s4": {
+          "title": "Hébergement et sous-traitants",
+          "body": "Les données sont hébergées par Supabase (base de données, authentification, fichiers) et le site par Vercel. Les e-mails passent par Resend ; la protection anti-robots par Cloudflare Turnstile."
+        },
+        "s5": {
+          "title": "Lecteurs intégrés",
+          "body": "Les lecteurs YouTube, Spotify ou SoundCloud ne se chargent qu’après votre clic ; ces services peuvent alors déposer leurs propres cookies."
+        },
+        "s6": {
+          "title": "Vos droits",
+          "body": "Conformément à la loi organique n° 2004-63 relative à la protection des données à caractère personnel, vous pouvez accéder à vos données, les rectifier ou demander leur suppression. Vous pouvez aussi saisir l’INPDP."
+        }
+      },
+      "terms": {
+        "s1": {
+          "title": "Objet",
+          "body": "Ces conditions encadrent l’utilisation du site de l’association ACF et de ses espaces membres."
+        },
+        "s2": {
+          "title": "Comptes",
+          "body": "Vous êtes responsable de la confidentialité de votre mot de passe et des informations de votre compte."
+        },
+        "s3": {
+          "title": "Contenus publiés",
+          "body": "Vous garantissez détenir les droits sur ce que vous publiez. Les profils, événements et articles sont relus avant publication ; ACF peut refuser ou retirer un contenu contraire à la loi ou à ses valeurs."
+        },
+        "s4": {
+          "title": "Liens externes",
+          "body": "Les liens vers d’autres sites sont fournis par commodité ; ACF n’est pas responsable de leur contenu."
+        },
+        "s5": {
+          "title": "Responsabilité",
+          "body": "Le site est fourni en l’état. ACF fait de son mieux pour l’exactitude des informations, notamment des dates d’événements, sans pouvoir la garantir."
+        },
+        "s6": {
+          "title": "Droit applicable",
+          "body": "Ces conditions sont soumises au droit tunisien."
+        }
+      }
     }
   }
 }

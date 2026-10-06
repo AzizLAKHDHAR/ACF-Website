@@ -521,7 +521,58 @@
     },
     "legal": {
       "draft": "Draft to be validated by ACF: this text has no legal force yet.",
-      "updated": "Last updated: {date}"
+      "privacy": {
+        "s1": {
+          "title": "Who we are",
+          "body": "This website is published by the ACF association (Tunisia). For any question about your data, use the Contact page."
+        },
+        "s2": {
+          "title": "Data we collect",
+          "body": "For an account: email address, display name and preferred language. For a public profile: the information you choose to publish. For the contact form: your name, email and message, forwarded by email and not kept on the site."
+        },
+        "s3": {
+          "title": "Purposes",
+          "body": "Running your account, publishing approved profiles and content, answering your messages and keeping the site secure. No advertising, no selling of data."
+        },
+        "s4": {
+          "title": "Hosting and processors",
+          "body": "Data is hosted by Supabase (database, authentication, files) and the site by Vercel. Emails go through Resend; bot protection through Cloudflare Turnstile."
+        },
+        "s5": {
+          "title": "Embedded players",
+          "body": "YouTube, Spotify or SoundCloud players load only after you click; those services may then set their own cookies."
+        },
+        "s6": {
+          "title": "Your rights",
+          "body": "Under Organic Law No. 2004-63 on the protection of personal data, you may access, correct or ask us to delete your data. You may also contact the INPDP."
+        }
+      },
+      "terms": {
+        "s1": {
+          "title": "Purpose",
+          "body": "These terms govern the use of the ACF association’s website and its member areas."
+        },
+        "s2": {
+          "title": "Accounts",
+          "body": "You are responsible for keeping your password and account information confidential."
+        },
+        "s3": {
+          "title": "Published content",
+          "body": "You confirm that you hold the rights to what you publish. Profiles, events and articles are reviewed before publication; ACF may refuse or remove content that breaks the law or its values."
+        },
+        "s4": {
+          "title": "External links",
+          "body": "Links to other sites are provided for convenience; ACF is not responsible for their content."
+        },
+        "s5": {
+          "title": "Liability",
+          "body": "The site is provided as is. ACF does its best to keep information, especially event dates, accurate but cannot guarantee it."
+        },
+        "s6": {
+          "title": "Governing law",
+          "body": "These terms are governed by Tunisian law."
+        }
+      }
     }
   }
 }

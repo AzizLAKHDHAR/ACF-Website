@@ -11,11 +11,11 @@ mainstream. Trilingual — **French (default), Arabic (RTL) and English** — wi
 | **Board** (hidden) | Task assignment, finances, legal vault, correspondence with the supervising authority |
 | **Admin** (hidden) | Users and roles, profile approvals, moderation, audit log, analytics, settings |
 
-> **Status: phase 2 of 9 done — data model, auth and RLS.** The trilingual site uses the charter in
-> `/brand` in light and dark themes. The full database schema is in place with row-level security tested
-> against the [permission matrix](docs/roles.md), and accounts work end to end (sign-up with email
-> confirmation, password or magic-link sign-in, password reset). Public pages other than home and About
-> are placeholders until phase 3 ([roadmap](docs/roadmap.md)).
+> **Status: phase 3 of 9 done — public site.** The trilingual site uses the charter in `/brand` in light
+> and dark themes. The full database schema is in place with row-level security tested against the
+> [permission matrix](docs/roles.md), and accounts work end to end. Every public page reads from the
+> database: catalogues with filters, events, news, blogs, Arabic/Latin search, contact form, sitemap and
+> JSON-LD. Member, board and admin areas are still placeholders ([roadmap](docs/roadmap.md)).
 
 ![Home page in French, Arabic and English, light and dark, desktop and mobile](docs/screenshots/brand/public.jpg)
 
@@ -65,7 +65,7 @@ ACF_PREVIEW_HIDDEN_AREAS=1 npm run dev   # development only — production build
 | `npm run test:e2e` | Playwright on the production build: desktop + mobile, ar/fr/en, axe accessibility |
 | `npm run i18n:check` | `messages/ar.json`, `fr.json`, `en.json` have identical keys and placeholders |
 | `npm run screenshots` | Screenshots in every locale × theme × viewport → `docs/screenshots/brand/` (override with `SCREENSHOT_DIR`) |
-| `npm run lighthouse` | Mobile Lighthouse on `/ar`, `/fr`, `/en` (needs `npm start` running); fails below 90 |
+| `npm run lighthouse` | Mobile Lighthouse on the home pages plus seeded catalogue and detail pages (needs `npm start`); fails below 90 |
 | `npm run db:start` / `db:stop` / `db:reset` | Local Supabase stack; `db:reset` rebuilds it from migrations + seed |
 | `npm run db:test` | pgTAP row-level-security suite + concurrency test |
 | `npm run db:lint` | Database linter and Supabase security/performance advisors |

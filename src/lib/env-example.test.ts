@@ -24,6 +24,7 @@ describe('.env.example', () => {
       'RESEND_API_KEY',
       'DISCORD_BOT_TOKEN',
       'CRON_SECRET',
+      'CONTENT_WEBHOOK_SECRET',
     ]) {
       expect(example).toMatch(new RegExp(`^${name}=$`, 'm'));
     }
