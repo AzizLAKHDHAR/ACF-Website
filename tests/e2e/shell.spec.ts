@@ -3,7 +3,7 @@ import { locales, messages, publicPaths } from './helpers';
 
 test.describe('public pages', () => {
   for (const locale of locales) {
-    test(`render every placeholder page in ${locale}`, async ({ page }) => {
+    test(`render every public section in ${locale}`, async ({ page }) => {
       for (const { key, path } of publicPaths) {
         const response = await page.goto(`/${locale}${path}`);
         expect(response?.status(), path).toBe(200);

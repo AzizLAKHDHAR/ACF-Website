@@ -1,6 +1,6 @@
 -- Local / preview seed. Loaded by `npx supabase db reset` only; never pushed to production
 -- (`supabase db push` does not run it). Two parts:
---   1. Real taxonomies: Tunisia's 24 governorates, genres, professions (in ar/fr/en).
+--   1. (Taxonomies now come from a migration, see below.)
 --   2. CLEARLY FICTIONAL demo data: users on the reserved `.test` domain, made-up names, no real
 --      people or places. Every demo password is `demo-password-1` (local only).
 -- CLAUDE.md → "No fabricated content": nothing below is presented as fact on a real site.
@@ -9,65 +9,8 @@
 -- 1. Taxonomies
 -- ════════════════════════════════════════════════════════════════════════════
 
--- ISO 3166-2:TN codes.
-insert into public.governorates (code, name, position) values
-  ('TN-11', '{"ar":"تونس","fr":"Tunis","en":"Tunis"}', 1),
-  ('TN-12', '{"ar":"أريانة","fr":"Ariana","en":"Ariana"}', 2),
-  ('TN-13', '{"ar":"بن عروس","fr":"Ben Arous","en":"Ben Arous"}', 3),
-  ('TN-14', '{"ar":"منوبة","fr":"La Manouba","en":"Manouba"}', 4),
-  ('TN-21', '{"ar":"نابل","fr":"Nabeul","en":"Nabeul"}', 5),
-  ('TN-22', '{"ar":"زغوان","fr":"Zaghouan","en":"Zaghouan"}', 6),
-  ('TN-23', '{"ar":"بنزرت","fr":"Bizerte","en":"Bizerte"}', 7),
-  ('TN-31', '{"ar":"باجة","fr":"Béja","en":"Beja"}', 8),
-  ('TN-32', '{"ar":"جندوبة","fr":"Jendouba","en":"Jendouba"}', 9),
-  ('TN-33', '{"ar":"الكاف","fr":"Le Kef","en":"Kef"}', 10),
-  ('TN-34', '{"ar":"سليانة","fr":"Siliana","en":"Siliana"}', 11),
-  ('TN-41', '{"ar":"القيروان","fr":"Kairouan","en":"Kairouan"}', 12),
-  ('TN-42', '{"ar":"القصرين","fr":"Kasserine","en":"Kasserine"}', 13),
-  ('TN-43', '{"ar":"سيدي بوزيد","fr":"Sidi Bouzid","en":"Sidi Bouzid"}', 14),
-  ('TN-51', '{"ar":"سوسة","fr":"Sousse","en":"Sousse"}', 15),
-  ('TN-52', '{"ar":"المنستير","fr":"Monastir","en":"Monastir"}', 16),
-  ('TN-53', '{"ar":"المهدية","fr":"Mahdia","en":"Mahdia"}', 17),
-  ('TN-61', '{"ar":"صفاقس","fr":"Sfax","en":"Sfax"}', 18),
-  ('TN-71', '{"ar":"قفصة","fr":"Gafsa","en":"Gafsa"}', 19),
-  ('TN-72', '{"ar":"توزر","fr":"Tozeur","en":"Tozeur"}', 20),
-  ('TN-73', '{"ar":"قبلي","fr":"Kébili","en":"Kebili"}', 21),
-  ('TN-81', '{"ar":"قابس","fr":"Gabès","en":"Gabes"}', 22),
-  ('TN-82', '{"ar":"مدنين","fr":"Médenine","en":"Medenine"}', 23),
-  ('TN-83', '{"ar":"تطاوين","fr":"Tataouine","en":"Tataouine"}', 24);
-
--- The 11 genres of the legacy catalogue (docs/audit.md) plus funk, named on ACF's one-pager (D-053).
-insert into public.genres (slug, name, position) values
-  ('rock', '{"ar":"روك","fr":"Rock","en":"Rock"}', 1),
-  ('jazz', '{"ar":"جاز","fr":"Jazz","en":"Jazz"}', 2),
-  ('metal', '{"ar":"ميتال","fr":"Metal","en":"Metal"}', 3),
-  ('funk', '{"ar":"فانك","fr":"Funk","en":"Funk"}', 4),
-  ('alternative-indie', '{"ar":"بديل / مستقل","fr":"Alternatif / Indé","en":"Alternative / Indie"}', 5),
-  ('hip-hop-rap', '{"ar":"هيب هوب / راب","fr":"Hip-hop / Rap","en":"Hip Hop / Rap"}', 6),
-  ('electronic', '{"ar":"إلكتروني","fr":"Électronique","en":"Electronic"}', 7),
-  ('reggae-dub', '{"ar":"ريغي / دَب","fr":"Reggae / Dub","en":"Reggae / Dub"}', 8),
-  ('pop', '{"ar":"بوب","fr":"Pop","en":"Pop"}', 9),
-  ('classical-instrumental', '{"ar":"كلاسيكي / آلي","fr":"Classique / Instrumental","en":"Classical / Instrumental"}', 10),
-  ('traditional-folk', '{"ar":"تقليدي / شعبي","fr":"Traditionnel / Folk","en":"Traditional / Folk"}', 11),
-  ('soundtracks-scores', '{"ar":"موسيقى تصويرية","fr":"Bandes originales","en":"Soundtracks / Scores"}', 12);
-
-insert into public.professions (slug, name, position) values
-  ('sound-engineer', '{"ar":"مهندس صوت","fr":"Ingénieur·e du son","en":"Sound engineer"}', 1),
-  ('mixing-mastering', '{"ar":"مكساج وماسترينغ","fr":"Mixage et mastering","en":"Mixing and mastering"}', 2),
-  ('music-producer', '{"ar":"منتج موسيقي","fr":"Producteur·rice","en":"Music producer"}', 3),
-  ('lighting-technician', '{"ar":"تقني إضاءة","fr":"Éclairagiste","en":"Lighting technician"}', 4),
-  ('stage-technician', '{"ar":"تقني ركح","fr":"Technicien·ne plateau","en":"Stage technician"}', 5),
-  ('backline-technician', '{"ar":"تقني معدات","fr":"Backliner","en":"Backline technician"}', 6),
-  ('artist-manager', '{"ar":"مدير أعمال فنان","fr":"Manager d’artiste","en":"Artist manager"}', 7),
-  ('booking-agent', '{"ar":"وكيل حجوزات","fr":"Agent·e de booking","en":"Booking agent"}', 8),
-  ('tour-manager', '{"ar":"مدير جولات","fr":"Régisseur·se de tournée","en":"Tour manager"}', 9),
-  ('concert-promoter', '{"ar":"منظم حفلات","fr":"Organisateur·rice de concerts","en":"Concert promoter"}', 10),
-  ('photographer', '{"ar":"مصور فوتوغرافي","fr":"Photographe","en":"Photographer"}', 11),
-  ('videographer', '{"ar":"مصور فيديو","fr":"Vidéaste","en":"Videographer"}', 12),
-  ('graphic-designer', '{"ar":"مصمم غرافيك","fr":"Graphiste","en":"Graphic designer"}', 13),
-  ('music-journalist', '{"ar":"صحفي موسيقي","fr":"Journaliste musical·e","en":"Music journalist"}', 14),
-  ('music-teacher', '{"ar":"مدرس موسيقى","fr":"Professeur·e de musique","en":"Music teacher"}', 15),
-  ('instrument-maker', '{"ar":"صانع آلات موسيقية","fr":"Luthier·ère","en":"Instrument maker"}', 16);
+-- Governorates, genres and professions are reference data: they live in migration
+-- 20261006000000_reference_taxonomies.sql so production gets them too.
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 2. Fictional demo data (local and preview only)
@@ -167,6 +110,69 @@ insert into public.events (slug, title, starts_at, venue_profile_id, governorate
   ('demo-proposition', '{"fr":"Soirée proposée (démo)","ar":"سهرة مقترحة (تجريبية)","en":"Proposed night (demo)"}',
    now() + interval '35 days', '00000000-0000-4000-b000-000000000002', 'TN-51', 'pending', '00000000-0000-4000-a000-000000000005');
 insert into public.event_lineup (event_id, profile_id, position) values ('00000000-0000-4000-d000-000000000001', '00000000-0000-4000-b000-000000000001', 0);
+
+-- More of the fictional catalogue, so lists, filters and search have something to show (phase 3).
+-- One Arabic-named artist exercises Arabic search; one draft profile and one draft event must never
+-- appear anywhere public. The YouTube id is a placeholder: the embed loads only on click.
+insert into public.public_profiles (id, type, slug, status, display_name, tagline, bio, governorate_code, city,
+                                    links, created_by, submitted_at, approved_at, approved_by)
+values
+  ('00000000-0000-4000-b000-000000000006', 'artist', 'demo-al-amwaj', 'approved', 'الأمواج (تجريبي)',
+   '{"ar":"فرقة جاز وفانك خيالية","fr":"Groupe fictif de jazz et funk","en":"Fictional jazz and funk band"}',
+   '{"ar":"ملف تجريبي لفرقة غير موجودة.","fr":"Profil de démonstration d’un groupe inexistant.","en":"Demo profile of a band that does not exist."}',
+   'TN-61', 'Sfax', '[{"kind":"youtube","url":"https://www.youtube.com/watch?v=demo0000000"},{"kind":"instagram","url":"https://www.instagram.com/example"}]',
+   '00000000-0000-4000-a000-000000000004', now(), now(), '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-b000-000000000007', 'venue', 'demo-cave-fictive', 'approved', 'La Cave Fictive (démo)',
+   '{"fr":"Club de jazz fictif","ar":"نادي جاز خيالي","en":"Fictional jazz club"}', '{}',
+   'TN-11', 'Tunis', '[]', '00000000-0000-4000-a000-000000000005', now(), now(), '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-b000-000000000008', 'studio', 'demo-studio-nuit', 'approved', 'Studio Nuit (démo)',
+   '{"fr":"Studio d’enregistrement fictif","ar":"استوديو تسجيل خيالي","en":"Fictional recording studio"}', '{}',
+   'TN-21', 'Nabeul', '[]', '00000000-0000-4000-a000-000000000006', now(), now(), '00000000-0000-4000-a000-000000000001'),
+  ('00000000-0000-4000-b000-000000000009', 'artist', 'demo-brouillon-artiste', 'draft', 'Brouillon Secret (démo)',
+   '{"fr":"Ne doit jamais apparaître publiquement"}', '{}', 'TN-11', 'Tunis', '[]',
+   '00000000-0000-4000-a000-000000000004', null, null, null);
+insert into public.profile_managers (profile_id, user_id, role) values
+  ('00000000-0000-4000-b000-000000000006', '00000000-0000-4000-a000-000000000004', 'owner'),
+  ('00000000-0000-4000-b000-000000000007', '00000000-0000-4000-a000-000000000005', 'owner'),
+  ('00000000-0000-4000-b000-000000000008', '00000000-0000-4000-a000-000000000006', 'owner'),
+  ('00000000-0000-4000-b000-000000000009', '00000000-0000-4000-a000-000000000004', 'owner');
+insert into public.artist_details (profile_id, kind, formed_year) values
+  ('00000000-0000-4000-b000-000000000006', 'band', 2021), ('00000000-0000-4000-b000-000000000009', 'solo', null);
+insert into public.venue_details (profile_id, address, capacity, venue_kind, has_backline)
+  values ('00000000-0000-4000-b000-000000000007', 'Adresse fictive', 120, 'jazz club', false);
+insert into public.studio_details (profile_id, services) values ('00000000-0000-4000-b000-000000000008', '{recording,mixing,mastering}');
+insert into public.profile_genres (profile_id, genre_id)
+select '00000000-0000-4000-b000-000000000006', id from public.genres where slug in ('jazz', 'funk');
+
+insert into public.events (id, slug, title, description, starts_at, ends_at, venue_profile_id, governorate_code,
+                           ticket_url, is_free, organized_by_acf, status, published_at, published_by) values
+  ('00000000-0000-4000-d000-000000000002', 'demo-soiree-jazz', '{"fr":"Soirée jazz (démo)","ar":"سهرة جاز (تجريبية)","en":"Jazz night (demo)"}',
+   '{"fr":"Soirée fictive à La Cave Fictive.","ar":"سهرة خيالية.","en":"A fictional night."}', now() + interval '10 days', null,
+   '00000000-0000-4000-b000-000000000007', 'TN-11', 'https://example.org/demo-tickets', false, false, 'published', now(), '00000000-0000-4000-a000-000000000002'),
+  ('00000000-0000-4000-d000-000000000003', 'demo-concert-passe', '{"fr":"Concert passé (démo)","ar":"حفل سابق (تجريبي)","en":"Past concert (demo)"}',
+   '{"fr":"Un concert fictif déjà passé.","ar":"حفل خيالي مضى.","en":"A fictional concert in the past."}', now() - interval '30 days', null,
+   '00000000-0000-4000-b000-000000000007', 'TN-11', null, true, true, 'published', now() - interval '40 days', '00000000-0000-4000-a000-000000000002'),
+  ('00000000-0000-4000-d000-000000000004', 'demo-evenement-brouillon', '{"fr":"Événement brouillon secret (démo)"}',
+   '{}', now() + interval '50 days', null, null, 'TN-11', null, true, true, 'draft', null, null);
+insert into public.event_lineup (event_id, profile_id, position) values
+  ('00000000-0000-4000-d000-000000000002', '00000000-0000-4000-b000-000000000006', 0),
+  ('00000000-0000-4000-d000-000000000003', '00000000-0000-4000-b000-000000000006', 0),
+  ('00000000-0000-4000-d000-000000000003', '00000000-0000-4000-b000-000000000001', 1);
+
+insert into public.posts (kind, locale, translation_group, slug, title, excerpt, body_md, status, published_at, author_id) values
+  ('news', 'fr', '00000000-0000-4000-c000-000000000002', 'demo-appel-benevoles', 'Appel à bénévoles (démo)',
+   'Un second article fictif.', 'Texte fictif avec un [lien](https://example.org).', 'published', now() - interval '10 days', '00000000-0000-4000-a000-000000000002'),
+  ('news', 'ar', '00000000-0000-4000-c000-000000000002', 'demo-appel-benevoles', 'نداء للمتطوعين (تجريبي)',
+   'مقال خيالي ثانٍ.', 'نص خيالي مع [رابط](https://example.org).', 'published', now() - interval '10 days', '00000000-0000-4000-a000-000000000002'),
+  ('news', 'en', '00000000-0000-4000-c000-000000000002', 'demo-appel-benevoles', 'Call for volunteers (demo)',
+   'A second fictional article.', 'Fictional text with a [link](https://example.org).', 'published', now() - interval '10 days', '00000000-0000-4000-a000-000000000002');
+insert into public.posts (kind, blog_profile_id, locale, slug, title, excerpt, body_md, status, published_at, author_id) values
+  ('blog', '00000000-0000-4000-b000-000000000003', 'ar', 'demo-tadwina', 'تدوينة تجريبية', 'تدوينة خيالية.',
+   'نص **تدوينة** خيالية.', 'published', now() - interval '2 days', '00000000-0000-4000-a000-000000000004'),
+  ('blog', '00000000-0000-4000-b000-000000000003', 'en', 'demo-first-post', 'First post (demo)', 'A fictional blog post.',
+   'A fictional **blog** post.', 'published', now() - interval '2 days', '00000000-0000-4000-a000-000000000004'),
+  ('blog', '00000000-0000-4000-b000-000000000003', 'fr', 'demo-billet-brouillon', 'Billet brouillon secret (démo)', null,
+   'Jamais public.', 'draft', null, '00000000-0000-4000-a000-000000000004');
 
 -- Member space.
 insert into public.meetings (title, description_md, starts_at, ends_at, location_text, audience) values

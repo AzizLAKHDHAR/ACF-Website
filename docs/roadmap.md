@@ -86,15 +86,17 @@ search; events (upcoming/past, filters); detail pages; about, contact, privacy, 
 `sitemap.xml` with `hreflang`, robots, OG images, JSON-LD); click-to-load media embeds.
 
 Acceptance criteria:
-- [ ] No hard-coded content: every list and detail page reads from Supabase.
-- [ ] Only `approved` profiles and `published` posts/events are visible. E2E seeds a draft and asserts it's absent everywhere, including sitemap and search.
-- [ ] Filters: genre, governorate, profile type, date range for events. Full-text search across profiles and events works for Arabic and Latin names.
-- [ ] Pages are statically cached and revalidated by tag when content is published or approved (verified: publish → visible without redeploy).
-- [ ] `sitemap.xml` lists every public URL in all locales with `hreflang` alternates. Hidden areas are excluded.
-- [ ] JSON-LD validates (MusicGroup/Person, MusicVenue/Place, Event, Article).
-- [ ] Contact form (Turnstile) emails ACF and stores nothing sensitive.
-- [ ] axe: no serious/critical violations on any public template in `ar` and `fr`. Lighthouse ≥ 90 on home, catalogue and detail pages.
-- [ ] Embeds don't load third-party scripts until the user clicks.
+- [x] No hard-coded content: every list and detail page reads from Supabase.
+- [x] Only `approved` profiles and `published` posts/events are visible. E2E seeds a draft and asserts it's absent everywhere, including sitemap and search.
+- [x] Filters: genre, governorate, profile type, date range for events. Full-text search across profiles and events works for Arabic and Latin names.
+- [x] Pages are statically cached and revalidated by tag when content is published or approved (verified: publish → visible without redeploy).
+- [x] `sitemap.xml` lists every public URL in all locales with `hreflang` alternates. Hidden areas are excluded.
+- [ ] JSON-LD validates (MusicGroup/Person, MusicVenue/Place, Event, Article). Structure is unit- and e2e-tested; run Google's Rich Results test once deployed.
+- [x] Contact form (Turnstile) emails ACF and stores nothing sensitive.
+- [x] axe: no serious/critical violations on any public template in `ar` and `fr`. Lighthouse ≥ 90 on home, catalogue and detail pages.
+- [x] Embeds don't load third-party scripts until the user clicks.
+
+Done in the phase 3 PR (D-060 to D-065). Legal texts are drafts awaiting ACF; contact needs `CONTACT_EMAIL_TO`.
 
 Inputs needed: About/mission text in 3 languages, contact address, legal texts (or OK to draft), decision on migrating legacy content.
 

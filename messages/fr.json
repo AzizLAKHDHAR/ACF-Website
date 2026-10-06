@@ -27,7 +27,8 @@
     "signIn": "Se connecter",
     "backToSite": "Retour au site public",
     "comingSoon": "Bientôt disponible",
-    "placeholderNotice": "Cette page est provisoire. Son contenu arrivera lors d'une prochaine phase de la refonte."
+    "placeholderNotice": "Cette page est provisoire. Son contenu arrivera lors d'une prochaine phase de la refonte.",
+    "search": "Rechercher"
   },
   "nav": {
     "primary": "Navigation principale",
@@ -125,6 +126,10 @@
     "resetPassword": {
       "title": "Nouveau mot de passe",
       "description": "Choisissez un nouveau mot de passe pour votre compte."
+    },
+    "search": {
+      "title": "Rechercher",
+      "description": "Artistes, professionnels, salles, studios, blogs et événements."
     }
   },
   "areas": {
@@ -393,6 +398,181 @@
       },
       "spaces": "Vos espaces",
       "changePassword": "Changer de mot de passe"
+    }
+  },
+  "content": {
+    "filters": {
+      "label": "Filtrer",
+      "search": "Rechercher",
+      "searchPlaceholder": "Nom, ville…",
+      "genre": "Genre",
+      "governorate": "Gouvernorat",
+      "all": "Tous",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser",
+      "from": "Du",
+      "to": "Au",
+      "when": "Période",
+      "upcoming": "À venir",
+      "past": "Passés"
+    },
+    "results": "{count, plural, =0 {Aucun résultat} one {# résultat} other {# résultats}}",
+    "empty": {
+      "profiles": "Aucun profil ne correspond pour l’instant.",
+      "events": "Aucun événement ne correspond pour l’instant.",
+      "posts": "Aucun article pour l’instant.",
+      "blogs": "Aucun blog pour l’instant."
+    },
+    "pagination": {
+      "label": "Pagination",
+      "previous": "Page précédente",
+      "next": "Page suivante",
+      "status": "Page {page} sur {pages}"
+    },
+    "profile": {
+      "genres": "Genres",
+      "professions": "Métiers",
+      "location": "Lieu",
+      "links": "Liens",
+      "listen": "Écouter et voir",
+      "events": "Événements",
+      "noEvents": "Aucun événement publié.",
+      "formed": "Formé en {year}",
+      "capacity": "Capacité : {count, number} personnes",
+      "backline": "Backline disponible",
+      "services": "Services",
+      "experience": "{years, plural, one {# an} other {# ans}} d’expérience",
+      "availableForHire": "Disponible pour des missions",
+      "address": "Adresse",
+      "posts": "Billets",
+      "kind": {
+        "solo": "Artiste solo",
+        "band": "Groupe",
+        "collective": "Collectif",
+        "dj": "DJ"
+      },
+      "service": {
+        "recording": "Enregistrement",
+        "mixing": "Mixage",
+        "mastering": "Mastering",
+        "rehearsal": "Répétition",
+        "production": "Production"
+      },
+      "back": "Retour à la liste"
+    },
+    "event": {
+      "date": "Date",
+      "venue": "Lieu",
+      "lineup": "Programmation",
+      "tickets": "Billetterie",
+      "free": "Entrée libre",
+      "byAcf": "Organisé par l’ACF",
+      "back": "Retour aux événements",
+      "past": "Cet événement est passé."
+    },
+    "post": {
+      "publishedOn": "Publié le {date}",
+      "readMore": "Lire la suite",
+      "backToNews": "Retour aux actualités",
+      "backToBlog": "Retour au blog",
+      "otherLanguages": "Aussi disponible en",
+      "latest": "Derniers billets",
+      "allBlogs": "Tous les blogs",
+      "language": "En {language}"
+    },
+    "embed": {
+      "play": "Charger le lecteur {provider}",
+      "notice": "Le lecteur se charge seulement si vous cliquez : {provider} peut alors déposer des cookies.",
+      "title": "Lecteur {provider}"
+    },
+    "home": {
+      "latestNews": "Dernières actualités",
+      "upcomingEvents": "Prochains événements",
+      "allNews": "Toutes les actualités",
+      "allEvents": "Tous les événements"
+    },
+    "search": {
+      "title": "Rechercher",
+      "description": "Artistes, professionnels, salles, studios, blogs et événements.",
+      "label": "Rechercher sur le site",
+      "submit": "Rechercher",
+      "profiles": "Profils",
+      "events": "Événements",
+      "none": "Aucun résultat pour « {query} ».",
+      "hint": "Saisissez au moins un mot."
+    },
+    "contact": {
+      "intro": "Une question, une proposition, une envie de rejoindre l’association ? Écrivez-nous.",
+      "name": "Votre nom",
+      "email": "Votre adresse e-mail",
+      "subject": "Objet",
+      "message": "Message",
+      "send": "Envoyer",
+      "sent": "Merci ! Votre message a été envoyé.",
+      "unavailable": "Le formulaire n’est pas encore activé. Réessayez plus tard.",
+      "privacy": "Votre message nous est transmis par e-mail ; nous ne le conservons pas sur le site.",
+      "honeypot": "Laissez ce champ vide",
+      "errors": {
+        "invalidInput": "Vérifiez les champs signalés.",
+        "unavailable": "Le formulaire n’est pas encore actif. Réessayez plus tard.",
+        "captcha": "La vérification de sécurité a échoué. Réessayez.",
+        "failed": "Votre message n’a pas pu être envoyé. Réessayez dans un instant."
+      }
+    },
+    "legal": {
+      "draft": "Brouillon à faire valider par l’ACF : ce texte n’a pas encore de valeur juridique.",
+      "privacy": {
+        "s1": {
+          "title": "Qui sommes-nous",
+          "body": "Ce site est publié par l’association ACF (Tunisie). Pour toute question sur vos données, utilisez la page Contact."
+        },
+        "s2": {
+          "title": "Données collectées",
+          "body": "Pour un compte : adresse e-mail, nom affiché et langue préférée. Pour un profil public : les informations que vous choisissez de publier. Pour le formulaire de contact : votre nom, votre e-mail et votre message, transmis par e-mail et non conservés sur le site."
+        },
+        "s3": {
+          "title": "Finalités",
+          "body": "Gérer votre compte, publier les profils et contenus approuvés, répondre à vos messages et assurer la sécurité du site. Aucune publicité, aucune revente de données."
+        },
+        "s4": {
+          "title": "Hébergement et sous-traitants",
+          "body": "Les données sont hébergées par Supabase (base de données, authentification, fichiers) et le site par Vercel. Les e-mails passent par Resend ; la protection anti-robots par Cloudflare Turnstile."
+        },
+        "s5": {
+          "title": "Lecteurs intégrés",
+          "body": "Les lecteurs YouTube, Spotify ou SoundCloud ne se chargent qu’après votre clic ; ces services peuvent alors déposer leurs propres cookies."
+        },
+        "s6": {
+          "title": "Vos droits",
+          "body": "Conformément à la loi organique n° 2004-63 relative à la protection des données à caractère personnel, vous pouvez accéder à vos données, les rectifier ou demander leur suppression. Vous pouvez aussi saisir l’INPDP."
+        }
+      },
+      "terms": {
+        "s1": {
+          "title": "Objet",
+          "body": "Ces conditions encadrent l’utilisation du site de l’association ACF et de ses espaces membres."
+        },
+        "s2": {
+          "title": "Comptes",
+          "body": "Vous êtes responsable de la confidentialité de votre mot de passe et des informations de votre compte."
+        },
+        "s3": {
+          "title": "Contenus publiés",
+          "body": "Vous garantissez détenir les droits sur ce que vous publiez. Les profils, événements et articles sont relus avant publication ; ACF peut refuser ou retirer un contenu contraire à la loi ou à ses valeurs."
+        },
+        "s4": {
+          "title": "Liens externes",
+          "body": "Les liens vers d’autres sites sont fournis par commodité ; ACF n’est pas responsable de leur contenu."
+        },
+        "s5": {
+          "title": "Responsabilité",
+          "body": "Le site est fourni en l’état. ACF fait de son mieux pour l’exactitude des informations, notamment des dates d’événements, sans pouvoir la garantir."
+        },
+        "s6": {
+          "title": "Droit applicable",
+          "body": "Ces conditions sont soumises au droit tunisien."
+        }
+      }
     }
   }
 }

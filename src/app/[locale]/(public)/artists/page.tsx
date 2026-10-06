@@ -1,6 +1,6 @@
-import { placeholderRoute } from '@/lib/routes/placeholder-route';
+import { catalogueListRoute } from '@/lib/routes/catalogue-route';
 
-const route = placeholderRoute('artists', '/artists');
+const route = catalogueListRoute('artists');
 
 export const generateMetadata = route.generateMetadata;
 export default route.Page;

@@ -524,3 +524,55 @@ Format:
   dev-only by rule and there is no dev project.
 - Consequences: Auth journeys are tested locally and in CI, never against live users. If ACF later wants previews
   with a database, a second free project can be added as `dev` without code changes.
+
+## D-060: Reference taxonomies ship as a migration, not seed
+- Date: 2026-10-06 · Phase: 3 · Status: accepted
+- Context: Production has only migrations (D-059); `seed.sql` never reaches it, so the 24 governorates, genres and
+  professions that every filter depends on would have been missing there.
+- Decision: `20261006000000_reference_taxonomies.sql` inserts them with `on conflict do nothing`. `seed.sql` keeps
+  only fictional demo data.
+- Consequences: Admins can still edit or add rows; re-running the migration never overwrites their changes.
+
+## D-061: Search normalization shared by the database and the app
+- Date: 2026-10-06 · Phase: 3 · Status: accepted
+- Context: People type «الامواج» for «الأمواج» and «soiree» for «Soirée». Plain `unaccent` also strips Arabic
+  hamza and splits words on harakat.
+- Decision: `private.search_normalize()` lowercases, strips Latin accents, drops harakat and tatweel, folds
+  أ/إ/آ/ٱ → ا, ة → ه, ى → ي. The generated `search` columns of `public_profiles` and `events` use it, and
+  `src/lib/content/search.ts` applies the same folding to the query (prefix matching, `simple` config).
+- Consequences: Both sides must change together (unit test + pgTAP `070-search`). Fuzzy (trigram) matching is not
+  needed yet.
+
+## D-062: Public pages use a tagged data cache with webhook revalidation
+- Date: 2026-10-06 · Phase: 3 · Status: accepted
+- Decision: The public Supabase client (anon, no cookies) fetches with `force-cache`, a 5-minute `revalidate` and
+  tags per content family (`profiles`, `events`, `posts`, `taxonomies`, `settings`). Detail pages are ISR
+  (`generateStaticParams` returns `[]`, `revalidate = 300`); lists read `searchParams` and render per request from
+  the cached data. `POST /api/webhooks/content` (Bearer `CONTENT_WEBHOOK_SECRET`, constant-time) maps a table name
+  to its tags and expires them; phase 4 publishing actions will call `revalidateTag` directly. If Supabase is
+  unreachable, reads fall back to empty lists so a preview without a database still renders.
+- Consequences: To make changes made outside the app appear instantly, create a Supabase Database Webhook on the
+  content tables pointing at `/api/webhooks/content` with that header. Without it, changes show within 5 minutes.
+
+## D-063: Markdown via react-markdown, no raw HTML
+- Date: 2026-10-06 · Phase: 3 · Status: accepted
+- Decision: Post bodies render with `react-markdown` (new dependency, rendered only in Server Components so it adds nothing to client bundles) with `skipHtml`; links keep only
+  http(s), relative and `mailto:` targets, outbound links get `rel="nofollow ugc noopener"`, images are lazy and
+  sent no referrer. No HTML sanitizer is needed because no HTML is ever parsed.
+- Consequences: Authors can't embed raw HTML or iframes in posts; media embeds stay on profiles (click-to-load).
+
+## D-064: The contact form forwards by email and stores nothing
+- Date: 2026-10-06 · Phase: 3 · Status: accepted
+- Decision: `sendContactMessage` is the only anonymous Server Action. It validates with Zod, drops honeypot hits
+  silently, verifies Turnstile when `TURNSTILE_SECRET_KEY` is set, and sends plain text through Resend's HTTP API
+  to the fixed `CONTACT_EMAIL_TO` with the visitor as Reply-To. Nothing is written to the database. Without the
+  Resend key, sender or recipient, the page says the form isn't active yet.
+- Consequences: No per-IP rate limit beyond Turnstile and Resend's own quota; add one (e.g. a small table or
+  Vercel Firewall rule) if spam appears. The e2e suite points `RESEND_API_URL` at a local mock.
+
+## D-065: Draft legal texts and a default OG image
+- Date: 2026-10-06 · Phase: 3 · Status: accepted
+- Decision: Privacy policy and terms ship as drafts in three languages (citing organic law 2004-63 and the INPDP),
+  each with a visible "draft to be validated by ACF" notice. Pages without their own cover use a generated Open Graph
+  image (`[locale]/opengraph-image.tsx`) with the Latin brand name, so no Arabic font is bundled.
+- Consequences: ACF (or its lawyer) must validate the legal texts before launch; removing the notice is one key.

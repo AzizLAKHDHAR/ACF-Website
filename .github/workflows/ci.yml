@@ -48,6 +48,18 @@ jobs:
       - name: Point the app at the local stack
         run: node scripts/supabase-env.mjs --print >> "$GITHUB_ENV"
 
+      # Test-only values (same as playwright.config.ts): the contact form posts to the mock Resend
+      # server started by Playwright, and the e2e suite calls the revalidation webhook.
+      - name: E2E service stand-ins
+        run: |
+          {
+            echo "RESEND_API_URL=http://127.0.0.1:3999"
+            echo "RESEND_API_KEY=re_e2e_test_key"
+            echo "EMAIL_FROM=ACF <no-reply@acf.test>"
+            echo "CONTACT_EMAIL_TO=contact@acf.test"
+            echo "CONTENT_WEBHOOK_SECRET=e2e-content-webhook-secret-0123456789abcdef"
+          } >> "$GITHUB_ENV"
+
       - name: Lint
         run: npm run lint
 

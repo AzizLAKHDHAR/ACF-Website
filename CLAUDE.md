@@ -15,12 +15,13 @@ scene. It has four access levels: public · members · board · admin. Read thes
 
 ## Current state
 
-**Phases 1 (foundation, ACF brand) and 2 (data model, auth, RLS, seed) are done; phase 3 (public site) is
-next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
+**Phases 1 (foundation, ACF brand), 2 (data model, auth, RLS, seed) and 3 (public site) are done; phase 4
+(profile onboarding and admin approval) is next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
 pgTAP suite that encodes `docs/roles.md` (`npm run db:test`). Authentication works end to end: sign-up with email
 confirmation, password and magic-link sign-in, password reset, sign-out. `requireUser` / `requireRole` guard the
-account, member, board and admin layouts (signed out → sign-in; wrong role → 404). Pages other than home, About,
-the auth pages and the account page are still placeholders. Local development uses the Supabase stack in Docker
+account, member, board and admin layouts (signed out → sign-in; wrong role → 404). Every public page reads from Supabase through the tagged public cache
+(`src/lib/supabase/public.ts`, revalidated by `POST /api/webhooks/content`, D-062); member, board and admin pages are
+still placeholders. Legal texts are drafts awaiting ACF. Local development uses the Supabase stack in Docker
 (`npm run db:start`, seeded with fictional demo users `*@acf.test`, password `demo-password-1`). Supabase has one hosted project (production, `ccntrlsymnokmfamcaho`) and migrations reach it only through
 `db-migrate.yml` after approval (D-059); the Vercel project still has to be connected; fonts and logo are still stand-ins. Update this section at the end of every phase.
 
@@ -46,7 +47,7 @@ Keep this table true.
 | `npm run test:e2e` | Playwright on the production build: desktop + mobile, ar/fr/en, axe |
 | `npm run i18n:check` | Message files have identical keys and placeholders |
 | `npm run screenshots` | Shell screenshots, every locale × theme × viewport → `docs/screenshots/brand/` (or `$SCREENSHOT_DIR`) |
-| `npm run lighthouse` | Mobile Lighthouse on the home pages (needs `npm start`), fails below 90 |
+| `npm run lighthouse` | Mobile Lighthouse on the home, catalogue and detail pages (needs `npm start` and the seed), fails below 90 |
 | `npm run db:start` / `db:stop` | Local Supabase stack in Docker (Postgres, Auth, Storage, Mailpit on :54324) |
 | `npm run db:env` | Write the local stack's URL and keys into `.env.local` (needed by `dev`, `build`, e2e) |
 | `npm run db:reset` | Rebuild the local database from migrations + `supabase/seed.sql` |

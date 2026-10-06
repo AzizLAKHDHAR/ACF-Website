@@ -1,6 +1,6 @@
-import { placeholderRoute } from '@/lib/routes/placeholder-route';
+import { legalRoute } from '@/lib/routes/legal-route';
 
-const route = placeholderRoute('privacy', '/legal/privacy');
+const route = legalRoute('privacy');
 
 export const generateMetadata = route.generateMetadata;
 export default route.Page;

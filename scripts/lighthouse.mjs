@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Mobile Lighthouse audit of the home page in every locale (roadmap phase 1: all categories ≥ 90).
+// Mobile Lighthouse audit (all categories ≥ 90): the home page in every locale (phase 1), plus a
+// catalogue and detail pages from the local seed (phase 3). Override with PAGES=/fr,/ar/events.
 // Usage: npm run build && npm start   (in another terminal)
 //        npm run lighthouse            [BASE_URL=http://localhost:3000] [CHROME_PATH=/path/to/chrome]
 //
@@ -11,7 +12,15 @@ import { fileURLToPath } from 'node:url';
 
 const LIGHTHOUSE = 'lighthouse@13.5.0';
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
-const LOCALES = ['ar', 'fr', 'en'];
+const PAGES = process.env.PAGES?.split(',') ?? [
+  '/ar',
+  '/fr',
+  '/en',
+  '/fr/artists',
+  '/ar/artists/demo-al-amwaj',
+  '/fr/events/demo-soiree-jazz',
+  '/ar/news/demo-appel-benevoles',
+];
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo'];
 const MINIMUM = 90;
 const outDir = fileURLToPath(new URL('../.lighthouse/', import.meta.url));
@@ -21,9 +30,9 @@ mkdirSync(outDir, { recursive: true });
 const rows = [];
 let failed = false;
 
-for (const locale of LOCALES) {
-  const url = `${BASE_URL}/${locale}`;
-  const base = `${outDir}home-${locale}`;
+for (const page of PAGES) {
+  const url = `${BASE_URL}${page}`;
+  const base = `${outDir}${page.slice(1).replaceAll('/', '-') || 'root'}`;
   execFileSync(
     'npx',
     [
@@ -46,7 +55,7 @@ for (const locale of LOCALES) {
     CATEGORIES.map((id) => [id, Math.round((lhr.categories[id]?.score ?? 0) * 100)]),
   );
   if (Object.values(scores).some((score) => score < MINIMUM)) failed = true;
-  rows.push({ page: `/${locale}`, ...scores });
+  rows.push({ page, ...scores });
 }
 
 console.table(rows);
