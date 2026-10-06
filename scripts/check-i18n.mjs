@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Verifies that messages/{ar,fr,en}.json have identical key sets, no empty strings,
 // and the same ICU placeholders per key. Exits non-zero on any mismatch (run in CI).
+import { parse, TYPE } from '@formatjs/icu-messageformat-parser';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -17,11 +18,31 @@ function flatten(value, prefix = '', out = new Map()) {
   return out;
 }
 
+// ICU argument names, from the real parser (plural/select branch text is not a placeholder).
 function placeholders(message) {
-  return [...String(message).matchAll(/\{\s*([A-Za-z0-9_]+)/g)]
-    .map((m) => m[1])
-    .sort()
-    .join(',');
+  const names = new Set();
+  const walk = (elements) => {
+    for (const element of elements) {
+      if (element.type !== TYPE.literal && element.type !== TYPE.pound && 'value' in element) {
+        names.add(element.value);
+      }
+      if ('options' in element) {
+        for (const option of Object.values(element.options)) walk(option.value);
+      }
+      if ('children' in element) walk(element.children);
+    }
+  };
+  walk(parse(String(message)));
+  return [...names].sort().join(',');
+}
+
+function parses(message) {
+  try {
+    parse(String(message));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 const catalogs = Object.fromEntries(
@@ -44,6 +65,8 @@ for (const locale of LOCALES) {
       errors.push(`${locale}: extra key "${key}" (not in ${REFERENCE}.json)`);
     if (typeof message !== 'string' || message.trim() === '') {
       errors.push(`${locale}: empty or non-string message "${key}"`);
+    } else if (!parses(message)) {
+      errors.push(`${locale}: invalid ICU message "${key}"`);
     } else if (reference.has(key) && placeholders(message) !== placeholders(reference.get(key))) {
       errors.push(`${locale}: placeholders of "${key}" differ from ${REFERENCE}.json`);
     }

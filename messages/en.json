@@ -27,7 +27,8 @@
     "signIn": "Sign in",
     "backToSite": "Back to the public site",
     "comingSoon": "Coming soon",
-    "placeholderNotice": "This page is a placeholder. Its content arrives in a later phase of the rebuild."
+    "placeholderNotice": "This page is a placeholder. Its content arrives in a later phase of the rebuild.",
+    "search": "Search"
   },
   "nav": {
     "primary": "Main navigation",
@@ -125,6 +126,10 @@
     "resetPassword": {
       "title": "New password",
       "description": "Choose a new password for your account."
+    },
+    "search": {
+      "title": "Search",
+      "description": "Artists, professionals, venues, studios, blogs and events."
     }
   },
   "areas": {
@@ -393,6 +398,130 @@
       },
       "spaces": "Your spaces",
       "changePassword": "Change password"
+    }
+  },
+  "content": {
+    "filters": {
+      "label": "Filter",
+      "search": "Search",
+      "searchPlaceholder": "Name, city…",
+      "genre": "Genre",
+      "governorate": "Governorate",
+      "all": "All",
+      "apply": "Apply",
+      "reset": "Reset",
+      "from": "From",
+      "to": "To",
+      "when": "When",
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "results": "{count, plural, =0 {No results} one {# result} other {# results}}",
+    "empty": {
+      "profiles": "No profile matches yet.",
+      "events": "No event matches yet.",
+      "posts": "No articles yet.",
+      "blogs": "No blogs yet."
+    },
+    "pagination": {
+      "label": "Pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "status": "Page {page} of {pages}"
+    },
+    "profile": {
+      "genres": "Genres",
+      "professions": "Trades",
+      "location": "Location",
+      "links": "Links",
+      "listen": "Listen and watch",
+      "events": "Events",
+      "noEvents": "No published events.",
+      "formed": "Formed in {year}",
+      "capacity": "Capacity: {count, number} people",
+      "backline": "Backline available",
+      "services": "Services",
+      "experience": "{years, plural, one {# year} other {# years}} of experience",
+      "availableForHire": "Available for hire",
+      "address": "Address",
+      "posts": "Posts",
+      "kind": {
+        "solo": "Solo artist",
+        "band": "Band",
+        "collective": "Collective",
+        "dj": "DJ"
+      },
+      "service": {
+        "recording": "Recording",
+        "mixing": "Mixing",
+        "mastering": "Mastering",
+        "rehearsal": "Rehearsal",
+        "production": "Production"
+      },
+      "back": "Back to the list"
+    },
+    "event": {
+      "date": "Date",
+      "venue": "Venue",
+      "lineup": "Line-up",
+      "tickets": "Tickets",
+      "free": "Free entry",
+      "byAcf": "Organized by ACF",
+      "back": "Back to events",
+      "past": "This event has passed."
+    },
+    "post": {
+      "publishedOn": "Published on {date}",
+      "readMore": "Read more",
+      "backToNews": "Back to news",
+      "backToBlog": "Back to the blog",
+      "otherLanguages": "Also available in",
+      "latest": "Latest posts",
+      "allBlogs": "All blogs",
+      "language": "In {language}"
+    },
+    "embed": {
+      "play": "Load the {provider} player",
+      "notice": "The player loads only when you click: {provider} may then set cookies.",
+      "title": "{provider} player"
+    },
+    "home": {
+      "latestNews": "Latest news",
+      "upcomingEvents": "Upcoming events",
+      "allNews": "All news",
+      "allEvents": "All events"
+    },
+    "search": {
+      "title": "Search",
+      "description": "Artists, professionals, venues, studios, blogs and events.",
+      "label": "Search the site",
+      "submit": "Search",
+      "profiles": "Profiles",
+      "events": "Events",
+      "none": "No results for “{query}”.",
+      "hint": "Type at least one word."
+    },
+    "contact": {
+      "intro": "A question, a proposal, want to join the association? Write to us.",
+      "name": "Your name",
+      "email": "Your email address",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send",
+      "sent": "Thank you! Your message has been sent.",
+      "unavailable": "The form isn’t active yet. Please try again later.",
+      "privacy": "Your message is forwarded to us by email; the site doesn’t keep it.",
+      "honeypot": "Leave this field empty",
+      "errors": {
+        "invalidInput": "Please check the highlighted fields.",
+        "unavailable": "The form isn’t active yet. Please try again later.",
+        "captcha": "The security check failed. Please try again.",
+        "failed": "Your message couldn’t be sent. Please try again in a moment."
+      }
+    },
+    "legal": {
+      "draft": "Draft to be validated by ACF: this text has no legal force yet.",
+      "updated": "Last updated: {date}"
     }
   }
 }

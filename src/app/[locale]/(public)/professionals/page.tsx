@@ -1,6 +1,6 @@
-import { placeholderRoute } from '@/lib/routes/placeholder-route';
+import { catalogueListRoute } from '@/lib/routes/catalogue-route';
 
-const route = placeholderRoute('professionals', '/professionals');
+const route = catalogueListRoute('professionals');
 
 export const generateMetadata = route.generateMetadata;
 export default route.Page;
