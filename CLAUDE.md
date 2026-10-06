@@ -21,8 +21,8 @@ pgTAP suite that encodes `docs/roles.md` (`npm run db:test`). Authentication wor
 confirmation, password and magic-link sign-in, password reset, sign-out. `requireUser` / `requireRole` guard the
 account, member, board and admin layouts (signed out → sign-in; wrong role → 404). Pages other than home, About,
 the auth pages and the account page are still placeholders. Local development uses the Supabase stack in Docker
-(`npm run db:start`, seeded with fictional demo users `*@acf.test`, password `demo-password-1`). The Vercel and
-Supabase projects still have to be created by ACF; fonts and logo are still stand-ins. Update this section at the end of every phase.
+(`npm run db:start`, seeded with fictional demo users `*@acf.test`, password `demo-password-1`). Supabase has one hosted project (production, `ccntrlsymnokmfamcaho`) and migrations reach it only through
+`db-migrate.yml` after approval (D-059); the Vercel project still has to be connected; fonts and logo are still stand-ins. Update this section at the end of every phase.
 
 ## Stack
 
@@ -138,6 +138,8 @@ Unit tests sit next to the code (`*.test.ts`).
 ## Database rules
 
 - Schema changes **only** via `supabase/migrations/*.sql` (`npx supabase migration new`). No dashboard edits on any project.
+- The only hosted project is **production**. Never run `supabase db push`, `link` or SQL against it from a session;
+  `db-migrate.yml` applies merged migrations after an approval (D-059).
 - Never edit a migration that is already merged; add a new one.
 - After a migration, regenerate types (`npm run db:types`) and commit them.
 - The Supabase MCP server is **dev-project only** and read-only by default. Never point it at prod.
@@ -168,7 +170,7 @@ Unit tests sit next to the code (`*.test.ts`).
 | `context7` | Current docs for Next.js, Supabase, next-intl, Tailwind, shadcn | Network access to `context7.com` (optional `CONTEXT7_API_KEY`) |
 | `playwright` | Driving the app in a real browser, screenshots in `ar`/`fr`/`en` | Chromium (auto-detected in cloud sessions) |
 | `shadcn` | Browsing and adding registry components | Network access to `ui.shadcn.com` |
-| `supabase` | Inspecting the **dev** database (read-only) | `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DEV_PROJECT_REF` env vars |
+| `supabase` | Inspecting the **dev** database (read-only). Unconfigured: there is no hosted dev project (D-059) | `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DEV_PROJECT_REF` env vars |
 
 Versions are pinned in `.mcp.json`. The wrappers live in `scripts/mcp/`. Cloud sessions run
 `.claude/hooks/session-start.sh` at start (installs deps and pre-fetches the MCP packages).

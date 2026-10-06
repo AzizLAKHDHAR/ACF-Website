@@ -1,0 +1,62 @@
+name: Database migrations
+
+# Applies supabase/migrations to the production Supabase project (the only hosted project, D-059).
+# Runs after a merge that touches migrations, or by hand. The `production` environment should require
+# a reviewer, so nothing reaches the live database without an approval. The seed is never pushed.
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/migrations/**']
+  workflow_dispatch:
+
+concurrency:
+  group: db-migrate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    name: Push migrations to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - name: Check configuration
+        id: config
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$SUPABASE_DB_PASSWORD" ] || [ -z "$SUPABASE_PROJECT_REF" ]; then
+            echo "::notice::Skipped: set the SUPABASE_ACCESS_TOKEN and SUPABASE_DB_PASSWORD secrets and the SUPABASE_PROJECT_REF variable on the production environment (docs/architecture.md §10)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.config.outputs.ready == 'true'
+
+      - uses: actions/setup-node@v5
+        if: steps.config.outputs.ready == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+        if: steps.config.outputs.ready == 'true'
+
+      - name: Link the project
+        if: steps.config.outputs.ready == 'true'
+        run: npx supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Migrations that will be applied
+        if: steps.config.outputs.ready == 'true'
+        run: npx supabase db push --dry-run
+
+      - name: Apply migrations
+        if: steps.config.outputs.ready == 'true'
+        run: npx supabase db push

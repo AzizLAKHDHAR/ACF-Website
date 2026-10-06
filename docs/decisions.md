@@ -117,7 +117,7 @@ Format:
 - Consequences: Phase 1 records measurements and the final choice here.
 
 ## D-014: Two Supabase free projects; schema changes only through CLI migrations
-- Date: 2026-10-04 · Phase: 0 · Status: accepted
+- Date: 2026-10-04 · Phase: 0 · Status: superseded by D-059 (one hosted project); migrations-only still applies
 - Context: The free tier allows 2 projects; dashboard edits are untracked.
 - Decision: `dev` (local, previews, Claude's MCP) and `prod`. Schema changes are only `supabase/migrations/*.sql`.
   Prod migrations run through a GitHub workflow that needs manual approval.
@@ -509,3 +509,18 @@ Format:
   `src/app/api/webhooks/**` and `src/features/account/delete-account.ts`; `no-restricted-syntax` forbids
   `.getSession()` in `src/`. `src/lib/supabase/admin-import.test.ts` runs ESLint on sample files to prove both
   directions.
+
+## D-059: One hosted Supabase project (production); the local stack is the dev database
+- Date: 2026-10-06 · Phase: 2 (follow-up) · Status: accepted, supersedes the two-project plan of D-014
+- Context: ACF runs a single free Supabase project, `ccntrlsymnokmfamcaho` (production). Phase 2 already made the
+  local Docker stack the development database (D-055), and CI tests against it.
+- Decision: Production is the only hosted project. Development, CI and tests use the local stack and its fictional
+  seed. Migrations reach production only through `.github/workflows/db-migrate.yml`: after a merge that touches
+  `supabase/migrations/` (or by hand), behind the `production` GitHub environment's required reviewer, with a dry run
+  first; it needs the `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` secrets and the `SUPABASE_PROJECT_REF`
+  variable and skips with a notice until they exist. Vercel gets the Supabase URL and publishable key in the
+  **Production** environment only: preview deployments run without a database (the public site works; sign-in is
+  unavailable) so a pull request can never write live data. The Supabase MCP server stays unconfigured: it is
+  dev-only by rule and there is no dev project.
+- Consequences: Auth journeys are tested locally and in CI, never against live users. If ACF later wants previews
+  with a database, a second free project can be added as `dev` without code changes.
