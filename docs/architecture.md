@@ -56,7 +56,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 | Styling | Tailwind CSS v4 | 4.3.x | CSS-first `@theme`, logical properties for RTL |
 | Components | shadcn/ui (CLI) | 4.21.x | Generated into `src/components/ui`, Radix primitives, RTL-aware |
 | i18n | next-intl | 4.14.x | `[locale]` segment, `ar` (RTL), `fr`, `en` |
-| Backend | Supabase: Postgres, Auth, Storage | `@supabase/supabase-js` 2.x, `@supabase/ssr` 0.12.x | Two free projects: **dev** and **prod** |
+| Backend | Supabase: Postgres, Auth, Storage | `@supabase/supabase-js` 2.x, `@supabase/ssr` 0.12.x | One free hosted project (**prod**); the local Docker stack is dev (D-059) |
 | Validation | Zod | 4.x | Shared between forms and server actions |
 | Forms | React Hook Form + Zod resolver | | Server actions re-validate |
 | Email | Resend + React Email | | Also Supabase Auth custom SMTP |
@@ -586,7 +586,7 @@ after 7 days of inactivity. Fallbacks: Supabase `pg_cron`, or Vercel Cron (Hobby
 | Environment | App | Database | Trigger |
 |---|---|---|---|
 | Local | `npm run dev` | Local Supabase stack (`npm run db:start`, Docker), seeded | — |
-| Preview | Per-PR preview deployment | Supabase **dev** project | PR opened/updated |
+| Preview | Per-PR preview deployment | None: public pages only, sign-in unavailable (D-059) | PR opened/updated |
 | Production | Vercel (`main`) | Supabase **prod** project | Merge to `main` |
 
 **Hosting: Vercel** (D-042), connected to the GitHub repository through Vercel's Git integration:
@@ -598,18 +598,20 @@ Vercel project settings (done once in the dashboard, never in git):
 - Framework preset Next.js, Node 22, install `npm ci`, build `npm run build`.
 - Environment variables per environment (Production / Preview / Development), starting with
   `NEXT_PUBLIC_SITE_URL`; the Supabase, Resend, Discord and cron variables are added in their phases.
-  Preview points at the Supabase **dev** project, Production at **prod**.
+  `NEXT_PUBLIC_SUPABASE_URL` (`https://ccntrlsymnokmfamcaho.supabase.co`) and
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` go in **Production only**, so previews never touch live data. The
+  publishable key is public by design; the secret key and database password never go in Vercel's Preview
+  environment, the repository or a chat.
 - Functions region next to the Supabase project's region (for example `fra1` for Supabase
   `eu-central-1`), so server-side queries don't cross the Atlantic. The default is `iad1` (US East).
 
-**Supabase project settings** (dev and prod, once, in the dashboard; schema changes still only by migration):
-- Auth → URL configuration: Site URL = `NEXT_PUBLIC_SITE_URL`; redirect URLs `https://<domain>/**` (and the Vercel
-  preview pattern on **dev** only).
+**Supabase project settings** (the production project, once, in the dashboard; schema changes only by migration):
+- Auth → URL configuration: Site URL = `NEXT_PUBLIC_SITE_URL`; redirect URLs `https://<domain>/**`.
 - Auth → Email templates: paste the four files from `supabase/templates/` (subjects in `config.toml`).
 - Auth → Providers → Email: confirm email on; minimum password length 8 with letters and digits.
 - Auth → SMTP: Resend (phase 2 input), otherwise Supabase's built-in sender is limited to a few emails per hour.
 - Auth → Bot protection: Turnstile secret, and `NEXT_PUBLIC_TURNSTILE_SITE_KEY` in Vercel.
-- Apply migrations with `supabase db push` (never the seed).
+- Migrations are applied by `db-migrate.yml` (below), never by hand and never with the seed.
 
 **Plan.** Vercel Hobby is free but limited to personal, non-commercial use: an association's
 informational site fits; selling tickets, memberships or services on the site would require Pro.
@@ -632,8 +634,12 @@ Which plan ACF uses is an open question.
   runs `db:lint` (linter + advisors), `db:test` (pgTAP + concurrency) and a stale-types check (D-055).
 - Deployments are not a workflow: Vercel builds `main` and every pull request itself and reports the
   preview URL on the PR.
-- `db-migrate.yml`: applies `supabase/migrations` to **dev** automatically on merge, and to **prod**
-  only after manual approval (GitHub Environment `production` with required reviewer).
+- `db-migrate.yml` (**in place**, D-059): after a merge to `main` that touches `supabase/migrations/` (or run by
+  hand), links the production project, prints a dry run and runs `supabase db push`. It waits for the GitHub
+  Environment `production` (add yourself as required reviewer: Settings → Environments → production) and needs, on
+  that environment, the secrets `SUPABASE_ACCESS_TOKEN` (Supabase → Account → Access tokens) and
+  `SUPABASE_DB_PASSWORD` (the database password) and the variable `SUPABASE_PROJECT_REF` = `ccntrlsymnokmfamcaho`.
+  Without them it skips with a notice.
 
 ### Configuration (`.env.example` in phase 1)
 
@@ -648,7 +654,7 @@ Which plan ACF uses is an open question.
 | `SIGNATURE_PROVIDER` (`manual`/`documenso`/`docuseal`), `SIGNATURE_API_URL`, `SIGNATURE_API_KEY`, `SIGNATURE_WEBHOOK_SECRET` | server | E-signature |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public), `TURNSTILE_SECRET_KEY` | mixed | Bot protection |
 | `BACKUP_AGE_RECIPIENT` | GitHub secret | Public key for encrypting backups |
-| `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DEV_PROJECT_REF` | developer machine / Claude env only | Supabase MCP server (dev project) |
+| `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DEV_PROJECT_REF` | developer machine / Claude env only | Supabase MCP server (dev project only; unused while there is no dev project, D-059) |
 
 ## 11. Risks and open technical questions
 

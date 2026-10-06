@@ -119,8 +119,10 @@ workflow (every change ends in a pull request and a [decisions](docs/decisions.m
 Hosted on **Vercel** with its Git integration: import the repository in Vercel (framework preset
 Next.js, Node 22), and `main` deploys to production while every pull request gets a preview URL.
 Set `NEXT_PUBLIC_SITE_URL` in the Vercel project's environment variables (see
-[`.env.example`](.env.example)); never commit secrets. The database is Supabase from phase 2: preview
-deployments use the **dev** project, production the **prod** project. Details in
+[`.env.example`](.env.example)), plus `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the
+**Production** environment only; never commit secrets. The database is one hosted Supabase project (production);
+development uses the local stack, and preview deployments run without a database. Migrations reach production
+through the `db-migrate.yml` workflow after an approval. Details in
 [architecture §10](docs/architecture.md#10-environments-and-free-tier-deployment-plan).
 
 ## License
