@@ -1,8 +1,13 @@
 import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
+import { assertLocalSupabase } from './scripts/e2e-target';
 
 // The auth specs talk to the local Supabase stack; `npm run db:env` writes its URL and keys here.
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
+
+// The tests sign people up and write data: refuse to start if the app would use a hosted project
+// (for instance a .env pointing at production, with no local stack). D-079.
+assertLocalSupabase();
 
 // The contact form and the revalidation webhook need these at build and run time. CI sets the same
 // values in its environment (ci.yml); these defaults cover local runs. Test-only values, no secrets.

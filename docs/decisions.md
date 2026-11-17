@@ -728,3 +728,16 @@ Format:
   the preview, so the pages show their empty states. The check lives in `src/lib/auth/preview.ts` (development builds
   only, as before).
 - Consequences: Screenshots keep working without Docker. Production builds never take the preview path.
+
+## D-079: End-to-end tests only run against the local Supabase stack
+- Date: 2026-11-17 · Phase: 5 (follow-up) · Status: accepted
+- Context: The e2e suite signs people up, confirms emails, writes meetings, polls and tasks, and uploads files. A
+  developer machine without Docker had only a `.env` pointing at the production project (with its secret key), so
+  `npm run test:e2e` would have built the app against production and run all of that on real data.
+- Decision: `playwright.config.ts` calls `assertLocalSupabase()` (`scripts/e2e-target.ts`) before anything starts. It
+  works out the Supabase URL the app under test will use the way Next does (the environment, which holds CI's values
+  and `.env.local`, then `.env.production.local`, `.env.production`, `.env`) and stops the run with instructions unless
+  the host is `localhost`, `127.0.0.1`, `::1` or a `*.localhost` name. There is no override. The screenshot tool has
+  its own config and is unaffected.
+- Consequences: CI (local stack at `127.0.0.1`) is unchanged. Locally, e2e needs `npm run db:start` and
+  `npm run db:env`. A hosted test project, if ACF ever wants one, would need its own config.

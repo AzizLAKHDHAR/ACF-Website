@@ -50,7 +50,7 @@ Keep this table true.
 | `npm run typecheck` | `next typegen && tsc --noEmit` (route types like `PageProps` are generated) |
 | `npm run format` / `format:check` | Prettier + Tailwind class sorting |
 | `npm test` | Vitest: unit tests, token contrast (AA), config ↔ messages, `.env.example` completeness |
-| `npm run test:e2e` | Playwright on the production build: desktop + mobile, ar/fr/en, axe |
+| `npm run test:e2e` | Playwright on the production build: desktop + mobile, ar/fr/en, axe. Refuses to start unless the app would use the local Supabase stack (D-079) |
 | `npm run i18n:check` | Message files have identical keys and placeholders |
 | `npm run screenshots` | Shell screenshots, every locale × theme × viewport → `docs/screenshots/brand/` (or `$SCREENSHOT_DIR`) |
 | `npm run lighthouse` | Mobile Lighthouse on the home, catalogue and detail pages (needs `npm start` and the seed), fails below 90 |
