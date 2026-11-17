@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { routing, type Locale } from '@/i18n/routing';
 import { SLUG_PATTERN } from '@/lib/content/slug';
+import { httpUrl } from '@/lib/forms/schemas';
 import type { Database, Json } from '@/types/database';
 
 // Validation for the profile onboarding forms (roadmap phase 4). Messages are keys under
@@ -65,18 +66,7 @@ export const slugSchema = z
   .max(80, 'tooLong')
   .regex(SLUG_PATTERN, 'invalidSlug');
 
-export const httpUrl = z
-  .string()
-  .trim()
-  .max(300, 'tooLong')
-  .refine((value) => {
-    try {
-      const url = new URL(value);
-      return url.protocol === 'https:' || url.protocol === 'http:';
-    } catch {
-      return false;
-    }
-  }, 'invalidUrl');
+export { httpUrl };
 
 /** `{prefix}_ar`, `{prefix}_fr`, `{prefix}_en` form fields → a jsonb locale map without empty values. */
 export function localeMapFrom(

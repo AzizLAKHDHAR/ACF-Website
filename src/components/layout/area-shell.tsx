@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, BellIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Area } from '@/config/navigation';
 import { Link } from '@/i18n/navigation';
@@ -10,7 +10,16 @@ import { SkipLink } from './skip-link';
 import { ThemeToggle } from './theme-toggle';
 
 /** Chrome of the hidden areas (member, board, admin): top bar + section sidebar. */
-export function AreaShell({ area, children }: { area: Area; children: React.ReactNode }) {
+export function AreaShell({
+  area,
+  unread = 0,
+  children,
+}: {
+  area: Area;
+  /** Unread in-app notifications, shown on the bell. */
+  unread?: number;
+  children: React.ReactNode;
+}) {
   const t = useTranslations();
 
   return (
@@ -30,6 +39,22 @@ export function AreaShell({ area, children }: { area: Area; children: React.Reac
             >
               <ArrowLeftIcon className="size-4 rtl:rotate-180" aria-hidden />
               {t('common.backToSite')}
+            </Link>
+            <Link
+              href="/account/notifications"
+              aria-label={t('notifications.bell', { count: unread })}
+              data-testid="notifications-bell"
+              className="relative inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <BellIcon className="size-5" aria-hidden />
+              {unread > 0 ? (
+                <span
+                  aria-hidden
+                  className="absolute -end-0.5 -top-0.5 inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-bold text-primary-foreground"
+                >
+                  {unread > 99 ? '99+' : unread}
+                </span>
+              ) : null}
             </Link>
             <LocaleSwitcher />
             <ThemeToggle />

@@ -20,12 +20,36 @@ export function formatDateTime(value: string | Date, locale: Locale): string {
   }).format(new Date(value));
 }
 
+/** A start and optional end, as one range ("12 Nov 2026, 18:00 – 20:00" on a single day), in Tunis time. */
+export function formatDateTimeRange(
+  start: string | Date,
+  end: string | Date | null | undefined,
+  locale: Locale,
+): string {
+  const format = new Intl.DateTimeFormat(intlLocale[locale], {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: TIME_ZONE,
+  });
+  return end ? format.formatRange(new Date(start), new Date(end)) : format.format(new Date(start));
+}
+
+/** A count, in the locale's digits (ar-TN keeps Latin digits, like Tunisian usage). */
+export function formatNumber(value: number, locale: Locale): string {
+  return new Intl.NumberFormat(intlLocale[locale]).format(value);
+}
+
 /** Short date for lists and cards. */
 export function formatShortDate(value: string | Date, locale: Locale): string {
   return new Intl.DateTimeFormat(intlLocale[locale], {
     dateStyle: 'medium',
     timeZone: TIME_ZONE,
   }).format(new Date(value));
+}
+
+/** Today's calendar day in Tunis (YYYY-MM-DD), to compare with `date` columns such as due dates. */
+export function todayInTunis(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(now);
 }
 
 /** Midnight today in Tunis, as an ISO instant: the boundary between upcoming and past events. */

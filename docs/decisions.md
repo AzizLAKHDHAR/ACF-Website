@@ -657,3 +657,74 @@ Format:
   generator's format; CI's staleness check confirms it.
 - Consequences: The PR is not mergeable until CI's database and e2e jobs pass. Windows checkouts with
   `core.autocrlf=true` make `format:check` flag untouched files (CRLF); CI on Linux is unaffected.
+
+## D-073: Member-space notifications come from database triggers
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Phase 5 needs in-app notifications for new announcements, assignments and meetings. Writing them in the
+  Server Actions would miss rows written elsewhere, and users have no insert grant on `notifications`.
+- Decision: SECURITY DEFINER triggers write them: a board announcement notifies the active members of its audience
+  (`announcement_published`), the board assigning someone notifies that person (`task_assigned`), and a new or
+  cancelled meeting notifies its audience (`meeting_scheduled`, `meeting_cancelled`). The person who acted is never
+  notified, and rows written without a session (seed, imports, the Discord sync of phase 8) notify nobody. Payloads
+  carry ids and titles only. `/account/notifications` lists them (mark one or all read), and every hidden area shows
+  a bell with the unread count. Links are built from the payload's ids only after checking their format.
+- Consequences: Notifications exist whatever writes the row (UI, SQL, future integrations). Discord-synced
+  announcements won't notify unless phase 8 decides otherwise. A notification keeps the title it was sent with even
+  if the item is later renamed, hidden or deleted.
+
+## D-074: Answers and votes run as the member, through two small RPCs
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Changing an RSVP or a vote is an upsert. A PostgREST upsert also SETs the key columns (`meeting_id`,
+  `user_id`, `option_id`), which the column grants deliberately leave out, so it fails with "permission denied".
+- Decision: `answer_meeting(meeting, answer, answer_note)` and `set_poll_votes(poll, votes)` are SECURITY INVOKER
+  functions: they run as the caller, so the existing RLS policies still decide (own rows, the caller's audience,
+  votes only while the poll is open), and they add clear errors for cancelled or finished meetings and closed polls.
+  `set_poll_votes` takes every option of the poll at once (options left out are withdrawn).
+  `volunteer_shift_overview()` (SECURITY DEFINER, members only) returns upcoming shifts with places taken and the
+  caller's own sign-up, since members can't read other people's sign-ups.
+- Consequences: No policy or grant was widened. The "votes locked after `closes_at`" rule stays in the policies
+  (pgTAP `030` and `090`).
+
+## D-075: Library files are uploaded by the browser and linked to their row by path
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Library documents may be 20 MB (Server Actions accept 1 MB), and the `documents` insert grant has no `id`,
+  so the phase 2 convention `library/{document_id}/…` (with a storage policy matching the folder to the row's id)
+  couldn't be followed without creating the row before the file.
+- Decision: The board's browser uploads the file straight to the private `member-documents` bucket at
+  `library/{random id}/{safe file name}`, then a Server Action re-checks the path and records the row (the file is
+  removed again if that fails). `can_read_member_document()` now matches the object to the row by `storage_path`.
+  Members download through `GET /{locale}/member/documents/{id}/download`, which checks their access and answers
+  with a redirect to a signed URL valid for 60 seconds. The board manages the library on `/member/documents`; the
+  board area keeps no separate library page.
+- Consequences: A file is readable only at the path its row records (pgTAP `060`); the public URL of the bucket is
+  refused (e2e). Deleting a document removes the file first, because Storage only deletes what the caller can read.
+
+## D-076: The member directory lists active members; the board also sees phone numbers
+- Date: 2026-11-17 · Phase: 5 · Status: accepted (emails: open question for ACF)
+- Context: roles.md gives members the directory (names, avatars, roles) and the board "contact details". Phone
+  numbers are in `account_private` (board-readable); emails only in `auth.users`.
+- Decision: `/member/directory` lists active memberships on accounts that aren't deactivated: name, role and join date
+  for everyone, plus the phone number for the board. Emails are not shown; that would need a new board-only RPC over
+  `auth.users`.
+- Consequences: No new data is exposed. If ACF wants the board to see emails, it is one SECURITY DEFINER function
+  and a column.
+
+## D-077: Scope of the phase 5 board forms
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Phase 5 includes "the board-side forms that feed these features"; task creation is phase 6.
+- Decision: The board creates, cancels and deletes meetings (`/board/meetings`), posts, hides, pins and deletes
+  announcements (`/board/announcements`), creates, closes and deletes availability polls with up to six slots
+  (`/board/polls`), and opens shifts and removes sign-ups (`/board/volunteering`). Attendance lists and poll results
+  are on the member pages, which board members also use. Editing after posting, meeting minutes, choice polls,
+  document archiving and the Discord push are left for later phases. The seed adds a task assigned to the demo member.
+- Consequences: Mistakes are fixed by deleting and re-creating for now. Members' tasks come from the seed (and from
+  phase 6's task screens).
+
+## D-078: Hidden-area pages render empty in the shell preview
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: `npm run screenshots` runs the dev server with `ACF_PREVIEW_HIDDEN_AREAS=1` and no database, and it
+  screenshots `/member`, which is now a real page.
+- Decision: Member-space reads go through `sessionClient()` (`src/lib/supabase/session.ts`), which returns no client in
+  the preview, so the pages show their empty states. The check lives in `src/lib/auth/preview.ts` (development builds
+  only, as before).
+- Consequences: Screenshots keep working without Docker. Production builds never take the preview path.

@@ -593,7 +593,23 @@
       "rejected": "Profil refusé.",
       "suspended": "Profil suspendu.",
       "reinstated": "Profil rétabli.",
-      "proposed": "Proposition envoyée au bureau."
+      "proposed": "Proposition envoyée au bureau.",
+      "answered": "Réponse enregistrée.",
+      "voted": "Vos réponses sont enregistrées.",
+      "signedUp": "Vous êtes inscrit sur ce créneau.",
+      "signupCancelled": "Votre place est libérée.",
+      "taken": "La tâche est à vous.",
+      "left": "Vous avez quitté la tâche.",
+      "statusChanged": "Statut mis à jour.",
+      "commented": "Commentaire publié.",
+      "cancelled": "Réunion annulée. Les membres sont prévenus.",
+      "hidden": "Annonce masquée.",
+      "shown": "Annonce de nouveau visible.",
+      "pinned": "Annonce épinglée.",
+      "unpinned": "Annonce désépinglée.",
+      "closed": "Sondage clos : les votes sont verrouillés.",
+      "uploaded": "Document ajouté à la bibliothèque.",
+      "markedRead": "Marqué comme lu."
     },
     "errors": {
       "invalidInput": "Certains champs sont à corriger.",
@@ -607,7 +623,10 @@
       "alreadyManager": "Cette personne gère déjà ce profil.",
       "lastOwner": "Un profil garde toujours au moins un propriétaire. Nommez-en un autre avant de partir.",
       "uploadFailed": "L’envoi a échoué. Réessayez.",
-      "failed": "Une erreur est survenue. Réessayez dans un instant."
+      "failed": "Une erreur est survenue. Réessayez dans un instant.",
+      "shiftFull": "Ce créneau est complet.",
+      "meetingClosed": "Cette réunion n’accepte plus de réponses : elle est annulée ou terminée.",
+      "pollClosed": "Ce sondage est clos : les votes sont verrouillés."
     },
     "fieldErrors": {
       "required": "Ce champ est obligatoire.",
@@ -618,7 +637,8 @@
       "invalidNumber": "Saisissez un nombre valide.",
       "invalidDate": "Saisissez une date à venir valide.",
       "endBeforeStart": "La fin doit être après le début.",
-      "oneLocaleRequired": "Remplissez au moins une langue."
+      "oneLocaleRequired": "Remplissez au moins une langue.",
+      "optionsRequired": "Proposez au moins deux créneaux."
     },
     "missing": {
       "tagline": "une courte présentation (dans au moins une langue)",
@@ -897,6 +917,271 @@
         "subject": "Votre profil « {profile} » est de nouveau en ligne",
         "body": "Le profil « {profile} » est de nouveau visible dans l’annuaire."
       }
+    }
+  },
+  "memberSpace": {
+    "formerMember": "Ancien membre",
+    "audience": {
+      "label": "Public",
+      "member": "Tous les membres",
+      "board": "Le bureau seulement",
+      "boardOnly": "Bureau"
+    },
+    "dashboard": {
+      "seeAll": "Tout voir",
+      "unread": "{count, plural, =0 {Aucune notification non lue.} one {# notification non lue.} other {# notifications non lues.}}",
+      "seeNotifications": "Voir les notifications",
+      "meetings": "Prochaines réunions",
+      "tasks": "Mes tâches",
+      "announcements": "Dernières annonces",
+      "polls": "Sondages ouverts",
+      "shifts": "Mes créneaux de bénévolat",
+      "noShifts": "Vous n’êtes inscrit sur aucun créneau à venir."
+    },
+    "meetings": {
+      "upcoming": "Prochaines réunions",
+      "past": "Réunions passées",
+      "empty": "Aucune réunion prévue.",
+      "emptyPast": "Aucune réunion passée.",
+      "cancelled": "Annulée",
+      "online": "En ligne",
+      "join": "Rejoindre la réunion en ligne",
+      "location": "Lieu",
+      "when": "Quand",
+      "agenda": "Ordre du jour",
+      "yourAnswer": "Votre réponse",
+      "answerLegend": "Serez-vous là ?",
+      "answers": {
+        "yes": "Oui",
+        "maybe": "Peut-être",
+        "no": "Non"
+      },
+      "myAnswer": {
+        "yes": "Vous venez",
+        "maybe": "Vous viendrez peut-être",
+        "no": "Vous ne venez pas"
+      },
+      "noAnswer": "Pas encore répondu",
+      "note": "Note (facultative)",
+      "noteHint": "Le bureau la voit avec votre réponse.",
+      "save": "Enregistrer ma réponse",
+      "closed": "Cette réunion n’accepte plus de réponses.",
+      "closedWithAnswer": "Cette réunion n’accepte plus de réponses. Votre réponse : {answer}.",
+      "counts": "Réponses",
+      "attendance": "Liste de présence",
+      "attendanceHint": "Visible par le bureau uniquement.",
+      "attendanceEmpty": "Personne n’a encore répondu.",
+      "name": "Nom",
+      "response": "Réponse",
+      "noteColumn": "Note",
+      "answeredAt": "Répondu le",
+      "back": "Toutes les réunions"
+    },
+    "tasks": {
+      "mine": "Mes tâches",
+      "emptyMine": "Aucune tâche ne vous est attribuée.",
+      "open": "Tâches ouvertes aux bénévoles",
+      "openHint": "Prenez-en une : elle vous sera attribuée.",
+      "emptyOpen": "Aucune tâche ouverte pour le moment.",
+      "others": "Autres tâches en cours",
+      "take": "Prendre cette tâche",
+      "takeHint": "Cette tâche est ouverte : prenez-la pour qu’elle vous soit attribuée.",
+      "leave": "Quitter cette tâche",
+      "back": "Toutes les tâches",
+      "due": "Échéance",
+      "dueOn": "Pour le {date}",
+      "noDueDate": "Pas d’échéance",
+      "project": "Projet",
+      "assignees": "Attribuée à",
+      "nobody": "Personne",
+      "status": {
+        "todo": "À faire",
+        "in_progress": "En cours",
+        "blocked": "Bloquée",
+        "done": "Terminée",
+        "cancelled": "Annulée"
+      },
+      "priorityHigh": "Prioritaire",
+      "overdue": "En retard",
+      "openToVolunteers": "Ouverte",
+      "yourPart": "Votre part",
+      "statusLabel": "Statut",
+      "saveStatus": "Mettre à jour le statut",
+      "comments": "Commentaires",
+      "noComments": "Aucun commentaire pour le moment.",
+      "deleteComment": "Supprimer",
+      "deleteCommentConfirm": "Supprimer ce commentaire ?",
+      "addComment": "Publier le commentaire",
+      "commentLabel": "Votre commentaire"
+    },
+    "announcements": {
+      "empty": "Aucune annonce pour le moment.",
+      "pinned": "Épinglée",
+      "fromDiscord": "Depuis Discord",
+      "hiddenBadge": "Masquée",
+      "untitled": "Annonce"
+    },
+    "polls": {
+      "open": "Sondages ouverts",
+      "emptyOpen": "Aucun sondage ouvert.",
+      "closedHeading": "Sondages clos",
+      "answered": "Répondu",
+      "notAnswered": "À répondre",
+      "closed": "Clos",
+      "openBadge": "Ouvert",
+      "voters": "{count, plural, =0 {Personne n’a encore répondu} one {# personne a répondu} other {# personnes ont répondu}}",
+      "closesAt": "Clôture le {date}",
+      "closedAt": "Clos le {date}",
+      "back": "Tous les sondages",
+      "yourAnswers": "Vos disponibilités",
+      "noOptions": "Ce sondage n’a pas encore de créneaux.",
+      "save": "Enregistrer mes réponses",
+      "voteHint": "Pour chaque créneau, dites si vous êtes disponible. Vous pouvez changer d’avis jusqu’à la clôture.",
+      "noAnswer": "Sans réponse",
+      "locked": "Ce sondage est clos : les votes sont verrouillés.",
+      "results": "Résultats",
+      "noVotes": "Personne n’a encore répondu.",
+      "member": "Membre",
+      "best": "Le plus de oui",
+      "totals": "Total",
+      "tally": "{yes} oui · {maybe} peut-être",
+      "values": {
+        "yes": "Oui",
+        "maybe": "Peut-être",
+        "no": "Non"
+      }
+    },
+    "volunteer": {
+      "empty": "Aucun créneau de bénévolat à venir.",
+      "noEvent": "Autres créneaux",
+      "youreIn": "Vous êtes inscrit",
+      "full": "Complet",
+      "places": "Places prises : {taken} sur {capacity}",
+      "cancel": "Libérer ma place",
+      "signUp": "M’inscrire"
+    },
+    "documents": {
+      "empty": "La bibliothèque est vide pour le moment.",
+      "download": "Télécharger",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer « {title} » et son fichier ? C’est définitif.",
+      "upload": {
+        "heading": "Ajouter un document",
+        "intro": "Réservé au bureau. Le fichier reste privé : les membres le téléchargent par un lien valable une minute.",
+        "file": "Fichier",
+        "fileHint": "PDF, image, texte, Word, Excel ou LibreOffice, 20 Mo au plus.",
+        "title": "Titre",
+        "category": "Catégorie (facultative)",
+        "submit": "Ajouter à la bibliothèque",
+        "problems": {
+          "noFile": "Choisissez un fichier.",
+          "fileType": "Ce type de fichier n’est pas accepté.",
+          "fileTooLarge": "Ce fichier dépasse 20 Mo.",
+          "empty": "Ce fichier est vide.",
+          "noTitle": "Donnez un titre au document.",
+          "uploadFailed": "L’envoi a échoué. Réessayez.",
+          "forbidden": "Seul le bureau peut ajouter des documents.",
+          "failed": "Le document n’a pas pu être enregistré. Réessayez."
+        }
+      }
+    },
+    "directory": {
+      "intro": "Les membres actifs de l’association.",
+      "boardIntro": "Les membres actifs de l’association, avec leur téléphone (visible par le bureau uniquement).",
+      "empty": "Aucun membre pour le moment.",
+      "joined": "Membre depuis le {date}"
+    },
+    "board": {
+      "delete": "Supprimer",
+      "fields": {
+        "title": "Titre",
+        "startsAt": "Début",
+        "endsAt": "Fin",
+        "tunisTime": "Heure de Tunis.",
+        "location": "Lieu",
+        "onlineUrl": "Lien de la réunion en ligne",
+        "agenda": "Ordre du jour",
+        "description": "Description",
+        "message": "Message",
+        "markdownHint": "Markdown accepté : **gras**, listes, liens.",
+        "audienceHint": "« Le bureau seulement » reste invisible pour les membres."
+      },
+      "meetings": {
+        "new": "Nouvelle réunion",
+        "create": "Programmer la réunion",
+        "cancel": "Annuler la réunion",
+        "cancelConfirm": "Annuler cette réunion ? Les membres concernés seront prévenus.",
+        "deleteConfirm": "Supprimer cette réunion et ses réponses ? C’est définitif."
+      },
+      "announcements": {
+        "new": "Nouvelle annonce",
+        "discordLater": "Les membres concernés sont prévenus sur le site. La publication sur Discord arrivera avec l’intégration Discord.",
+        "publish": "Publier l’annonce",
+        "pin": "Épingler en haut du fil",
+        "all": "Toutes les annonces",
+        "show": "Afficher de nouveau",
+        "hide": "Masquer",
+        "unpin": "Désépingler",
+        "pinAction": "Épingler",
+        "deleteConfirm": "Supprimer cette annonce ? C’est définitif."
+      },
+      "polls": {
+        "new": "Nouveau sondage de disponibilité",
+        "create": "Créer le sondage",
+        "closesAt": "Clôture (facultative)",
+        "closesAtHint": "Après cette date, les votes sont verrouillés.",
+        "slots": "Créneaux",
+        "slotsHint": "Au moins {min} créneaux. Indiquez un début, ou à défaut un intitulé ; les lignes vides sont ignorées.",
+        "slot": "Créneau {number}",
+        "slotLabel": "Intitulé (facultatif)",
+        "all": "Tous les sondages",
+        "empty": "Aucun sondage pour le moment.",
+        "close": "Clore maintenant",
+        "closeConfirm": "Clore ce sondage ? Les votes seront verrouillés.",
+        "deleteConfirm": "Supprimer ce sondage et ses votes ? C’est définitif."
+      },
+      "volunteering": {
+        "new": "Nouveau créneau de bénévolat",
+        "create": "Ouvrir le créneau",
+        "event": "Événement",
+        "noEvent": "Sans événement",
+        "eventOption": "{title} ({date})",
+        "role": "Mission",
+        "roleIn": "Mission en {language}",
+        "capacity": "Places",
+        "upcoming": "Créneaux à venir",
+        "signedUp": "Inscrits",
+        "remove": "Retirer",
+        "removeConfirm": "Retirer cette personne du créneau ?",
+        "nobody": "Personne n’est encore inscrit.",
+        "deleteConfirm": "Supprimer ce créneau et ses inscriptions ? C’est définitif."
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Les nouvelles qui vous concernent sur le site.",
+    "bell": "{count, plural, =0 {Notifications} one {Notifications : # non lue} other {Notifications : # non lues}}",
+    "backToAccount": "Mon compte",
+    "open": "Voir les notifications",
+    "unread": "{count, plural, =0 {Aucune notification non lue.} one {# notification non lue.} other {# notifications non lues.}}",
+    "markAllRead": "Tout marquer comme lu",
+    "markRead": "Marquer comme lu",
+    "empty": "Aucune notification pour le moment.",
+    "new": "Nouveau",
+    "untitled": "sans titre",
+    "note": "Note de l’équipe : {note}",
+    "kinds": {
+      "announcement": "Nouvelle annonce : {title}",
+      "taskAssigned": "Une tâche vous est attribuée : {title}",
+      "meetingScheduled": "Nouvelle réunion : {title}",
+      "meetingCancelled": "Réunion annulée : {title}",
+      "profileApproved": "Votre profil « {name} » est publié.",
+      "profileRejected": "Votre profil « {name} » n’a pas été validé.",
+      "profileSuspended": "Votre profil « {name} » est suspendu.",
+      "profileReinstated": "Votre profil « {name} » est de nouveau publié.",
+      "profileSubmitted": "Un profil attend votre validation : {name}",
+      "other": "Nouvelle notification"
     }
   }
 }

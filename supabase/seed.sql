@@ -186,6 +186,15 @@ insert into public.budget_lines (project_id, category, label, planned_millimes) 
 insert into public.tasks (title, description_md, audience, is_open, project_id, due_on) values
   ('Préparer les affiches (démo)', 'Tâche fictive ouverte aux bénévoles.', 'member', true, '00000000-0000-4000-e000-000000000001', current_date + 14),
   ('Valider le budget (démo)', 'Tâche fictive du bureau.', 'board', false, '00000000-0000-4000-e000-000000000001', current_date + 7);
+-- Phase 5: a task assigned to the demo member (task creation and assignment arrive in phase 6) and a
+-- comment from the board, so "my tasks" and the comment thread have something to show.
+insert into public.tasks (id, title, description_md, audience, is_open, project_id, due_on) values
+  ('00000000-0000-4000-e000-000000000101', 'Contacter les bénévoles (démo)',
+   'Tâche fictive attribuée au membre de démonstration.', 'member', false, '00000000-0000-4000-e000-000000000001', current_date + 10);
+insert into public.task_assignees (task_id, user_id) values
+  ('00000000-0000-4000-e000-000000000101', '00000000-0000-4000-a000-000000000003');
+insert into public.task_comments (task_id, author_id, body_md) values
+  ('00000000-0000-4000-e000-000000000101', '00000000-0000-4000-a000-000000000002', 'Commentaire fictif du bureau.');
 insert into public.announcements (audience, title, body_md, source) values
   ('member', 'Annonce de démonstration', 'Message fictif pour les membres.', 'board'),
   ('board', 'Note du bureau (démo)', 'Message fictif pour le bureau.', 'board');

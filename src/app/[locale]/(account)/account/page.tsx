@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { signOut } from '@/features/auth/actions';
+import { countUnreadNotifications } from '@/features/notifications/queries';
 import { Link } from '@/i18n/navigation';
 import { getSessionRole, requireUser } from '@/lib/auth/guards';
 import { hasRoleAtLeast } from '@/lib/auth/roles';
@@ -31,9 +32,10 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/accou
   const user = await requireUser({ returnTo: '/account' });
   const t = await getTranslations({ locale });
   const supabase = await createClient();
-  const [{ data: account }, role] = await Promise.all([
+  const [{ data: account }, role, unread] = await Promise.all([
     supabase.from('accounts').select('display_name').eq('id', user.id).maybeSingle(),
     getSessionRole(),
+    countUnreadNotifications(user.id),
   ]);
   const reachable = spaces.filter((space) => hasRoleAtLeast(role, space));
 
@@ -63,6 +65,18 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/accou
           </dd>
         </div>
       </dl>
+
+      <section aria-labelledby="notifications-title" className="flex flex-col gap-3">
+        <h2 id="notifications-title" className="text-lg font-bold">
+          {t('notifications.title')}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {t('notifications.unread', { count: unread })}
+        </p>
+        <Button asChild variant="outline" className="w-fit">
+          <Link href="/account/notifications">{t('notifications.open')}</Link>
+        </Button>
+      </section>
 
       <section aria-labelledby="profiles-title" className="flex flex-col gap-3">
         <h2 id="profiles-title" className="text-lg font-bold">

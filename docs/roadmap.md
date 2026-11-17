@@ -127,7 +127,7 @@ submitted (D-070); the claim flow for seeded profiles is not built (no legacy pr
 
 Inputs needed: required fields per profile type, review criteria, whether edits to approved profiles need re-approval, whether to seed legacy artists.
 
-## Phase 5: Member space
+## Phase 5: Member space ✅ (pgTAP and e2e run in CI on the pull request)
 
 **Goal:** members coordinate on the site.
 
@@ -138,14 +138,23 @@ board-side forms that feed these features (create meeting, announcement, poll, s
 document). Task creation and assignment come in phase 6; phase 5 uses seeded tasks.
 
 Acceptance criteria:
-- [ ] A member can RSVP yes/maybe/no and change it. The board sees the attendance list. Members see counts.
-- [ ] A board-audience meeting, announcement, poll or document is invisible to members (RLS test + e2e).
-- [ ] Availability poll: members vote per slot; results grid; votes locked after `closes_at` (DB-enforced).
-- [ ] Volunteer sign-up respects capacity under concurrency (DB test with parallel sign-ups); members can cancel their own sign-up.
-- [ ] Library downloads use signed URLs that expire. Direct storage URLs are denied.
-- [ ] Tasks: a member sees members-visible and assigned tasks, can change the status of assigned tasks, and can self-assign `is_open` tasks only.
-- [ ] In-app notifications for new announcements, assignments and meetings.
-- [ ] All member screens pass axe in `ar` and `fr`.
+- [x] A member can RSVP yes/maybe/no and change it. The board sees the attendance list. Members see counts.
+- [x] A board-audience meeting, announcement, poll or document is invisible to members (RLS test + e2e).
+- [x] Availability poll: members vote per slot; results grid; votes locked after `closes_at` (DB-enforced).
+- [x] Volunteer sign-up respects capacity under concurrency (DB test with parallel sign-ups); members can cancel their own sign-up.
+- [x] Library downloads use signed URLs that expire. Direct storage URLs are denied.
+- [x] Tasks: a member sees members-visible and assigned tasks, can change the status of assigned tasks, and can self-assign `is_open` tasks only.
+- [x] In-app notifications for new announcements, assignments and meetings.
+- [x] All member screens pass axe in `ar` and `fr`.
+
+Done in the phase 5 PR (D-073 to D-078): the member dashboard and the meetings, tasks, announcements, polls,
+volunteering, documents and directory pages; the notifications page (`/account/notifications`) and a bell in every
+hidden area; the board's forms in `/board/meetings`, `/board/announcements`, `/board/polls` and `/board/volunteering`;
+library uploads on `/member/documents` (board only). Migration `20261117211020_member_space` adds the notification
+triggers, `answer_meeting()`, `set_poll_votes()` and `volunteer_shift_overview()`, and links library files to their
+row by path. Not built yet: editing meetings, polls and announcements after they're posted (create, cancel or close,
+delete only), minutes attached to meetings, choice polls, archiving documents, and pushing announcements to Discord
+(phase 8).
 
 ## Phase 6: Board space
 

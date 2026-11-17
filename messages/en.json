@@ -593,7 +593,23 @@
       "rejected": "Profile rejected.",
       "suspended": "Profile suspended.",
       "reinstated": "Profile reinstated.",
-      "proposed": "Proposal sent to the board."
+      "proposed": "Proposal sent to the board.",
+      "answered": "Answer saved.",
+      "voted": "Your answers are saved.",
+      "signedUp": "You’re signed up for this shift.",
+      "signupCancelled": "Your place is free again.",
+      "taken": "The task is yours.",
+      "left": "You left the task.",
+      "statusChanged": "Status updated.",
+      "commented": "Comment posted.",
+      "cancelled": "Meeting cancelled. Members have been told.",
+      "hidden": "Announcement hidden.",
+      "shown": "Announcement visible again.",
+      "pinned": "Announcement pinned.",
+      "unpinned": "Announcement unpinned.",
+      "closed": "Poll closed: votes are locked.",
+      "uploaded": "Document added to the library.",
+      "markedRead": "Marked as read."
     },
     "errors": {
       "invalidInput": "Some fields need fixing.",
@@ -607,7 +623,10 @@
       "alreadyManager": "This person already manages the profile.",
       "lastOwner": "A profile always keeps at least one owner. Name another owner before leaving.",
       "uploadFailed": "The upload failed. Try again.",
-      "failed": "Something went wrong. Try again in a moment."
+      "failed": "Something went wrong. Try again in a moment.",
+      "shiftFull": "This shift is full.",
+      "meetingClosed": "This meeting no longer takes answers: it was cancelled or is over.",
+      "pollClosed": "This poll is closed: votes are locked."
     },
     "fieldErrors": {
       "required": "This field is required.",
@@ -618,7 +637,8 @@
       "invalidNumber": "Enter a valid number.",
       "invalidDate": "Enter a valid date in the future.",
       "endBeforeStart": "The end must be after the start.",
-      "oneLocaleRequired": "Fill in at least one language."
+      "oneLocaleRequired": "Fill in at least one language.",
+      "optionsRequired": "Offer at least two time slots."
     },
     "missing": {
       "tagline": "a short introduction (in at least one language)",
@@ -897,6 +917,271 @@
         "subject": "Your profile “{profile}” is back online",
         "body": "The profile “{profile}” appears in the directory again."
       }
+    }
+  },
+  "memberSpace": {
+    "formerMember": "Former member",
+    "audience": {
+      "label": "Who can see it",
+      "member": "All members",
+      "board": "The board only",
+      "boardOnly": "Board"
+    },
+    "dashboard": {
+      "seeAll": "See all",
+      "unread": "{count, plural, =0 {No unread notifications.} one {# unread notification.} other {# unread notifications.}}",
+      "seeNotifications": "See notifications",
+      "meetings": "Next meetings",
+      "tasks": "My tasks",
+      "announcements": "Latest announcements",
+      "polls": "Open polls",
+      "shifts": "My volunteer shifts",
+      "noShifts": "You haven’t signed up for any upcoming shift."
+    },
+    "meetings": {
+      "upcoming": "Upcoming meetings",
+      "past": "Past meetings",
+      "empty": "No meetings planned.",
+      "emptyPast": "No past meetings.",
+      "cancelled": "Cancelled",
+      "online": "Online",
+      "join": "Join the online meeting",
+      "location": "Place",
+      "when": "When",
+      "agenda": "Agenda",
+      "yourAnswer": "Your answer",
+      "answerLegend": "Will you be there?",
+      "answers": {
+        "yes": "Yes",
+        "maybe": "Maybe",
+        "no": "No"
+      },
+      "myAnswer": {
+        "yes": "You’re coming",
+        "maybe": "You may come",
+        "no": "You’re not coming"
+      },
+      "noAnswer": "Not answered yet",
+      "note": "Note (optional)",
+      "noteHint": "The board sees it with your answer.",
+      "save": "Save my answer",
+      "closed": "This meeting no longer takes answers.",
+      "closedWithAnswer": "This meeting no longer takes answers. Your answer: {answer}.",
+      "counts": "Answers",
+      "attendance": "Attendance list",
+      "attendanceHint": "Only the board sees this.",
+      "attendanceEmpty": "Nobody has answered yet.",
+      "name": "Name",
+      "response": "Answer",
+      "noteColumn": "Note",
+      "answeredAt": "Answered on",
+      "back": "All meetings"
+    },
+    "tasks": {
+      "mine": "My tasks",
+      "emptyMine": "No tasks are assigned to you.",
+      "open": "Tasks open to volunteers",
+      "openHint": "Take one and it’s assigned to you.",
+      "emptyOpen": "No open tasks right now.",
+      "others": "Other tasks in progress",
+      "take": "Take this task",
+      "takeHint": "This task is open: take it and it will be assigned to you.",
+      "leave": "Leave this task",
+      "back": "All tasks",
+      "due": "Due",
+      "dueOn": "Due {date}",
+      "noDueDate": "No due date",
+      "project": "Project",
+      "assignees": "Assigned to",
+      "nobody": "Nobody",
+      "status": {
+        "todo": "To do",
+        "in_progress": "In progress",
+        "blocked": "Blocked",
+        "done": "Done",
+        "cancelled": "Cancelled"
+      },
+      "priorityHigh": "High priority",
+      "overdue": "Overdue",
+      "openToVolunteers": "Open",
+      "yourPart": "Your part",
+      "statusLabel": "Status",
+      "saveStatus": "Update the status",
+      "comments": "Comments",
+      "noComments": "No comments yet.",
+      "deleteComment": "Delete",
+      "deleteCommentConfirm": "Delete this comment?",
+      "addComment": "Post the comment",
+      "commentLabel": "Your comment"
+    },
+    "announcements": {
+      "empty": "No announcements yet.",
+      "pinned": "Pinned",
+      "fromDiscord": "From Discord",
+      "hiddenBadge": "Hidden",
+      "untitled": "Announcement"
+    },
+    "polls": {
+      "open": "Open polls",
+      "emptyOpen": "No open polls.",
+      "closedHeading": "Closed polls",
+      "answered": "Answered",
+      "notAnswered": "Waiting for your answer",
+      "closed": "Closed",
+      "openBadge": "Open",
+      "voters": "{count, plural, =0 {Nobody has answered yet} one {# person answered} other {# people answered}}",
+      "closesAt": "Closes on {date}",
+      "closedAt": "Closed on {date}",
+      "back": "All polls",
+      "yourAnswers": "Your availability",
+      "noOptions": "This poll has no time slots yet.",
+      "save": "Save my answers",
+      "voteHint": "For each slot, say whether you’re available. You can change your mind until the poll closes.",
+      "noAnswer": "No answer",
+      "locked": "This poll is closed: votes are locked.",
+      "results": "Results",
+      "noVotes": "Nobody has answered yet.",
+      "member": "Member",
+      "best": "Most yes",
+      "totals": "Total",
+      "tally": "{yes} yes · {maybe} maybe",
+      "values": {
+        "yes": "Yes",
+        "maybe": "Maybe",
+        "no": "No"
+      }
+    },
+    "volunteer": {
+      "empty": "No upcoming volunteer shifts.",
+      "noEvent": "Other shifts",
+      "youreIn": "You’re signed up",
+      "full": "Full",
+      "places": "Places taken: {taken} of {capacity}",
+      "cancel": "Give my place back",
+      "signUp": "Sign me up"
+    },
+    "documents": {
+      "empty": "The library is empty for now.",
+      "download": "Download",
+      "delete": "Delete",
+      "deleteConfirm": "Delete “{title}” and its file? This can’t be undone.",
+      "upload": {
+        "heading": "Add a document",
+        "intro": "Board only. The file stays private: members download it through a link that lasts one minute.",
+        "file": "File",
+        "fileHint": "PDF, image, text, Word, Excel or LibreOffice, up to 20 MB.",
+        "title": "Title",
+        "category": "Category (optional)",
+        "submit": "Add to the library",
+        "problems": {
+          "noFile": "Choose a file.",
+          "fileType": "This file type isn’t accepted.",
+          "fileTooLarge": "This file is larger than 20 MB.",
+          "empty": "This file is empty.",
+          "noTitle": "Give the document a title.",
+          "uploadFailed": "The upload failed. Try again.",
+          "forbidden": "Only the board can add documents.",
+          "failed": "The document couldn’t be saved. Try again."
+        }
+      }
+    },
+    "directory": {
+      "intro": "The association’s active members.",
+      "boardIntro": "The association’s active members, with their phone numbers (only the board sees them).",
+      "empty": "No members yet.",
+      "joined": "Member since {date}"
+    },
+    "board": {
+      "delete": "Delete",
+      "fields": {
+        "title": "Title",
+        "startsAt": "Start",
+        "endsAt": "End",
+        "tunisTime": "Tunis time.",
+        "location": "Place",
+        "onlineUrl": "Online meeting link",
+        "agenda": "Agenda",
+        "description": "Description",
+        "message": "Message",
+        "markdownHint": "Markdown works: **bold**, lists, links.",
+        "audienceHint": "“The board only” stays invisible to members."
+      },
+      "meetings": {
+        "new": "New meeting",
+        "create": "Schedule the meeting",
+        "cancel": "Cancel the meeting",
+        "cancelConfirm": "Cancel this meeting? The members concerned will be told.",
+        "deleteConfirm": "Delete this meeting and its answers? This can’t be undone."
+      },
+      "announcements": {
+        "new": "New announcement",
+        "discordLater": "The members concerned are notified on the site. Posting to Discord comes with the Discord integration.",
+        "publish": "Publish the announcement",
+        "pin": "Pin to the top of the feed",
+        "all": "All announcements",
+        "show": "Show again",
+        "hide": "Hide",
+        "unpin": "Unpin",
+        "pinAction": "Pin",
+        "deleteConfirm": "Delete this announcement? This can’t be undone."
+      },
+      "polls": {
+        "new": "New availability poll",
+        "create": "Create the poll",
+        "closesAt": "Closes (optional)",
+        "closesAtHint": "After this date, votes are locked.",
+        "slots": "Time slots",
+        "slotsHint": "At least {min} slots. Give a start time, or else a label; empty rows are ignored.",
+        "slot": "Slot {number}",
+        "slotLabel": "Label (optional)",
+        "all": "All polls",
+        "empty": "No polls yet.",
+        "close": "Close now",
+        "closeConfirm": "Close this poll? Votes will be locked.",
+        "deleteConfirm": "Delete this poll and its votes? This can’t be undone."
+      },
+      "volunteering": {
+        "new": "New volunteer shift",
+        "create": "Open the shift",
+        "event": "Event",
+        "noEvent": "No event",
+        "eventOption": "{title} ({date})",
+        "role": "Role",
+        "roleIn": "Role in {language}",
+        "capacity": "Places",
+        "upcoming": "Upcoming shifts",
+        "signedUp": "Signed up",
+        "remove": "Remove",
+        "removeConfirm": "Remove this person from the shift?",
+        "nobody": "Nobody has signed up yet.",
+        "deleteConfirm": "Delete this shift and its sign-ups? This can’t be undone."
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "News on the site that concerns you.",
+    "bell": "{count, plural, =0 {Notifications} one {Notifications: # unread} other {Notifications: # unread}}",
+    "backToAccount": "My account",
+    "open": "See notifications",
+    "unread": "{count, plural, =0 {No unread notifications.} one {# unread notification.} other {# unread notifications.}}",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "empty": "No notifications yet.",
+    "new": "New",
+    "untitled": "untitled",
+    "note": "Note from the team: {note}",
+    "kinds": {
+      "announcement": "New announcement: {title}",
+      "taskAssigned": "A task was assigned to you: {title}",
+      "meetingScheduled": "New meeting: {title}",
+      "meetingCancelled": "Meeting cancelled: {title}",
+      "profileApproved": "Your profile “{name}” is published.",
+      "profileRejected": "Your profile “{name}” was not approved.",
+      "profileSuspended": "Your profile “{name}” is suspended.",
+      "profileReinstated": "Your profile “{name}” is published again.",
+      "profileSubmitted": "A profile is waiting for your review: {name}",
+      "other": "New notification"
     }
   }
 }

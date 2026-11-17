@@ -15,15 +15,19 @@ scene. It has four access levels: public · members · board · admin. Read thes
 
 ## Current state
 
-**Phases 1 (foundation, ACF brand), 2 (data model, auth, RLS, seed), 3 (public site) and 4 (profile onboarding
-and admin approval) are done; phase 5 (member space) is next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
+**Phases 1 (foundation, ACF brand), 2 (data model, auth, RLS, seed), 3 (public site), 4 (profile onboarding
+and admin approval) and 5 (member space) are done; phase 6 (board space) is next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
 pgTAP suite that encodes `docs/roles.md` (`npm run db:test`). Authentication works end to end: sign-up with email
 confirmation, password and magic-link sign-in, password reset, sign-out. `requireUser` / `requireRole` guard the
 account, member, board and admin layouts (signed out → sign-in; wrong role → 404). Every public page reads from Supabase through the tagged public cache
 (`src/lib/supabase/public.ts`, revalidated by `POST /api/webhooks/content`, D-062). Scene actors create and manage
 their profiles under `/account/profiles` (media, co-managers, event proposals, blog posts with translations), the admin
 reviews them in `/admin/approvals` and the board publishes proposals in `/board/events`; forms use Server Actions with
-`ActionForm` (D-066). The other member, board and admin pages are still placeholders. Legal texts are drafts awaiting ACF. Local development uses the Supabase stack in Docker
+`ActionForm` (D-066). Members use the whole member space (dashboard, meetings with answers, tasks, announcements,
+availability polls, volunteer shifts, the document library through signed URLs, the directory) and everyone has
+`/account/notifications` (D-073–D-078); the board feeds it from `/board/meetings`, `/board/announcements`, `/board/polls`
+and `/board/volunteering`. The other board pages (tasks, news, finance, vault, correspondence) and the admin pages
+except approvals are still placeholders. Legal texts are drafts awaiting ACF. Local development uses the Supabase stack in Docker
 (`npm run db:start`, seeded with fictional demo users `*@acf.test`, password `demo-password-1`). Supabase has one hosted project (production, `ccntrlsymnokmfamcaho`) and migrations reach it only through
 `db-migrate.yml` after approval (D-059); the Vercel project still has to be connected; fonts and logo are still stand-ins. Update this section at the end of every phase.
 

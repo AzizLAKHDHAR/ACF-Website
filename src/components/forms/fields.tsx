@@ -144,6 +144,89 @@ export function CheckboxField({
   );
 }
 
+/** The server's error for a group of fields (e.g. `options`), where no single input owns it. */
+export function FieldErrorMessage({ name, id }: { name: string; id?: string }) {
+  const error = useFieldError(name);
+  const t = useTranslations('forms.fieldErrors');
+  if (!error) return null;
+  return (
+    <p id={id} className="text-sm font-semibold text-destructive">
+      {t(error)}
+    </p>
+  );
+}
+
+/** One choice among a few (an RSVP, a vote), as native radio buttons in a labelled fieldset. */
+export function RadioGroupField({
+  name,
+  legend,
+  options,
+  defaultValue,
+  hint,
+  className,
+  legendClassName,
+  legendDir,
+  id,
+}: {
+  name: string;
+  legend: React.ReactNode;
+  options: { value: string; label: string }[];
+  defaultValue?: string | null;
+  hint?: string;
+  className?: string;
+  legendClassName?: string;
+  /** `auto` when the legend is user-written (a poll option). */
+  legendDir?: 'auto';
+  /** Prefix of the inputs' ids, when the same name appears twice on a page. */
+  id?: string;
+}) {
+  const error = useFieldError(name);
+  const t = useTranslations('forms.fieldErrors');
+  const baseId = (id ?? name).replace(/[^a-zA-Z0-9_-]/g, '-');
+  const hintId = hint ? `${baseId}-hint` : undefined;
+  const errorId = error ? `${baseId}-error` : undefined;
+  return (
+    <fieldset
+      className={cn('flex flex-col gap-2', className)}
+      aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}
+    >
+      <legend className={cn('mb-1 text-sm font-semibold', legendClassName)} dir={legendDir}>
+        {legend}
+      </legend>
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {options.map((option) => {
+          const id = `${baseId}-${option.value || 'none'}`;
+          return (
+            <div key={option.value} className="flex min-h-10 items-center gap-2">
+              <input
+                id={id}
+                name={name}
+                type="radio"
+                value={option.value}
+                defaultChecked={(defaultValue ?? '') === option.value}
+                className="size-5 shrink-0 accent-primary"
+              />
+              <Label htmlFor={id} className="font-medium">
+                {option.label}
+              </Label>
+            </div>
+          );
+        })}
+      </div>
+      {hint ? (
+        <p id={hintId} className="text-sm text-muted-foreground">
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p id={errorId} className="text-sm font-semibold text-destructive">
+          {t(error)}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
+
 /** A group of checkboxes posted under one name (genres, professions, services). */
 export function CheckboxGroup({
   name,
