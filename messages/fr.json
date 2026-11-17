@@ -574,5 +574,329 @@
         }
       }
     }
+  },
+  "forms": {
+    "pending": "Envoi…",
+    "uploading": "Envoi de l’image…",
+    "removeImage": "Retirer l’image",
+    "emailsSent": "{count, plural, =0 {Aucun e-mail envoyé.} one {# e-mail envoyé.} other {# e-mails envoyés.}}",
+    "notices": {
+      "saved": "Enregistré.",
+      "created": "Créé.",
+      "submitted": "Envoyé pour validation. Vous recevrez un e-mail quand l’équipe aura décidé.",
+      "added": "Ajouté.",
+      "removed": "Retiré.",
+      "deleted": "Supprimé.",
+      "published": "Publié.",
+      "unpublished": "Dépublié.",
+      "approved": "Profil validé.",
+      "rejected": "Profil refusé.",
+      "suspended": "Profil suspendu.",
+      "reinstated": "Profil rétabli.",
+      "proposed": "Proposition envoyée au bureau."
+    },
+    "errors": {
+      "invalidInput": "Certains champs sont à corriger.",
+      "forbidden": "Vous n’avez pas le droit de faire cela.",
+      "notFound": "Introuvable : la page a peut-être changé entre-temps.",
+      "slugTaken": "Cette adresse est déjà utilisée. Choisissez-en une autre.",
+      "conflict": "Cela existe déjà.",
+      "invalidTransition": "Ce changement n’est pas possible dans l’état actuel.",
+      "incomplete": "Il manque encore quelques informations :",
+      "unknownEmail": "Aucun compte actif n’utilise cette adresse. La personne doit d’abord créer un compte et confirmer son e-mail.",
+      "alreadyManager": "Cette personne gère déjà ce profil.",
+      "lastOwner": "Un profil garde toujours au moins un propriétaire. Nommez-en un autre avant de partir.",
+      "uploadFailed": "L’envoi a échoué. Réessayez.",
+      "failed": "Une erreur est survenue. Réessayez dans un instant."
+    },
+    "fieldErrors": {
+      "required": "Ce champ est obligatoire.",
+      "tooLong": "Ce champ est trop long.",
+      "invalidSlug": "Lettres minuscules sans accents, chiffres et tirets uniquement (ex. : les-pixels).",
+      "invalidUrl": "Saisissez une adresse web complète, commençant par https://.",
+      "invalidEmail": "Saisissez une adresse e-mail valide.",
+      "invalidNumber": "Saisissez un nombre valide.",
+      "invalidDate": "Saisissez une date à venir valide.",
+      "endBeforeStart": "La fin doit être après le début.",
+      "oneLocaleRequired": "Remplissez au moins une langue."
+    },
+    "missing": {
+      "tagline": "une courte présentation (dans au moins une langue)",
+      "governorate": "le gouvernorat"
+    },
+    "uploadErrors": {
+      "fileType": "Format non accepté. Choisissez une image JPEG, PNG, WebP, AVIF ou GIF.",
+      "fileTooLarge": "Image trop lourde. Choisissez un fichier de moins de 15 Mo.",
+      "uploadFailed": "L’envoi a échoué. Réessayez.",
+      "forbidden": "Vous ne pouvez pas modifier les images de ce profil."
+    }
+  },
+  "profiles": {
+    "save": "Enregistrer",
+    "list": {
+      "title": "Mes profils publics",
+      "description": "Les profils d’artiste, de professionnel·le, de lieu, de studio ou de blog que vous gérez.",
+      "heading": "Profils que je gère",
+      "empty": "Vous ne gérez encore aucun profil.",
+      "accountIntro": "Présentez votre projet dans les annuaires d’ACF : artiste, professionnel·le, lieu, studio ou blog.",
+      "manage": "Gérer mes profils"
+    },
+    "create": {
+      "title": "Créer un profil",
+      "intro": "Le profil commence en brouillon : complétez-le, puis envoyez-le pour validation. Il devient public une fois validé par l’équipe d’ACF.",
+      "type": "Type de profil",
+      "displayNameHint": "Le nom tel qu’il apparaîtra dans l’annuaire. Vous pourrez le changer.",
+      "submit": "Créer le brouillon"
+    },
+    "types": {
+      "artist": "Artiste",
+      "professional": "Professionnel·le",
+      "venue": "Lieu",
+      "studio": "Studio",
+      "blog": "Blog"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "pending": "En attente de validation",
+      "approved": "Publié",
+      "rejected": "À revoir",
+      "suspended": "Suspendu"
+    },
+    "statusHelp": {
+      "draft": "Visible par vous seul·e. Complétez-le, puis envoyez-le pour validation.",
+      "pending": "L’équipe d’ACF examine votre profil. Vous pouvez encore le modifier.",
+      "approved": "Votre profil est visible publiquement. Vos modifications sont publiées tout de suite.",
+      "rejected": "L’équipe vous demande quelques changements. Corrigez puis renvoyez-le.",
+      "suspended": "Votre profil n’est plus visible publiquement. Contactez ACF pour en savoir plus."
+    },
+    "editor": {
+      "title": "Modifier le profil",
+      "description": "Modifier un profil public et suivre sa validation.",
+      "back": "Retour à mes profils",
+      "backToAccount": "Retour à mon compte",
+      "viewPublic": "Voir la page publique",
+      "generalIntro": "Ces informations apparaissent sur la page publique du profil.",
+      "sections": {
+        "status": "Statut et validation",
+        "content": "Contenus",
+        "general": "Présentation",
+        "details": "Détails",
+        "media": "Images",
+        "private": "Contact privé"
+      }
+    },
+    "fields": {
+      "displayName": "Nom",
+      "slug": "Adresse de la page",
+      "slugHint": "Lettres minuscules sans accents, chiffres et tirets. Elle apparaît dans le lien de la page.",
+      "tagline": "Courte présentation",
+      "taglineHint": "Une phrase. Remplissez au moins une langue ; les autres sont facultatives.",
+      "bio": "Biographie",
+      "governorate": "Gouvernorat",
+      "governoratePlaceholder": "Choisir un gouvernorat",
+      "city": "Ville",
+      "links": "Liens",
+      "linksHint": "Site, réseaux sociaux, YouTube, Spotify, SoundCloud… Les liens YouTube, Spotify et SoundCloud deviennent des lecteurs sur la page.",
+      "link": "Lien {number}"
+    },
+    "details": {
+      "kind": "Formation",
+      "formedYear": "Année de création",
+      "genres": "Genres",
+      "yearsExperience": "Années d’expérience",
+      "availableForHire": "Disponible pour des missions",
+      "professions": "Métiers",
+      "address": "Adresse",
+      "capacity": "Capacité (personnes)",
+      "venueKind": "Type de lieu",
+      "venueKindHint": "Par exemple : club, salle de concert, café-théâtre, espace en plein air.",
+      "hasBackline": "Backline disponible",
+      "services": "Services"
+    },
+    "media": {
+      "intro": "Les images sont réduites dans votre navigateur avant l’envoi. JPEG, PNG, WebP, AVIF ou GIF, 15 Mo au plus.",
+      "avatar": "Photo de profil",
+      "avatarHint": "Carrée de préférence. Elle apparaît dans l’annuaire.",
+      "cover": "Image de couverture",
+      "coverHint": "Format paysage, au moins 1600 pixels de large."
+    },
+    "private": {
+      "intro": "Visible seulement par les gestionnaires du profil et l’équipe d’ACF, jamais sur la page publique.",
+      "contactEmail": "E-mail de contact",
+      "contactPhone": "Téléphone"
+    },
+    "managers": {
+      "title": "Gestionnaires",
+      "intro": "Les personnes qui peuvent modifier ce profil. Les propriétaires peuvent aussi ajouter ou retirer des gestionnaires.",
+      "you": "vous",
+      "roles": {
+        "owner": "Propriétaire",
+        "editor": "Éditeur·rice"
+      },
+      "remove": "Retirer",
+      "leave": "Quitter ce profil",
+      "removeConfirm": "Retirer cette personne des gestionnaires du profil ?",
+      "leaveConfirm": "Vous ne pourrez plus modifier ce profil. Continuer ?",
+      "add": {
+        "title": "Ajouter un·e gestionnaire",
+        "email": "E-mail de son compte ACF",
+        "emailHint": "La personne doit déjà avoir un compte confirmé.",
+        "role": "Rôle",
+        "submit": "Ajouter"
+      }
+    },
+    "review": {
+      "submit": "Envoyer pour validation",
+      "resubmit": "Renvoyer pour validation",
+      "submitHint": "L’équipe d’ACF vérifie chaque profil avant sa publication. Vous serez prévenu·e par e-mail.",
+      "noteFromTeam": "Message de l’équipe d’ACF",
+      "history": "Historique",
+      "noHistory": "Aucun événement pour l’instant.",
+      "actions": {
+        "submitted": "Envoyé pour validation",
+        "approved": "Validé",
+        "rejected": "Refusé",
+        "suspended": "Suspendu",
+        "reinstated": "Rétabli",
+        "published": "Publié",
+        "unpublished": "Dépublié"
+      }
+    },
+    "content": {
+      "posts": "Écrire et gérer les billets",
+      "postsHint": "Votre blog est validé : vos billets sont publiés dès que vous le décidez.",
+      "postsLocked": "Vous pourrez écrire des billets une fois le blog validé.",
+      "events": "Proposer un événement",
+      "eventsHint": "Proposez un concert ou une soirée ; le bureau d’ACF le publie dans l’agenda."
+    },
+    "danger": {
+      "title": "Supprimer le brouillon",
+      "hint": "Un brouillon peut être supprimé définitivement, avec ses images.",
+      "delete": "Supprimer le brouillon",
+      "confirm": "Supprimer définitivement ce brouillon et ses images ? Cette action est irréversible."
+    }
+  },
+  "review": {
+    "detailTitle": "Examiner un profil",
+    "back": "Retour aux validations",
+    "contentHeading": "Contenu du profil",
+    "privateContact": "Contact privé",
+    "decisionHeading": "Décision",
+    "decision": "Décision",
+    "decide": "Enregistrer la décision",
+    "notePublic": "Message aux gestionnaires",
+    "notePublicHint": "Envoyé par e-mail et affiché sur leur profil. Obligatoire pour un refus ou une suspension.",
+    "noteInternal": "Note interne",
+    "noteInternalHint": "Visible seulement par les administrateur·rices.",
+    "internalPrefix": "Note interne :",
+    "pendingHeading": "{count, plural, =0 {Aucun profil en attente} one {# profil en attente} other {# profils en attente}}",
+    "suspendedHeading": "{count, plural, one {# profil suspendu} other {# profils suspendus}}",
+    "emptyQueue": "Rien à examiner pour l’instant.",
+    "submittedOn": "envoyé le {date}",
+    "decisions": {
+      "approved": "Valider et publier",
+      "rejected": "Refuser (avec un message)",
+      "suspended": "Suspendre (avec un message)",
+      "reinstated": "Rétablir"
+    }
+  },
+  "proposals": {
+    "title": "Propositions d’événements",
+    "description": "Proposer un événement au bureau d’ACF et suivre sa publication.",
+    "backToProfile": "Retour au profil",
+    "introVenue": "Proposez un événement à {name}. Le bureau d’ACF l’examine puis le publie dans l’agenda.",
+    "introArtist": "Proposez un événement où joue {name}. Le bureau d’ACF l’examine puis le publie dans l’agenda.",
+    "mine": "Mes propositions",
+    "empty": "Aucune proposition pour l’instant.",
+    "new": "Nouvelle proposition",
+    "submit": "Envoyer la proposition",
+    "viewPublic": "Voir dans l’agenda",
+    "noteFromBoard": "Message du bureau",
+    "status": {
+      "draft": "Brouillon",
+      "pending": "En attente",
+      "published": "Publié",
+      "unpublished": "Non retenu"
+    },
+    "fields": {
+      "title": "Titre",
+      "titleHint": "Remplissez au moins une langue.",
+      "startsAt": "Début",
+      "endsAt": "Fin (facultatif)",
+      "timeHint": "Heure de Tunis.",
+      "venue": "Lieu",
+      "venueHint": "Nom et adresse du lieu.",
+      "description": "Description",
+      "ticketUrl": "Lien de billetterie",
+      "isFree": "Entrée libre"
+    },
+    "board": {
+      "pendingHeading": "{count, plural, =0 {Aucune proposition en attente} one {# proposition en attente} other {# propositions en attente}}",
+      "empty": "Aucune proposition à examiner.",
+      "proposer": "Proposé par",
+      "lineup": "Programmation",
+      "publish": "Publier dans l’agenda",
+      "reject": "Ne pas retenir (avec un message)",
+      "noteHint": "Envoyé à la personne qui propose. Obligatoire si la proposition n’est pas retenue."
+    }
+  },
+  "blogEditor": {
+    "title": "Billets du blog",
+    "editTitle": "Modifier un billet",
+    "description": "Écrire, traduire et publier les billets de votre blog.",
+    "back": "Retour aux billets",
+    "listHeading": "Tous les billets",
+    "empty": "Aucun billet pour l’instant.",
+    "new": "Nouveau billet",
+    "create": "Créer le brouillon",
+    "writtenIn": "En {language}",
+    "viewPublic": "Voir le billet publié",
+    "publication": "Publication",
+    "publishedHint": "Ce billet est en ligne. Vos modifications sont publiées tout de suite.",
+    "draftHint": "Ce billet n’est visible que par les gestionnaires du blog.",
+    "publish": "Publier",
+    "unpublish": "Dépublier",
+    "text": "Texte",
+    "cover": "Image de couverture",
+    "coverLabel": "Image du billet",
+    "translations": "Traductions",
+    "translationsHint": "Chaque langue est un billet à part, relié aux autres : les lecteurs passent d’une version à l’autre.",
+    "addTranslation": "Créer la traduction",
+    "deleteTitle": "Supprimer le billet",
+    "delete": "Supprimer le billet",
+    "deleteConfirm": "Supprimer définitivement ce billet et ses images ? Cette action est irréversible.",
+    "fields": {
+      "language": "Langue",
+      "title": "Titre",
+      "translatedTitle": "Titre traduit",
+      "excerpt": "Chapeau",
+      "body": "Texte",
+      "bodyHint": "Markdown : **gras**, *italique*, [lien](https://…), listes avec « - ». Le HTML n’est pas interprété."
+    }
+  },
+  "emails": {
+    "review": {
+      "greeting": "Bonjour {name},",
+      "noteLabel": "Message de l’équipe d’ACF :",
+      "publicLink": "La page publique :",
+      "editorLink": "Gérer le profil :",
+      "signature": "L’équipe d’ACF",
+      "approved": {
+        "subject": "Votre profil « {profile} » est publié",
+        "body": "Bonne nouvelle : l’équipe d’ACF a validé le profil « {profile} ». Il est maintenant visible dans l’annuaire."
+      },
+      "rejected": {
+        "subject": "Votre profil « {profile} » est à revoir",
+        "body": "L’équipe d’ACF a examiné le profil « {profile} » et vous demande quelques changements avant de le publier. Vous pouvez le corriger puis le renvoyer pour validation."
+      },
+      "suspended": {
+        "subject": "Votre profil « {profile} » est suspendu",
+        "body": "Le profil « {profile} » n’est plus visible publiquement pour le moment."
+      },
+      "reinstated": {
+        "subject": "Votre profil « {profile} » est de nouveau en ligne",
+        "body": "Le profil « {profile} » est de nouveau visible dans l’annuaire."
+      }
+    }
   }
 }

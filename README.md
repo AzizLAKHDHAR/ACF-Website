@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Amplify Creative Foundation — website and association platform
 
 Public website and internal platform of the **Amplify Creative Foundation (ACF)**, a Tunisian association
@@ -128,3 +129,6 @@ through the `db-migrate.yml` workflow after an approval. Details in
 ## License
 
 [MIT](LICENSE).
+=======
+# ACF-Website
+>>>>>>> 462cae46743c8a652260c7759e5b51951d0990fc

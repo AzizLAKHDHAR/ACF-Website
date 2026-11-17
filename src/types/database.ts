@@ -2057,6 +2057,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      add_profile_manager: {
+        Args: { email: string; manager_role?: string; profile: string };
+        Returns: string;
+      };
       create_profile: {
         Args: {
           display_name: string;
@@ -2065,11 +2069,28 @@ export type Database = {
         };
         Returns: string;
       };
+      list_profile_managers: {
+        Args: { profile: string };
+        Returns: {
+          created_at: string;
+          display_name: string;
+          role: string;
+          user_id: string;
+        }[];
+      };
       meeting_rsvp_counts: {
         Args: { meeting: string };
         Returns: {
           response: Database['public']['Enums']['rsvp_response'];
           total: number;
+        }[];
+      };
+      profile_review_recipients: {
+        Args: { profile: string };
+        Returns: {
+          display_name: string;
+          email: string;
+          locale: Database['public']['Enums']['locale'];
         }[];
       };
       propose_event: {

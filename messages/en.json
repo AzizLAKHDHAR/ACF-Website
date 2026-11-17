@@ -574,5 +574,329 @@
         }
       }
     }
+  },
+  "forms": {
+    "pending": "Sending…",
+    "uploading": "Uploading the image…",
+    "removeImage": "Remove the image",
+    "emailsSent": "{count, plural, =0 {No email sent.} one {# email sent.} other {# emails sent.}}",
+    "notices": {
+      "saved": "Saved.",
+      "created": "Created.",
+      "submitted": "Sent for review. You’ll get an email once the team has decided.",
+      "added": "Added.",
+      "removed": "Removed.",
+      "deleted": "Deleted.",
+      "published": "Published.",
+      "unpublished": "Unpublished.",
+      "approved": "Profile approved.",
+      "rejected": "Profile rejected.",
+      "suspended": "Profile suspended.",
+      "reinstated": "Profile reinstated.",
+      "proposed": "Proposal sent to the board."
+    },
+    "errors": {
+      "invalidInput": "Some fields need fixing.",
+      "forbidden": "You’re not allowed to do that.",
+      "notFound": "Not found: the page may have changed in the meantime.",
+      "slugTaken": "This address is already taken. Choose another one.",
+      "conflict": "This already exists.",
+      "invalidTransition": "This change isn’t possible in the current state.",
+      "incomplete": "A few things are still missing:",
+      "unknownEmail": "No active account uses this address. The person must first create an account and confirm their email.",
+      "alreadyManager": "This person already manages the profile.",
+      "lastOwner": "A profile always keeps at least one owner. Name another owner before leaving.",
+      "uploadFailed": "The upload failed. Try again.",
+      "failed": "Something went wrong. Try again in a moment."
+    },
+    "fieldErrors": {
+      "required": "This field is required.",
+      "tooLong": "This field is too long.",
+      "invalidSlug": "Lowercase letters without accents, digits and dashes only (e.g. les-pixels).",
+      "invalidUrl": "Enter a full web address starting with https://.",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidNumber": "Enter a valid number.",
+      "invalidDate": "Enter a valid date in the future.",
+      "endBeforeStart": "The end must be after the start.",
+      "oneLocaleRequired": "Fill in at least one language."
+    },
+    "missing": {
+      "tagline": "a short introduction (in at least one language)",
+      "governorate": "the governorate"
+    },
+    "uploadErrors": {
+      "fileType": "Format not accepted. Choose a JPEG, PNG, WebP, AVIF or GIF image.",
+      "fileTooLarge": "Image too large. Choose a file under 15 MB.",
+      "uploadFailed": "The upload failed. Try again.",
+      "forbidden": "You can’t change this profile’s images."
+    }
+  },
+  "profiles": {
+    "save": "Save",
+    "list": {
+      "title": "My public profiles",
+      "description": "The artist, professional, venue, studio or blog profiles you manage.",
+      "heading": "Profiles I manage",
+      "empty": "You don’t manage any profile yet.",
+      "accountIntro": "Present your project in ACF’s directories: artist, professional, venue, studio or blog.",
+      "manage": "Manage my profiles"
+    },
+    "create": {
+      "title": "Create a profile",
+      "intro": "A profile starts as a draft: fill it in, then send it for review. It becomes public once the ACF team approves it.",
+      "type": "Profile type",
+      "displayNameHint": "The name as it will appear in the directory. You can change it later.",
+      "submit": "Create the draft"
+    },
+    "types": {
+      "artist": "Artist",
+      "professional": "Professional",
+      "venue": "Venue",
+      "studio": "Studio",
+      "blog": "Blog"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending": "Awaiting review",
+      "approved": "Published",
+      "rejected": "Needs changes",
+      "suspended": "Suspended"
+    },
+    "statusHelp": {
+      "draft": "Only you can see it. Fill it in, then send it for review.",
+      "pending": "The ACF team is reviewing your profile. You can still edit it.",
+      "approved": "Your profile is public. Your changes are published right away.",
+      "rejected": "The team asks for a few changes. Fix them, then send it again.",
+      "suspended": "Your profile is no longer public. Contact ACF to find out more."
+    },
+    "editor": {
+      "title": "Edit profile",
+      "description": "Edit a public profile and follow its review.",
+      "back": "Back to my profiles",
+      "backToAccount": "Back to my account",
+      "viewPublic": "View the public page",
+      "generalIntro": "This information appears on the profile’s public page.",
+      "sections": {
+        "status": "Status and review",
+        "content": "Content",
+        "general": "Introduction",
+        "details": "Details",
+        "media": "Images",
+        "private": "Private contact"
+      }
+    },
+    "fields": {
+      "displayName": "Name",
+      "slug": "Page address",
+      "slugHint": "Lowercase letters without accents, digits and dashes. It appears in the page’s link.",
+      "tagline": "Short introduction",
+      "taglineHint": "One sentence. Fill in at least one language; the others are optional.",
+      "bio": "Biography",
+      "governorate": "Governorate",
+      "governoratePlaceholder": "Choose a governorate",
+      "city": "City",
+      "links": "Links",
+      "linksHint": "Website, social networks, YouTube, Spotify, SoundCloud… YouTube, Spotify and SoundCloud links become players on the page.",
+      "link": "Link {number}"
+    },
+    "details": {
+      "kind": "Line-up",
+      "formedYear": "Year formed",
+      "genres": "Genres",
+      "yearsExperience": "Years of experience",
+      "availableForHire": "Available for hire",
+      "professions": "Professions",
+      "address": "Address",
+      "capacity": "Capacity (people)",
+      "venueKind": "Kind of venue",
+      "venueKindHint": "For example: club, concert hall, café-theatre, open-air space.",
+      "hasBackline": "Backline available",
+      "services": "Services"
+    },
+    "media": {
+      "intro": "Images are scaled down in your browser before they’re sent. JPEG, PNG, WebP, AVIF or GIF, 15 MB at most.",
+      "avatar": "Profile picture",
+      "avatarHint": "Square if possible. It appears in the directory.",
+      "cover": "Cover image",
+      "coverHint": "Landscape, at least 1600 pixels wide."
+    },
+    "private": {
+      "intro": "Only the profile’s managers and the ACF team see this, never the public page.",
+      "contactEmail": "Contact email",
+      "contactPhone": "Phone"
+    },
+    "managers": {
+      "title": "Managers",
+      "intro": "The people who can edit this profile. Owners can also add or remove managers.",
+      "you": "you",
+      "roles": {
+        "owner": "Owner",
+        "editor": "Editor"
+      },
+      "remove": "Remove",
+      "leave": "Leave this profile",
+      "removeConfirm": "Remove this person from the profile’s managers?",
+      "leaveConfirm": "You won’t be able to edit this profile anymore. Continue?",
+      "add": {
+        "title": "Add a manager",
+        "email": "Email of their ACF account",
+        "emailHint": "The person must already have a confirmed account.",
+        "role": "Role",
+        "submit": "Add"
+      }
+    },
+    "review": {
+      "submit": "Send for review",
+      "resubmit": "Send for review again",
+      "submitHint": "The ACF team checks every profile before it’s published. You’ll be told by email.",
+      "noteFromTeam": "Message from the ACF team",
+      "history": "History",
+      "noHistory": "Nothing yet.",
+      "actions": {
+        "submitted": "Sent for review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "suspended": "Suspended",
+        "reinstated": "Reinstated",
+        "published": "Published",
+        "unpublished": "Unpublished"
+      }
+    },
+    "content": {
+      "posts": "Write and manage posts",
+      "postsHint": "Your blog is approved: your posts are published as soon as you decide.",
+      "postsLocked": "You can write posts once the blog is approved.",
+      "events": "Propose an event",
+      "eventsHint": "Propose a concert or a night out; ACF’s board publishes it in the calendar."
+    },
+    "danger": {
+      "title": "Delete the draft",
+      "hint": "A draft can be deleted for good, with its images.",
+      "delete": "Delete the draft",
+      "confirm": "Delete this draft and its images for good? This can’t be undone."
+    }
+  },
+  "review": {
+    "detailTitle": "Review a profile",
+    "back": "Back to approvals",
+    "contentHeading": "Profile content",
+    "privateContact": "Private contact",
+    "decisionHeading": "Decision",
+    "decision": "Decision",
+    "decide": "Save the decision",
+    "notePublic": "Message to the managers",
+    "notePublicHint": "Sent by email and shown on their profile. Required to reject or suspend.",
+    "noteInternal": "Internal note",
+    "noteInternalHint": "Only administrators see it.",
+    "internalPrefix": "Internal note:",
+    "pendingHeading": "{count, plural, =0 {No profile awaiting review} one {# profile awaiting review} other {# profiles awaiting review}}",
+    "suspendedHeading": "{count, plural, one {# suspended profile} other {# suspended profiles}}",
+    "emptyQueue": "Nothing to review right now.",
+    "submittedOn": "sent on {date}",
+    "decisions": {
+      "approved": "Approve and publish",
+      "rejected": "Reject (with a message)",
+      "suspended": "Suspend (with a message)",
+      "reinstated": "Reinstate"
+    }
+  },
+  "proposals": {
+    "title": "Event proposals",
+    "description": "Propose an event to ACF’s board and follow its publication.",
+    "backToProfile": "Back to the profile",
+    "introVenue": "Propose an event at {name}. ACF’s board reviews it, then publishes it in the calendar.",
+    "introArtist": "Propose an event where {name} plays. ACF’s board reviews it, then publishes it in the calendar.",
+    "mine": "My proposals",
+    "empty": "No proposals yet.",
+    "new": "New proposal",
+    "submit": "Send the proposal",
+    "viewPublic": "View in the calendar",
+    "noteFromBoard": "Message from the board",
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "published": "Published",
+      "unpublished": "Not accepted"
+    },
+    "fields": {
+      "title": "Title",
+      "titleHint": "Fill in at least one language.",
+      "startsAt": "Start",
+      "endsAt": "End (optional)",
+      "timeHint": "Tunis time.",
+      "venue": "Venue",
+      "venueHint": "Name and address of the venue.",
+      "description": "Description",
+      "ticketUrl": "Ticketing link",
+      "isFree": "Free entry"
+    },
+    "board": {
+      "pendingHeading": "{count, plural, =0 {No pending proposals} one {# pending proposal} other {# pending proposals}}",
+      "empty": "No proposals to review.",
+      "proposer": "Proposed by",
+      "lineup": "Line-up",
+      "publish": "Publish in the calendar",
+      "reject": "Don’t accept (with a message)",
+      "noteHint": "Sent to the person who proposed it. Required if the proposal isn’t accepted."
+    }
+  },
+  "blogEditor": {
+    "title": "Blog posts",
+    "editTitle": "Edit a post",
+    "description": "Write, translate and publish your blog’s posts.",
+    "back": "Back to posts",
+    "listHeading": "All posts",
+    "empty": "No posts yet.",
+    "new": "New post",
+    "create": "Create the draft",
+    "writtenIn": "In {language}",
+    "viewPublic": "View the published post",
+    "publication": "Publication",
+    "publishedHint": "This post is online. Your changes are published right away.",
+    "draftHint": "Only the blog’s managers can see this post.",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "text": "Text",
+    "cover": "Cover image",
+    "coverLabel": "Post image",
+    "translations": "Translations",
+    "translationsHint": "Each language is its own post, linked to the others: readers can switch between versions.",
+    "addTranslation": "Create the translation",
+    "deleteTitle": "Delete the post",
+    "delete": "Delete the post",
+    "deleteConfirm": "Delete this post and its images for good? This can’t be undone.",
+    "fields": {
+      "language": "Language",
+      "title": "Title",
+      "translatedTitle": "Translated title",
+      "excerpt": "Standfirst",
+      "body": "Text",
+      "bodyHint": "Markdown: **bold**, *italic*, [link](https://…), lists with “-”. HTML isn’t interpreted."
+    }
+  },
+  "emails": {
+    "review": {
+      "greeting": "Hello {name},",
+      "noteLabel": "Message from the ACF team:",
+      "publicLink": "The public page:",
+      "editorLink": "Manage the profile:",
+      "signature": "The ACF team",
+      "approved": {
+        "subject": "Your profile “{profile}” is published",
+        "body": "Good news: the ACF team approved the profile “{profile}”. It now appears in the directory."
+      },
+      "rejected": {
+        "subject": "Your profile “{profile}” needs changes",
+        "body": "The ACF team reviewed the profile “{profile}” and asks for a few changes before publishing it. You can fix it, then send it for review again."
+      },
+      "suspended": {
+        "subject": "Your profile “{profile}” is suspended",
+        "body": "The profile “{profile}” is no longer public for now."
+      },
+      "reinstated": {
+        "subject": "Your profile “{profile}” is back online",
+        "body": "The profile “{profile}” appears in the directory again."
+      }
+    }
   }
 }

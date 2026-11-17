@@ -38,3 +38,13 @@ export function startOfTodayInTunis(now: Date = new Date()): string {
 export function tunisDayStart(day: string): string {
   return new Date(`${day}T00:00:00+01:00`).toISOString();
 }
+
+/**
+ * A `datetime-local` value (YYYY-MM-DDTHH:mm), read as Tunis wall-clock time, as an ISO instant;
+ * null when it isn't a valid date. Tunisia is UTC+1 all year (no DST).
+ */
+export function tunisLocalToIso(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}:00+01:00`);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
