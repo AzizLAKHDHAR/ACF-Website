@@ -105,7 +105,9 @@ test.describe('profile onboarding and approval', () => {
     await signInAndWait(page, email, PASSWORD, 'ar');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 
-    const name = `فرقة الأمواج ${arabicToken()}`;
+    // Not «الأمواج»: the search test (public-content) expects the seed's band to be its only match,
+    // and the suites share one database.
+    const name = `فرقة النسيم ${arabicToken()}`;
     const profileId = await createProfile(page, 'ar', 'artist', name);
     // An Arabic-only name gets a Latin fallback slug the owner can change.
     const slug = await page
