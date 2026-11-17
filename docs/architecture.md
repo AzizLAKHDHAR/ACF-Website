@@ -107,7 +107,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 │   │   ├── queries.ts             server-only reads
 │   │   ├── actions.ts             'use server' mutations (validate → authorize → write)
 │   │   └── schemas.ts             Zod schemas
-│   ├── emails/                    React Email templates (localized)
+│   ├── emails/                    localized email templates (plain text, D-068)
 │   ├── i18n/                      routing.ts · request.ts · navigation.ts
 │   ├── lib/
 │   │   ├── supabase/              server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role, server-only)
@@ -142,7 +142,7 @@ required role → `notFound()`, so hidden areas don't reveal that they exist. `r
 | Area | Routes |
 |---|---|
 | Public | `/` home · `/news`, `/news/[slug]` · `/blogs`, `/blogs/[blog]`, `/blogs/[blog]/[slug]` · `/artists`, `/artists/[slug]` · `/professionals`, `/professionals/[slug]` · `/venues`, `/venues/[slug]` · `/studios`, `/studios/[slug]` · `/events`, `/events/[slug]` · `/search?q=` (noindex) · `/about` · `/contact` · `/legal/privacy` · `/legal/terms` |
-| Account | `/account` · `/account/settings` (name, locale, avatar, password, MFA) · `/account/profiles` · `/account/profiles/new?type=…` · `/account/profiles/[id]` (edit, submit, managers) · `/account/events/new` (approved artists/venues) · `/account/blog/posts…` (approved blog owners) |
+| Account | `/account` · `/account/settings` (name, locale, avatar, password, MFA) · `/account/profiles` (list, create) · `/account/profiles/[id]` (edit, media, private contact, managers, submit) · `/account/profiles/[id]/events` (approved artists/venues propose events) · `/account/profiles/[id]/posts`, `/account/profiles/[id]/posts/[postId]` (approved blogs: posts and translations) |
 | Member | `/member` (dashboard: next meetings, my tasks, latest announcements, open polls) · `/member/meetings`, `/member/meetings/[id]` · `/member/tasks` · `/member/announcements` · `/member/polls`, `/member/polls/[id]` · `/member/volunteer` · `/member/documents` · `/member/directory` |
 | Board | `/board` · `/board/tasks` (create/assign) · `/board/meetings` (create) · `/board/announcements` (compose, push to Discord) · `/board/polls` · `/board/volunteering` · `/board/news` · `/board/events` (proposals, publish) · `/board/finance` (ledger) · `/board/finance/projects/[id]` (budgets) · `/board/finance/receipts` · `/board/finance/exports` · `/board/vault` · `/board/correspondence`, `/board/correspondence/[id]` |
 | Admin | `/admin` (analytics) · `/admin/users` (roles, invitations) · `/admin/approvals` · `/admin/moderation` · `/admin/audit` · `/admin/settings` · `/admin/integrations` |
@@ -423,6 +423,8 @@ everywhere except the delivery log, plus column-level `INSERT`/`UPDATE`. Status,
 | RPC | Who |
 |---|---|
 | `create_profile(type, slug, display_name)` / `submit_profile(id)` | any signed-in user / the profile's managers |
+| `add_profile_manager(id, email, role)` / `list_profile_managers(id)` | owners and admin / managers and admin (names, never emails) |
+| `profile_review_recipients(id)` | admin (emails and locales of a profile's managers, for decision emails) |
 | `review_profile(id, approved\|rejected\|suspended\|reinstated, note_public, note_internal)` | admin |
 | `set_post_status(id, status, note)` | board (news); managers of an approved blog; admin (unpublish only) |
 | `propose_event(as_profile, …)` / `set_event_status(id, status, note)` | managers of an approved artist or venue / board |
@@ -522,11 +524,13 @@ the seed makes `admin@acf.test` the admin.
   or sends an invitation that attaches the role when the invited email signs in for the first time.
   There is no self-service path to a role.
 - **Public-profile onboarding** (any signed-in user):
-  1. `/account/profiles/new?type=artist` → `create_profile()` RPC inserts the profile (`draft`) and the
-     owner row in `profile_managers` atomically.
-  2. Owner completes the type-specific form (validated by Zod on the client and again in the action) → `submit_profile()` → `pending`; the admin gets an email and an in-app notification.
-  3. Admin approves/rejects in `/admin/approvals` (`review_profile()`) → `review_events` row, email to
-     the managers, cache tag revalidated → the profile appears in the catalogue.
+  1. `/account/profiles` → `create_profile()` RPC inserts the profile (`draft`), the owner row in
+     `profile_managers`, the private row and the type details atomically; the slug comes from the name.
+  2. Owner completes the editor (Zod in each Server Action, D-066; images resized in the browser, D-067) →
+     `submit_profile()` → `pending`; every admin gets an in-app notification (the email digest is phase 8).
+  3. Admin approves/rejects in `/admin/approvals` (`review_profile()`) → `review_events` row (+ internal note),
+     in-app notification and email to every manager in their locale (D-068), cache tag revalidated → the
+     profile appears in the catalogue.
 - **MFA:** TOTP enrollment in `/account/settings`. Requiring it (`aal2`) for board/admin data is
   planned and pending a decision.
 - **Account deletion:** self-service request → server action anonymizes the `accounts` row, removes
@@ -540,8 +544,9 @@ the seed makes `admin@acf.test` the admin.
   nothing (D-064).
 - One provider for both **Supabase Auth emails** (custom SMTP, which lifts the built-in SMTP's very low
   rate limit) and **app emails** (Resend HTTP API).
-- Templates in `src/emails/` (React Email), rendered in the recipient's `preferred_locale`; the
-  Arabic version is `dir="rtl"`.
+- Phase 4: app emails go through `src/lib/email/resend.ts`. Templates in `src/emails/` are plain text, rendered
+  with next-intl's `createTranslator` in the recipient's `preferred_locale` and snapshot-tested (D-068); React
+  Email can replace them when HTML emails are needed.
 - Requires a domain with SPF/DKIM records (open question: ACF domain).
 - Free-tier cap (about 100 emails/day and 3,000/month at planning time; verify): reminders are batched, and
   daily digests replace per-event emails when volume grows. Fallback provider: Brevo.

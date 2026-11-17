@@ -9,6 +9,7 @@ import {
   areaSubSections,
   infoPages,
   legalPages,
+  placeholderSections,
   publicHref,
   publicSections,
   type Area,
@@ -65,5 +66,14 @@ describe('hrefs', () => {
     expect(areaSectionHref('admin', 'overview')).toBe('/admin');
     expect(areaSubSections('board')).not.toContain('overview');
     expect(areaSubSections('board')).toHaveLength(areaSections.board.length - 1);
+  });
+});
+
+describe('placeholder sections', () => {
+  it('leave out the sections that have their own pages', () => {
+    expect(placeholderSections('admin')).not.toContain('approvals');
+    expect(placeholderSections('board')).not.toContain('events');
+    expect(placeholderSections('board')).toContain('finance');
+    expect(placeholderSections('member')).toEqual(areaSubSections('member'));
   });
 });

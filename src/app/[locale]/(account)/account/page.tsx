@@ -25,7 +25,7 @@ export async function generateMetadata({
 
 const spaces = ['member', 'board', 'admin'] as const;
 
-// Phase 2 shows who you are and where you can go; profile management arrives in phase 4.
+// Who you are, your public profiles (phase 4) and the hidden areas you can reach.
 export default async function AccountPage({ params }: PageProps<'/[locale]/account'>) {
   const locale = await resolveLocaleParam(params);
   const user = await requireUser({ returnTo: '/account' });
@@ -63,6 +63,16 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/accou
           </dd>
         </div>
       </dl>
+
+      <section aria-labelledby="profiles-title" className="flex flex-col gap-3">
+        <h2 id="profiles-title" className="text-lg font-bold">
+          {t('profiles.list.title')}
+        </h2>
+        <p className="text-sm text-muted-foreground">{t('profiles.list.accountIntro')}</p>
+        <Button asChild className="w-fit">
+          <Link href="/account/profiles">{t('profiles.list.manage')}</Link>
+        </Button>
+      </section>
 
       {reachable.length > 0 ? (
         <nav aria-labelledby="spaces-title" className="flex flex-col gap-3">

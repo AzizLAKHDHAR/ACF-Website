@@ -1,4 +1,4 @@
-import { areaSubSections } from '@/config/navigation';
+import { placeholderSections } from '@/config/navigation';
 import { areaRoute } from '@/lib/routes/area-route';
 
 const route = areaRoute('admin');
@@ -6,7 +6,7 @@ const route = areaRoute('admin');
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return areaSubSections('admin').map((section) => ({ section }));
+  return placeholderSections('admin').map((section) => ({ section }));
 }
 
 export const generateMetadata = route.generateSectionMetadata;

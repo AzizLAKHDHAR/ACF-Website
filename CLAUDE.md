@@ -15,13 +15,15 @@ scene. It has four access levels: public · members · board · admin. Read thes
 
 ## Current state
 
-**Phases 1 (foundation, ACF brand), 2 (data model, auth, RLS, seed) and 3 (public site) are done; phase 4
-(profile onboarding and admin approval) is next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
+**Phases 1 (foundation, ACF brand), 2 (data model, auth, RLS, seed), 3 (public site) and 4 (profile onboarding
+and admin approval) are done; phase 5 (member space) is next.** The full v1 schema is in `supabase/migrations/` with RLS, explicit grants and audit triggers, tested by a
 pgTAP suite that encodes `docs/roles.md` (`npm run db:test`). Authentication works end to end: sign-up with email
 confirmation, password and magic-link sign-in, password reset, sign-out. `requireUser` / `requireRole` guard the
 account, member, board and admin layouts (signed out → sign-in; wrong role → 404). Every public page reads from Supabase through the tagged public cache
-(`src/lib/supabase/public.ts`, revalidated by `POST /api/webhooks/content`, D-062); member, board and admin pages are
-still placeholders. Legal texts are drafts awaiting ACF. Local development uses the Supabase stack in Docker
+(`src/lib/supabase/public.ts`, revalidated by `POST /api/webhooks/content`, D-062). Scene actors create and manage
+their profiles under `/account/profiles` (media, co-managers, event proposals, blog posts with translations), the admin
+reviews them in `/admin/approvals` and the board publishes proposals in `/board/events`; forms use Server Actions with
+`ActionForm` (D-066). The other member, board and admin pages are still placeholders. Legal texts are drafts awaiting ACF. Local development uses the Supabase stack in Docker
 (`npm run db:start`, seeded with fictional demo users `*@acf.test`, password `demo-password-1`). Supabase has one hosted project (production, `ccntrlsymnokmfamcaho`) and migrations reach it only through
 `db-migrate.yml` after approval (D-059); the Vercel project still has to be connected; fonts and logo are still stand-ins. Update this section at the end of every phase.
 
@@ -66,6 +68,7 @@ src/app/api/cron/[job] · src/app/api/webhooks/…               service-role co
 src/features/<domain>/{components,queries.ts,actions.ts,schemas.ts}   (auth since phase 2)
 src/components/ui        shadcn/ui (hand-ported v4 source; restyle through tokens, not edits)
 src/components/layout    header, footer, nav, locale switcher, theme toggle, logo, shells
+src/components/forms     ActionForm (useActionState + FormState), labelled fields, ImageUpload (D-066, D-067)
 src/components/brand     charter motifs and one-pager sections (camo, genres, values, axes, members)
 src/config/              navigation.ts (every menu) · icons.ts
 src/lib/                 auth/guards.ts · metadata.ts · i18n-params.ts · env.ts · routes/ (page factories)

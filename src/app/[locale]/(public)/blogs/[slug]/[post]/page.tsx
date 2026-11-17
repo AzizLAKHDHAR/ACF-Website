@@ -8,11 +8,12 @@ import { getProfile } from '@/features/catalogue/queries';
 import { getBlogPost } from '@/features/posts/queries';
 import { getDirection } from '@/i18n/locale';
 import { Link } from '@/i18n/navigation';
+import { routing, type Locale } from '@/i18n/routing';
 import { formatDate } from '@/lib/content/format';
 import { publicMediaUrl } from '@/lib/content/media';
 import { publicEnv } from '@/lib/env';
 import { resolveLocaleParam } from '@/lib/i18n-params';
-import { pageMetadata } from '@/lib/metadata';
+import { localizedPath, pageMetadata } from '@/lib/metadata';
 import { articleJsonLd } from '@/lib/seo/json-ld';
 
 export const revalidate = 300;
@@ -27,13 +28,18 @@ async function load(params: PageProps<'/[locale]/blogs/[slug]/[post]'>['params']
   if (!blog) notFound();
   const post = await getBlogPost(blog.id, postSlug, locale);
   if (!post) notFound();
-  return { locale, blog, post };
+  const translations = post.translations.filter(
+    (translation): translation is { locale: Locale; slug: string } =>
+      translation.locale !== post.locale &&
+      (routing.locales as readonly string[]).includes(translation.locale),
+  );
+  return { locale, blog, post, translations };
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/blogs/[slug]/[post]'>): Promise<Metadata> {
-  const { locale, blog, post } = await load(params);
+  const { locale, blog, post, translations } = await load(params);
   const metadata = pageMetadata({
     locale,
     path: `/blogs/${blog.slug}/${post.slug}`,
@@ -41,8 +47,23 @@ export async function generateMetadata({
     description: post.excerpt ?? `${post.title} · ${blog.display_name}`,
   });
   const image = publicMediaUrl(post.cover_path);
+  // Each translation lives at its own slug under its own locale; the post itself under its locale.
+  const alternates =
+    translations.length > 0
+      ? {
+          ...metadata.alternates,
+          languages: Object.fromEntries([
+            [post.locale, localizedPath(post.locale, `/blogs/${blog.slug}/${post.slug}`)],
+            ...translations.map((translation) => [
+              translation.locale,
+              localizedPath(translation.locale, `/blogs/${blog.slug}/${translation.slug}`),
+            ]),
+          ]),
+        }
+      : metadata.alternates;
   return {
     ...metadata,
+    alternates,
     openGraph: {
       ...metadata.openGraph,
       type: 'article',
@@ -54,7 +75,7 @@ export async function generateMetadata({
 }
 
 export default async function BlogPostPage({ params }: PageProps<'/[locale]/blogs/[slug]/[post]'>) {
-  const { locale, blog, post } = await load(params);
+  const { locale, blog, post, translations } = await load(params);
   const t = await getTranslations({ locale });
   const site = publicEnv.NEXT_PUBLIC_SITE_URL;
   // A blog post is written in one language; the interface stays in the visitor's locale.
@@ -95,6 +116,28 @@ export default async function BlogPostPage({ params }: PageProps<'/[locale]/blog
       </PageHeader>
       <article className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-10 sm:px-6" {...lang}>
         <Markdown>{post.body_md}</Markdown>
+        {translations.length > 0 ? (
+          <aside className="flex flex-wrap items-center gap-3 border-t pt-6">
+            <h2 className="text-sm font-semibold text-muted-foreground">
+              {t('content.post.otherLanguages')}
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {translations.map((translation) => (
+                <li key={translation.locale}>
+                  <Link
+                    href={`/blogs/${blog.slug}/${translation.slug}`}
+                    locale={translation.locale}
+                    hrefLang={translation.locale}
+                    lang={translation.locale}
+                    className="inline-block rounded-full border-2 px-3 py-1 text-sm font-semibold hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {t(`localeNames.${translation.locale}`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        ) : null}
       </article>
     </>
   );

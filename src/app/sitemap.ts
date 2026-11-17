@@ -70,18 +70,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ),
     },
   }));
-  // Blog posts are written in one language: listed once, under that language.
-  const blogEntries = posts.flatMap((post) =>
-    post.kind === 'blog' && post.blog && isLocale(post.locale)
-      ? [
-          {
-            url: url(post.locale, `/blogs/${post.blog.slug}/${post.slug}`),
-            lastModified: post.updated_at,
-            priority: 0.5,
-          },
-        ]
-      : [],
+  // Blog posts are written in one language: listed once, under that language, with their
+  // translations (same group, same blog) as hreflang alternates.
+  const blogPosts = posts.filter(
+    (post) => post.kind === 'blog' && post.blog && isLocale(post.locale),
   );
+  const blogEntries = blogPosts.map((post) => {
+    const group = blogPosts.filter((other) => other.translation_group === post.translation_group);
+    return {
+      url: url(post.locale, `/blogs/${post.blog?.slug}/${post.slug}`),
+      lastModified: post.updated_at,
+      priority: 0.5,
+      ...(group.length > 1
+        ? {
+            alternates: {
+              languages: Object.fromEntries(
+                group.map((other) => [
+                  other.locale,
+                  url(other.locale, `/blogs/${other.blog?.slug}/${other.slug}`),
+                ]),
+              ),
+            },
+          }
+        : {}),
+    };
+  });
 
   return [...statics, ...profileEntries, ...eventEntries, ...newsEntries, ...blogEntries];
 }

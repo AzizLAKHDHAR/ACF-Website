@@ -576,3 +576,84 @@ Format:
   each with a visible "draft to be validated by ACF" notice. Pages without their own cover use a generated Open Graph
   image (`[locale]/opengraph-image.tsx`) with the Latin brand name, so no Arabic font is bundled.
 - Consequences: ACF (or its lawyer) must validate the legal texts before launch; removing the notice is one key.
+
+## D-066: Phase 4 forms are Server Actions with a shared `FormState` and `ActionForm`
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: The onboarding screens have about twenty forms. React Hook Form (listed in the stack) adds client
+  JavaScript to every one of them and duplicates validation that the actions must do anyway.
+- Decision: Every phase 4 action returns `FormState` (`src/lib/forms/state.ts`: `{ ok, notice }` or `{ ok: false,
+  error, fields?, missing? }`, all message keys under `forms.*`). `src/components/forms/action-form.tsx` wraps
+  `useActionState`, posts the locale and hidden ids, announces the outcome in a live region and hands field errors
+  to the labelled fields in `fields.tsx`. Database refusals map to form errors in one place (`fromDbError`:
+  42501 → forbidden, P0002 → not found, P0001 → invalid transition, 23505 → conflict). No React Hook Form.
+- Consequences: Forms work without JavaScript and stay small. Validation lives once, in Zod, on the server; the
+  browser only gets native `required`/`maxLength` hints. Later phases should reuse these pieces.
+
+## D-067: Images are resized in the browser and uploaded straight to Storage
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: Profiles and posts need avatars and covers "with size/MIME limits and resizing". Supabase image
+  transformations need a paid plan; Server Actions cap request bodies at 1 MB; phone photos are 3–8 MB.
+- Decision: `ImageUpload` checks the type (JPEG, PNG, WebP, AVIF, GIF) and a 15 MB source limit, redraws the image
+  on a canvas at most 800 px (avatar), 1920 px (cover) or 1600 px (post) on its longest side, encodes WebP (JPEG
+  where WebP can't be encoded), and uploads it with the user's session to `public-media`, where the storage policy
+  only accepts the user's own folder and the bucket enforces 5 MB and the type list. A Server Action then records
+  the path after re-checking its prefix, and deletes the file it replaces.
+- Consequences: No new dependency and no image service. Animated GIFs become still images. Files whose record
+  failed to save stay as orphans in the folder (rare; cleanup can come with the phase 7 storage view).
+
+## D-068: Review decisions notify in-app and by plain-text email, without the service role
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: Approval and rejection emails must reach every manager in their preferred locale. Their addresses live
+  in `auth.users`, which the admin's session can't read, and the service-role key is limited to cron, webhooks and
+  account deletion (Security rule 5).
+- Decision: `review_profile()` now writes one `profile_review` notification per manager (public note only), and
+  `submit_profile()` one `profile_submitted` notification per active admin. A new admin-only RPC,
+  `profile_review_recipients(profile)`, returns each manager's email, locale and name. The review action renders
+  `src/emails/review-decision.ts` (plain text, next-intl `createTranslator` over the message files, snapshot-tested
+  in three languages) and sends it through `src/lib/email/resend.ts`. React Email is not adopted yet.
+- Consequences: No new use of the service-role key. Without `RESEND_API_KEY`/`EMAIL_FROM` the decision still saves and
+  the admin sees "no email sent". The in-app notifications have no screen yet (phase 5 adds the notifications UI).
+
+## D-069: Co-managers are added by email through `add_profile_manager()`
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: Owners can't read other people's accounts, so they can't look up a user id to insert into
+  `profile_managers`.
+- Decision: `add_profile_manager(profile, email, role)` (SECURITY DEFINER, owners and admins only) adds a confirmed,
+  active account, and refuses unknown or deactivated addresses. `list_profile_managers(profile)` returns display
+  names and roles, never emails. Inserts, role changes and removals on `profile_managers` are now audited.
+- Consequences: An owner can learn whether an email has an active ACF account. Accepted for now (owners are
+  signed-in, audited users); if it is abused, switch to an emailed invitation with a token like `invitations`.
+
+## D-070: Submission requirements and edits after approval
+- Date: 2026-11-17 · Phase: 4 · Status: accepted (until ACF fixes the required fields per type)
+- Context: ACF hasn't said which fields each profile type must fill, or whether edits to an approved profile need
+  re-approval (roadmap phase 4 → inputs needed).
+- Decision: A profile can be submitted once it has a short introduction in at least one language and a governorate
+  (`missingForSubmit`, checked in the action; the editor lists what is missing). Edits to an approved profile go
+  live at once and are moderated afterwards, as `roles.md` already assumed. Event proposals that the board turns
+  down become `unpublished` with a required public note; there is no separate rejected status.
+- Consequences: Changing the rules is a one-function change plus messages. The database doesn't enforce them, so
+  the RPCs stay usable by tests and seeds.
+
+## D-071: Blog translations stay within their blog and are linked with hreflang
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: A blog post is one row per locale, grouped by `translation_group`. Nothing stopped a blog manager from
+  inserting a post into an ACF news group (or another blog's), which would make it that article's hreflang
+  alternate. Blog managers also couldn't upload post images (`posts/` was board-only).
+- Decision: A trigger (`check_post_translation_group`) only lets a post join a group whose posts have the same kind
+  and blog. A translation reuses the original's slug. The public post page and the sitemap list the published
+  translations as hreflang alternates, and the page links to them. `can_write_public_media()` now also lets the
+  managers of an approved blog write `posts/{post_id}/` for that blog's posts (roles.md §1 updated).
+- Consequences: Each language version is published on its own. pgTAP `080-onboarding` covers the trigger and the
+  storage rule.
+
+## D-072: Local checks on Windows without Docker
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: This session ran on a Windows machine without Docker, so the local Supabase stack (pgTAP, e2e) couldn't
+  start, and the SWC native binding failed to load from its default cache under `%LOCALAPPDATA%`.
+- Decision: Lint, typecheck, unit tests, i18n check and the production build ran locally (with
+  `SWC_NATIVE_BINDING_CACHE` pointing to a short folder in the user profile); `db:test`, `db:lint`, `db:types` and
+  e2e run in CI on the pull request. `src/types/database.ts` was updated by hand for the three new RPCs, in the
+  generator's format; CI's staleness check confirms it.
+- Consequences: The PR is not mergeable until CI's database and e2e jobs pass. Windows checkouts with
+  `core.autocrlf=true` make `format:check` flag untouched files (CRLF); CI on Linux is unaffected.
