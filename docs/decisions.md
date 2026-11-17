@@ -741,3 +741,14 @@ Format:
   its own config and is unaffected.
 - Consequences: CI (local stack at `127.0.0.1`) is unchanged. Locally, e2e needs `npm run db:start` and
   `npm run db:env`. A hosted test project, if ACF ever wants one, would need its own config.
+
+## D-080: Member shift lists use existing primitives instead of overview RPC
+- Date: 2026-11-17 · Phase: 5 (follow-up) · Status: accepted
+- Context: The member dashboard called `public.volunteer_shift_overview()`, but a machine pointed at an unmigrated
+  database returned PGRST202 and a 500. Docker was unavailable for rebuilding the local stack, while the app's
+  production migration workflow is separate and must not be run from a session.
+- Decision: Build the member shift list from the already-established `volunteer_shifts` table, the existing
+  `volunteer_shift_counts(event)` SECURITY DEFINER RPC, and the caller's own `volunteer_signups` rows. Keep RLS and
+  role checks intact; do not add an application-only count or authorization fallback.
+- Consequences: The dashboard no longer depends on the newer overview RPC, but the overview remains the simpler
+  API for future consumers and database migrations must still reach the hosted project through the approved workflow.

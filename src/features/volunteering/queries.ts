@@ -3,16 +3,29 @@ import { startOfTodayInTunis } from '@/lib/content/format';
 import { sessionClient, throwIfError } from '@/lib/supabase/session';
 import type { Json } from '@/types/database';
 
-// Volunteer shifts as the signed-in user. volunteer_shift_overview() gives every member the places
-// taken and their own sign-up; only the board reads who signed up (volunteer_signups RLS).
+// Volunteer shifts as the signed-in user. Counts use the existing SECURITY DEFINER RPC; each member
+// sees only their own sign-up through volunteer_signups RLS.
 
 /** Upcoming shifts with their event (when the user can see it), soonest first. */
 export async function listUpcomingShifts() {
   const supabase = await sessionClient();
   if (!supabase) return [];
-  const { data: shifts, error } = await supabase.rpc('volunteer_shift_overview');
-  throwIfError(error);
-  const eventIds = [...new Set((shifts ?? []).flatMap((s) => (s.event_id ? [s.event_id] : [])))];
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  throwIfError(userError);
+  if (!userData.user) return [];
+
+  const { data: shifts, error: shiftsError } = await supabase
+    .from('volunteer_shifts')
+    .select('id, event_id, role_label, starts_at, ends_at, capacity')
+    .gt('ends_at', new Date().toISOString())
+    .order('starts_at', { ascending: true });
+  throwIfError(shiftsError);
+
+  const shiftRows = shifts ?? [];
+  const shiftIds = shiftRows.map((shift) => shift.id);
+  const eventIds = [
+    ...new Set(shiftRows.flatMap((shift) => (shift.event_id ? [shift.event_id] : []))),
+  ];
   const events = new Map<string, { slug: string; title: Json; starts_at: string }>();
   if (eventIds.length > 0) {
     const { data, error: eventsError } = await supabase
@@ -22,9 +35,38 @@ export async function listUpcomingShifts() {
     throwIfError(eventsError);
     for (const event of data ?? []) events.set(event.id, event);
   }
-  return (shifts ?? []).map((shift) => ({
-    ...shift,
-    taken: Number(shift.taken),
+
+  const countEntries = await Promise.all(
+    eventIds.map(async (eventId) => {
+      const { data, error } = await supabase.rpc('volunteer_shift_counts', { event: eventId });
+      throwIfError(error);
+      return data ?? [];
+    }),
+  );
+  const takenByShift = new Map(
+    countEntries.flat().map((count) => [count.shift_id, Number(count.taken)]),
+  );
+
+  const ownSignups =
+    shiftIds.length > 0
+      ? await supabase
+          .from('volunteer_signups')
+          .select('shift_id')
+          .eq('user_id', userData.user.id)
+          .in('shift_id', shiftIds)
+      : { data: [], error: null };
+  throwIfError(ownSignups.error);
+  const signedUpShiftIds = new Set((ownSignups.data ?? []).map((signup) => signup.shift_id));
+
+  return shiftRows.map((shift) => ({
+    shift_id: shift.id,
+    event_id: shift.event_id,
+    role_label: shift.role_label,
+    starts_at: shift.starts_at,
+    ends_at: shift.ends_at,
+    capacity: shift.capacity,
+    taken: takenByShift.get(shift.id) ?? 0,
+    signed_up: signedUpShiftIds.has(shift.id),
     event: shift.event_id ? (events.get(shift.event_id) ?? null) : null,
   }));
 }
