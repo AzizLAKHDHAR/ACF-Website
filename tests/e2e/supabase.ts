@@ -71,6 +71,38 @@ export async function createConfirmedUser(
   expect(response.ok, await response.text()).toBe(true);
 }
 
+/**
+ * Inserts a row through the REST API with the local secret key (bypasses RLS). Test setup only, for
+ * data no screen creates yet (tasks arrive with the board's task screens in phase 6).
+ */
+export async function insertAsService<Row extends Record<string, unknown>>(
+  table: string,
+  row: Record<string, unknown>,
+): Promise<Row> {
+  const secret = process.env.SUPABASE_SECRET_KEY;
+  if (!secret) throw new Error('SUPABASE_SECRET_KEY is required for this test (npm run db:env).');
+  const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      apikey: secret,
+      Authorization: `Bearer ${secret}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify(row),
+  });
+  const body = await response.text();
+  expect(response.ok, body).toBe(true);
+  const [created] = JSON.parse(body) as Row[];
+  if (!created) throw new Error(`Nothing was inserted into ${table}`);
+  return created;
+}
+
+/** The public (unsigned) Storage URL of an object: private buckets must refuse it. */
+export function publicStorageUrl(bucket: string, path: string): string {
+  return `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
+}
+
 export async function signIn(
   page: Page,
   email: string,

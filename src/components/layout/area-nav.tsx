@@ -11,7 +11,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { areaSectionHref, areaSections, type Area, type AreaSection } from '@/config/navigation';
+import {
+  areaSectionHref,
+  areaSections,
+  isSectionActive,
+  type Area,
+  type AreaSection,
+} from '@/config/navigation';
 import { areaSectionIcon } from '@/config/icons';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -25,7 +31,7 @@ function AreaLinks<A extends Area>({ area, inSheet = false }: { area: A; inSheet
     <ul className="flex flex-col gap-1">
       {sections.map((section) => {
         const href = areaSectionHref(area, section);
-        const active = pathname === href;
+        const active = isSectionActive(area, section, pathname);
         const Icon = areaSectionIcon(area, section);
         const link = (
           <Link

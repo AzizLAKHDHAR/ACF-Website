@@ -6,11 +6,13 @@ select tests.setup();
 -- The Storage API sets this before running a delete as the user (RLS applies); do the same here.
 select set_config('storage.allow_delete_query', 'true', true);
 
--- Objects that already exist (created as the owner role, bypassing RLS).
+-- Objects that already exist (created as the owner role, bypassing RLS). Library files sit at the
+-- path their documents row records (the read policy matches on it, 20261117211020_member_space).
 insert into storage.objects (bucket_id, name) values
   ('public-media', 'profiles/' || tests.id('artist_b') || '/avatar.webp'),
-  ('member-documents', 'library/' || tests.id('doc_member') || '/guide.pdf'),
-  ('member-documents', 'library/' || tests.id('doc_board') || '/note.pdf'),
+  ('member-documents', (select storage_path from public.documents where id = tests.id('doc_member'))),
+  ('member-documents', (select storage_path from public.documents where id = tests.id('doc_board'))),
+  ('member-documents', 'library/' || tests.id('doc_member') || '/orphan.pdf'),
   ('board-vault', 'legal/statuts.pdf'),
   ('board-vault', 'receipts/' || tests.id('entry_open') || '/r.pdf');
 
@@ -51,6 +53,7 @@ select is(tests.rows($$select 1 from storage.objects where bucket_id = 'member-d
 select throws_ok($$insert into storage.objects (bucket_id, name) values ('member-documents', 'library/x/y.pdf')$$, '42501', null, 'members cannot upload documents');
 select tests.as('board');
 select is(tests.rows($$select 1 from storage.objects where bucket_id = 'member-documents'$$), 2, 'board reads board-audience files too');
+select is(tests.rows($$select 1 from storage.objects where bucket_id = 'member-documents' and name like '%/orphan.pdf'$$), 0, 'a file is readable only at the path its document records');
 select lives_ok($$insert into storage.objects (bucket_id, name) values ('member-documents', 'library/new/doc.pdf')$$, 'board uploads documents');
 
 -- ── board-vault ──

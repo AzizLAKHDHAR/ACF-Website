@@ -2061,6 +2061,14 @@ export type Database = {
         Args: { email: string; manager_role?: string; profile: string };
         Returns: string;
       };
+      answer_meeting: {
+        Args: {
+          answer: Database['public']['Enums']['rsvp_response'];
+          answer_note?: string;
+          meeting: string;
+        };
+        Returns: undefined;
+      };
       create_profile: {
         Args: {
           display_name: string;
@@ -2127,6 +2135,7 @@ export type Database = {
         Returns: undefined;
       };
       set_ledger_period_closed: { Args: { closed: boolean; period: string }; Returns: undefined };
+      set_poll_votes: { Args: { poll: string; votes: Json }; Returns: undefined };
       set_post_status: {
         Args: {
           new_status: Database['public']['Enums']['content_status'];
@@ -2153,6 +2162,19 @@ export type Database = {
         Returns: {
           capacity: number;
           shift_id: string;
+          taken: number;
+        }[];
+      };
+      volunteer_shift_overview: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          capacity: number;
+          ends_at: string;
+          event_id: string;
+          role_label: Json;
+          shift_id: string;
+          signed_up: boolean;
+          starts_at: string;
           taken: number;
         }[];
       };

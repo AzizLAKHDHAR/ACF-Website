@@ -1,11 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatDate,
+  formatDateTimeRange,
+  formatNumber,
   formatShortDate,
   startOfTodayInTunis,
+  todayInTunis,
   tunisDayStart,
   tunisLocalToIso,
 } from './format';
+
+describe('ranges, days and numbers', () => {
+  it('formats a same-day range once, in Tunis time', () => {
+    const range = formatDateTimeRange('2026-11-20T17:00:00Z', '2026-11-20T19:00:00Z', 'en');
+    expect(range).toMatch(/Nov 20, 2026/);
+    // 18:00–20:00 in Tunis; the day is written once (ICU shares the "PM" in recent versions).
+    expect(range).toMatch(/6:00.*8:00/);
+    expect(range.match(/2026/g)).toHaveLength(1);
+    // Without an end it is a plain date and time (fr-TN uses a 12-hour clock in CLDR).
+    expect(formatDateTimeRange('2026-11-20T17:00:00Z', null, 'fr')).toMatch(/20 nov\. 2026.*6:00/);
+  });
+
+  it('gives the calendar day in Tunis', () => {
+    expect(todayInTunis(new Date('2026-10-24T23:30:00Z'))).toBe('2026-10-25');
+  });
+
+  it('keeps Latin digits in Arabic (ar-TN)', () => {
+    expect(formatNumber(1234, 'ar')).toMatch(/1.?234/);
+  });
+});
 
 describe('date formatting', () => {
   const instant = '2026-10-24T23:30:00Z'; // already the 25th in Tunis (UTC+1)

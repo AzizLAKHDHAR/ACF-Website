@@ -157,11 +157,16 @@ triggers; see architecture §7) and tested for allowed **and** denied access in 
 | §5 Admin space and Guard rails 1–6 | `050-admin-and-guard-rails.test.sql` |
 | Storage buckets | `060-storage.test.sql` |
 | Phase 4 onboarding: co-managers, review notifications and email recipients, post images, translation groups | `080-onboarding.test.sql` |
+| Phase 5 member space: notifications for announcements, assignments and meetings; meeting answers and poll votes under RLS (locked after `closes_at`); the shift overview | `090-member-space.test.sql` |
 | Volunteer capacity under concurrent sign-ups | `supabase/tests/concurrency/volunteer-capacity.sh` |
 
 Implementation details that the matrix leaves open: co-managers of a profile see each other, and any manager may
 leave a profile (never its last owner); internal review notes are admin-only (`review_event_notes`); members read
-project names, dates and status, while descriptions and amounts are board-only (`project_budgets`).
+project names, dates and status, while descriptions and amounts are board-only (`project_budgets`). In the member
+space (phase 5): the directory's "contact details" are phone numbers (`account_private`), never emails; a poll's
+results, voters' names included, are visible to everyone who sees the poll; a library file is readable only at the
+path its `documents` row records; in-app notifications are written by triggers for the active members of the item's
+audience, never for the person who acted and never for rows written without a session (seed, Discord sync).
 
 ## System actor (service role): allowed uses
 

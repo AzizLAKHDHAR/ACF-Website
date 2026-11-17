@@ -15,6 +15,9 @@ export const formErrorKeys = [
   'alreadyManager',
   'lastOwner',
   'uploadFailed',
+  'shiftFull',
+  'meetingClosed',
+  'pollClosed',
   'failed',
 ] as const;
 export type FormErrorKey = (typeof formErrorKeys)[number];
@@ -33,6 +36,22 @@ export const formNoticeKeys = [
   'suspended',
   'reinstated',
   'proposed',
+  'answered',
+  'voted',
+  'signedUp',
+  'signupCancelled',
+  'taken',
+  'left',
+  'statusChanged',
+  'commented',
+  'cancelled',
+  'hidden',
+  'shown',
+  'pinned',
+  'unpinned',
+  'closed',
+  'uploaded',
+  'markedRead',
 ] as const;
 export type FormNoticeKey = (typeof formNoticeKeys)[number];
 
@@ -46,6 +65,7 @@ export const fieldErrorKeys = [
   'invalidDate',
   'endBeforeStart',
   'oneLocaleRequired',
+  'optionsRequired',
 ] as const;
 export type FieldErrorKey = (typeof fieldErrorKeys)[number];
 
