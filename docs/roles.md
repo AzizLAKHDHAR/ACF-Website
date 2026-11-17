@@ -53,14 +53,14 @@ Inheritance: each association role also has every permission of the roles to its
 | Public profiles: draft / pending / rejected / suspended | — | C (new draft) | R, U own; submit for review; D own drafts | — | — | R all |
 | Profile approval (status → approved / rejected / suspended) | — | — | — | — | — | U |
 | Profile private contact details (`profile_private`) | — | — | R, U own | — | — | R |
-| Profile managers (invite or remove co-managers) | — | — | C, D own profile | — | — | C, D |
+| Profile managers (invite or remove co-managers, by email via `add_profile_manager()`) | — | — | C, D own profile (owners) | — | — | C, D |
 | Events: published | R pub | R pub | R pub | R pub | R pub | R |
 | Events: proposals | — | — | C (approved artist/venue, only for own venue or own lineup); R, U own while pending | — | R, U, publish, D | R, U, D |
 | ACF news posts (`posts.kind = news`) | R pub | R pub | — | R pub | C, R, U, D, publish | C, R, U, D |
 | Blog posts (`posts.kind = blog`) | R pub | R pub | C, R, U, D own (approved blog only); publish directly | R pub | R pub | R, U (unpublish), D |
 | Taxonomies (genres, professions, cities) | R | R | R | R | R | C, U, D |
 | Moderation reports (flag a profile, post or event) | — | C | C | C | C | R, U (resolve) |
-| Public media uploads (avatars, covers, post images) | R | — | C, U, D in own profile folder | — | C, D (news/events) | C, D any |
+| Public media uploads (avatars, covers, post images) | R | — | C, U, D in own profile folder; in `posts/{id}/` for own approved blog's posts | — | C, D (news/events) | C, D any |
 | Public site settings (contact, socials, banner) | R | R | R | R | R | U |
 
 Notes:
@@ -156,11 +156,17 @@ triggers; see architecture §7) and tested for allowed **and** denied access in 
 | §4 Board space | `040-board-space.test.sql` |
 | §5 Admin space and Guard rails 1–6 | `050-admin-and-guard-rails.test.sql` |
 | Storage buckets | `060-storage.test.sql` |
+| Phase 4 onboarding: co-managers, review notifications and email recipients, post images, translation groups | `080-onboarding.test.sql` |
+| Phase 5 member space: notifications for announcements, assignments and meetings; meeting answers and poll votes under RLS (locked after `closes_at`); the shift overview | `090-member-space.test.sql` |
 | Volunteer capacity under concurrent sign-ups | `supabase/tests/concurrency/volunteer-capacity.sh` |
 
 Implementation details that the matrix leaves open: co-managers of a profile see each other, and any manager may
 leave a profile (never its last owner); internal review notes are admin-only (`review_event_notes`); members read
-project names, dates and status, while descriptions and amounts are board-only (`project_budgets`).
+project names, dates and status, while descriptions and amounts are board-only (`project_budgets`). In the member
+space (phase 5): the directory's "contact details" are phone numbers (`account_private`), never emails; a poll's
+results, voters' names included, are visible to everyone who sees the poll; a library file is readable only at the
+path its `documents` row records; in-app notifications are written by triggers for the active members of the item's
+audience, never for the person who acted and never for rows written without a session (seed, Discord sync).
 
 ## System actor (service role): allowed uses
 

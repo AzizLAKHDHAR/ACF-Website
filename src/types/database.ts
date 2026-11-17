@@ -2057,6 +2057,18 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      add_profile_manager: {
+        Args: { email: string; manager_role?: string; profile: string };
+        Returns: string;
+      };
+      answer_meeting: {
+        Args: {
+          answer: Database['public']['Enums']['rsvp_response'];
+          answer_note?: string;
+          meeting: string;
+        };
+        Returns: undefined;
+      };
       create_profile: {
         Args: {
           display_name: string;
@@ -2065,11 +2077,28 @@ export type Database = {
         };
         Returns: string;
       };
+      list_profile_managers: {
+        Args: { profile: string };
+        Returns: {
+          created_at: string;
+          display_name: string;
+          role: string;
+          user_id: string;
+        }[];
+      };
       meeting_rsvp_counts: {
         Args: { meeting: string };
         Returns: {
           response: Database['public']['Enums']['rsvp_response'];
           total: number;
+        }[];
+      };
+      profile_review_recipients: {
+        Args: { profile: string };
+        Returns: {
+          display_name: string;
+          email: string;
+          locale: Database['public']['Enums']['locale'];
         }[];
       };
       propose_event: {
@@ -2106,6 +2135,7 @@ export type Database = {
         Returns: undefined;
       };
       set_ledger_period_closed: { Args: { closed: boolean; period: string }; Returns: undefined };
+      set_poll_votes: { Args: { poll: string; votes: Json }; Returns: undefined };
       set_post_status: {
         Args: {
           new_status: Database['public']['Enums']['content_status'];
@@ -2132,6 +2162,19 @@ export type Database = {
         Returns: {
           capacity: number;
           shift_id: string;
+          taken: number;
+        }[];
+      };
+      volunteer_shift_overview: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          capacity: number;
+          ends_at: string;
+          event_id: string;
+          role_label: Json;
+          shift_id: string;
+          signed_up: boolean;
+          starts_at: string;
           taken: number;
         }[];
       };

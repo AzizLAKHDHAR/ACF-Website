@@ -153,6 +153,18 @@ export async function listGenres() {
   });
 }
 
+/** Genres and professions with their ids, for the profile editor's checkboxes. */
+export async function listTaxonomyOptions() {
+  return publicRead([contentTags.taxonomies], { genres: [], professions: [] }, async (db) => {
+    const [genres, professions] = await Promise.all([
+      db.from('genres').select('id, slug, name').order('position'),
+      db.from('professions').select('id, slug, name').order('position'),
+    ]);
+    throwIf(genres.error ?? professions.error);
+    return { genres: genres.data ?? [], professions: professions.data ?? [] };
+  });
+}
+
 export async function listGovernorates() {
   return publicRead([contentTags.taxonomies], [], async (db) => {
     const { data, error } = await db.from('governorates').select('code, name').order('position');

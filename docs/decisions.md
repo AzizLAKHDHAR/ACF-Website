@@ -576,3 +576,179 @@ Format:
   each with a visible "draft to be validated by ACF" notice. Pages without their own cover use a generated Open Graph
   image (`[locale]/opengraph-image.tsx`) with the Latin brand name, so no Arabic font is bundled.
 - Consequences: ACF (or its lawyer) must validate the legal texts before launch; removing the notice is one key.
+
+## D-066: Phase 4 forms are Server Actions with a shared `FormState` and `ActionForm`
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: The onboarding screens have about twenty forms. React Hook Form (listed in the stack) adds client
+  JavaScript to every one of them and duplicates validation that the actions must do anyway.
+- Decision: Every phase 4 action returns `FormState` (`src/lib/forms/state.ts`: `{ ok, notice }` or `{ ok: false,
+  error, fields?, missing? }`, all message keys under `forms.*`). `src/components/forms/action-form.tsx` wraps
+  `useActionState`, posts the locale and hidden ids, announces the outcome in a live region and hands field errors
+  to the labelled fields in `fields.tsx`. Database refusals map to form errors in one place (`fromDbError`:
+  42501 → forbidden, P0002 → not found, P0001 → invalid transition, 23505 → conflict). No React Hook Form.
+- Consequences: Forms work without JavaScript and stay small. Validation lives once, in Zod, on the server; the
+  browser only gets native `required`/`maxLength` hints. Later phases should reuse these pieces.
+
+## D-067: Images are resized in the browser and uploaded straight to Storage
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: Profiles and posts need avatars and covers "with size/MIME limits and resizing". Supabase image
+  transformations need a paid plan; Server Actions cap request bodies at 1 MB; phone photos are 3–8 MB.
+- Decision: `ImageUpload` checks the type (JPEG, PNG, WebP, AVIF, GIF) and a 15 MB source limit, redraws the image
+  on a canvas at most 800 px (avatar), 1920 px (cover) or 1600 px (post) on its longest side, encodes WebP (JPEG
+  where WebP can't be encoded), and uploads it with the user's session to `public-media`, where the storage policy
+  only accepts the user's own folder and the bucket enforces 5 MB and the type list. A Server Action then records
+  the path after re-checking its prefix, and deletes the file it replaces.
+- Consequences: No new dependency and no image service. Animated GIFs become still images. Files whose record
+  failed to save stay as orphans in the folder (rare; cleanup can come with the phase 7 storage view).
+
+## D-068: Review decisions notify in-app and by plain-text email, without the service role
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: Approval and rejection emails must reach every manager in their preferred locale. Their addresses live
+  in `auth.users`, which the admin's session can't read, and the service-role key is limited to cron, webhooks and
+  account deletion (Security rule 5).
+- Decision: `review_profile()` now writes one `profile_review` notification per manager (public note only), and
+  `submit_profile()` one `profile_submitted` notification per active admin. A new admin-only RPC,
+  `profile_review_recipients(profile)`, returns each manager's email, locale and name. The review action renders
+  `src/emails/review-decision.ts` (plain text, next-intl `createTranslator` over the message files, snapshot-tested
+  in three languages) and sends it through `src/lib/email/resend.ts`. React Email is not adopted yet.
+- Consequences: No new use of the service-role key. Without `RESEND_API_KEY`/`EMAIL_FROM` the decision still saves and
+  the admin sees "no email sent". The in-app notifications have no screen yet (phase 5 adds the notifications UI).
+
+## D-069: Co-managers are added by email through `add_profile_manager()`
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: Owners can't read other people's accounts, so they can't look up a user id to insert into
+  `profile_managers`.
+- Decision: `add_profile_manager(profile, email, role)` (SECURITY DEFINER, owners and admins only) adds a confirmed,
+  active account, and refuses unknown or deactivated addresses. `list_profile_managers(profile)` returns display
+  names and roles, never emails. Inserts, role changes and removals on `profile_managers` are now audited.
+- Consequences: An owner can learn whether an email has an active ACF account. Accepted for now (owners are
+  signed-in, audited users); if it is abused, switch to an emailed invitation with a token like `invitations`.
+
+## D-070: Submission requirements and edits after approval
+- Date: 2026-11-17 · Phase: 4 · Status: accepted (until ACF fixes the required fields per type)
+- Context: ACF hasn't said which fields each profile type must fill, or whether edits to an approved profile need
+  re-approval (roadmap phase 4 → inputs needed).
+- Decision: A profile can be submitted once it has a short introduction in at least one language and a governorate
+  (`missingForSubmit`, checked in the action; the editor lists what is missing). Edits to an approved profile go
+  live at once and are moderated afterwards, as `roles.md` already assumed. Event proposals that the board turns
+  down become `unpublished` with a required public note; there is no separate rejected status.
+- Consequences: Changing the rules is a one-function change plus messages. The database doesn't enforce them, so
+  the RPCs stay usable by tests and seeds.
+
+## D-071: Blog translations stay within their blog and are linked with hreflang
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: A blog post is one row per locale, grouped by `translation_group`. Nothing stopped a blog manager from
+  inserting a post into an ACF news group (or another blog's), which would make it that article's hreflang
+  alternate. Blog managers also couldn't upload post images (`posts/` was board-only).
+- Decision: A trigger (`check_post_translation_group`) only lets a post join a group whose posts have the same kind
+  and blog. A translation reuses the original's slug. The public post page and the sitemap list the published
+  translations as hreflang alternates, and the page links to them. `can_write_public_media()` now also lets the
+  managers of an approved blog write `posts/{post_id}/` for that blog's posts (roles.md §1 updated).
+- Consequences: Each language version is published on its own. pgTAP `080-onboarding` covers the trigger and the
+  storage rule.
+
+## D-072: Local checks on Windows without Docker
+- Date: 2026-11-17 · Phase: 4 · Status: accepted
+- Context: This session ran on a Windows machine without Docker, so the local Supabase stack (pgTAP, e2e) couldn't
+  start, and the SWC native binding failed to load from its default cache under `%LOCALAPPDATA%`.
+- Decision: Lint, typecheck, unit tests, i18n check and the production build ran locally (with
+  `SWC_NATIVE_BINDING_CACHE` pointing to a short folder in the user profile); `db:test`, `db:lint`, `db:types` and
+  e2e run in CI on the pull request. `src/types/database.ts` was updated by hand for the three new RPCs, in the
+  generator's format; CI's staleness check confirms it.
+- Consequences: The PR is not mergeable until CI's database and e2e jobs pass. Windows checkouts with
+  `core.autocrlf=true` make `format:check` flag untouched files (CRLF); CI on Linux is unaffected.
+
+## D-073: Member-space notifications come from database triggers
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Phase 5 needs in-app notifications for new announcements, assignments and meetings. Writing them in the
+  Server Actions would miss rows written elsewhere, and users have no insert grant on `notifications`.
+- Decision: SECURITY DEFINER triggers write them: a board announcement notifies the active members of its audience
+  (`announcement_published`), the board assigning someone notifies that person (`task_assigned`), and a new or
+  cancelled meeting notifies its audience (`meeting_scheduled`, `meeting_cancelled`). The person who acted is never
+  notified, and rows written without a session (seed, imports, the Discord sync of phase 8) notify nobody. Payloads
+  carry ids and titles only. `/account/notifications` lists them (mark one or all read), and every hidden area shows
+  a bell with the unread count. Links are built from the payload's ids only after checking their format.
+- Consequences: Notifications exist whatever writes the row (UI, SQL, future integrations). Discord-synced
+  announcements won't notify unless phase 8 decides otherwise. A notification keeps the title it was sent with even
+  if the item is later renamed, hidden or deleted.
+
+## D-074: Answers and votes run as the member, through two small RPCs
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Changing an RSVP or a vote is an upsert. A PostgREST upsert also SETs the key columns (`meeting_id`,
+  `user_id`, `option_id`), which the column grants deliberately leave out, so it fails with "permission denied".
+- Decision: `answer_meeting(meeting, answer, answer_note)` and `set_poll_votes(poll, votes)` are SECURITY INVOKER
+  functions: they run as the caller, so the existing RLS policies still decide (own rows, the caller's audience,
+  votes only while the poll is open), and they add clear errors for cancelled or finished meetings and closed polls.
+  `set_poll_votes` takes every option of the poll at once (options left out are withdrawn).
+  `volunteer_shift_overview()` (SECURITY DEFINER, members only) returns upcoming shifts with places taken and the
+  caller's own sign-up, since members can't read other people's sign-ups.
+- Consequences: No policy or grant was widened. The "votes locked after `closes_at`" rule stays in the policies
+  (pgTAP `030` and `090`).
+
+## D-075: Library files are uploaded by the browser and linked to their row by path
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Library documents may be 20 MB (Server Actions accept 1 MB), and the `documents` insert grant has no `id`,
+  so the phase 2 convention `library/{document_id}/…` (with a storage policy matching the folder to the row's id)
+  couldn't be followed without creating the row before the file.
+- Decision: The board's browser uploads the file straight to the private `member-documents` bucket at
+  `library/{random id}/{safe file name}`, then a Server Action re-checks the path and records the row (the file is
+  removed again if that fails). `can_read_member_document()` now matches the object to the row by `storage_path`.
+  Members download through `GET /{locale}/member/documents/{id}/download`, which checks their access and answers
+  with a redirect to a signed URL valid for 60 seconds. The board manages the library on `/member/documents`; the
+  board area keeps no separate library page.
+- Consequences: A file is readable only at the path its row records (pgTAP `060`); the public URL of the bucket is
+  refused (e2e). Deleting a document removes the file first, because Storage only deletes what the caller can read.
+
+## D-076: The member directory lists active members; the board also sees phone numbers
+- Date: 2026-11-17 · Phase: 5 · Status: accepted (emails: open question for ACF)
+- Context: roles.md gives members the directory (names, avatars, roles) and the board "contact details". Phone
+  numbers are in `account_private` (board-readable); emails only in `auth.users`.
+- Decision: `/member/directory` lists active memberships on accounts that aren't deactivated: name, role and join date
+  for everyone, plus the phone number for the board. Emails are not shown; that would need a new board-only RPC over
+  `auth.users`.
+- Consequences: No new data is exposed. If ACF wants the board to see emails, it is one SECURITY DEFINER function
+  and a column.
+
+## D-077: Scope of the phase 5 board forms
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: Phase 5 includes "the board-side forms that feed these features"; task creation is phase 6.
+- Decision: The board creates, cancels and deletes meetings (`/board/meetings`), posts, hides, pins and deletes
+  announcements (`/board/announcements`), creates, closes and deletes availability polls with up to six slots
+  (`/board/polls`), and opens shifts and removes sign-ups (`/board/volunteering`). Attendance lists and poll results
+  are on the member pages, which board members also use. Editing after posting, meeting minutes, choice polls,
+  document archiving and the Discord push are left for later phases. The seed adds a task assigned to the demo member.
+- Consequences: Mistakes are fixed by deleting and re-creating for now. Members' tasks come from the seed (and from
+  phase 6's task screens).
+
+## D-078: Hidden-area pages render empty in the shell preview
+- Date: 2026-11-17 · Phase: 5 · Status: accepted
+- Context: `npm run screenshots` runs the dev server with `ACF_PREVIEW_HIDDEN_AREAS=1` and no database, and it
+  screenshots `/member`, which is now a real page.
+- Decision: Member-space reads go through `sessionClient()` (`src/lib/supabase/session.ts`), which returns no client in
+  the preview, so the pages show their empty states. The check lives in `src/lib/auth/preview.ts` (development builds
+  only, as before).
+- Consequences: Screenshots keep working without Docker. Production builds never take the preview path.
+
+## D-079: End-to-end tests only run against the local Supabase stack
+- Date: 2026-11-17 · Phase: 5 (follow-up) · Status: accepted
+- Context: The e2e suite signs people up, confirms emails, writes meetings, polls and tasks, and uploads files. A
+  developer machine without Docker had only a `.env` pointing at the production project (with its secret key), so
+  `npm run test:e2e` would have built the app against production and run all of that on real data.
+- Decision: `playwright.config.ts` calls `assertLocalSupabase()` (`scripts/e2e-target.ts`) before anything starts. It
+  works out the Supabase URL the app under test will use the way Next does (the environment, which holds CI's values
+  and `.env.local`, then `.env.production.local`, `.env.production`, `.env`) and stops the run with instructions unless
+  the host is `localhost`, `127.0.0.1`, `::1` or a `*.localhost` name. There is no override. The screenshot tool has
+  its own config and is unaffected.
+- Consequences: CI (local stack at `127.0.0.1`) is unchanged. Locally, e2e needs `npm run db:start` and
+  `npm run db:env`. A hosted test project, if ACF ever wants one, would need its own config.
+
+## D-080: Member shift lists use existing primitives instead of overview RPC
+- Date: 2026-11-17 · Phase: 5 (follow-up) · Status: accepted
+- Context: The member dashboard called `public.volunteer_shift_overview()`, but a machine pointed at an unmigrated
+  database returned PGRST202 and a 500. Docker was unavailable for rebuilding the local stack, while the app's
+  production migration workflow is separate and must not be run from a session.
+- Decision: Build the member shift list from the already-established `volunteer_shifts` table, the existing
+  `volunteer_shift_counts(event)` SECURITY DEFINER RPC, and the caller's own `volunteer_signups` rows. Keep RLS and
+  role checks intact; do not add an application-only count or authorization fallback.
+- Consequences: The dashboard no longer depends on the newer overview RPC, but the overview remains the simpler
+  API for future consumers and database migrations must still reach the hosted project through the approved workflow.

@@ -107,7 +107,7 @@ is confined to the cron and webhook route handlers listed in [`roles.md`](roles.
 │   │   ├── queries.ts             server-only reads
 │   │   ├── actions.ts             'use server' mutations (validate → authorize → write)
 │   │   └── schemas.ts             Zod schemas
-│   ├── emails/                    React Email templates (localized)
+│   ├── emails/                    localized email templates (plain text, D-068)
 │   ├── i18n/                      routing.ts · request.ts · navigation.ts
 │   ├── lib/
 │   │   ├── supabase/              server.ts · browser.ts · public.ts (no cookies) · admin.ts (service role, server-only)
@@ -142,8 +142,8 @@ required role → `notFound()`, so hidden areas don't reveal that they exist. `r
 | Area | Routes |
 |---|---|
 | Public | `/` home · `/news`, `/news/[slug]` · `/blogs`, `/blogs/[blog]`, `/blogs/[blog]/[slug]` · `/artists`, `/artists/[slug]` · `/professionals`, `/professionals/[slug]` · `/venues`, `/venues/[slug]` · `/studios`, `/studios/[slug]` · `/events`, `/events/[slug]` · `/search?q=` (noindex) · `/about` · `/contact` · `/legal/privacy` · `/legal/terms` |
-| Account | `/account` · `/account/settings` (name, locale, avatar, password, MFA) · `/account/profiles` · `/account/profiles/new?type=…` · `/account/profiles/[id]` (edit, submit, managers) · `/account/events/new` (approved artists/venues) · `/account/blog/posts…` (approved blog owners) |
-| Member | `/member` (dashboard: next meetings, my tasks, latest announcements, open polls) · `/member/meetings`, `/member/meetings/[id]` · `/member/tasks` · `/member/announcements` · `/member/polls`, `/member/polls/[id]` · `/member/volunteer` · `/member/documents` · `/member/directory` |
+| Account | `/account` · `/account/notifications` (in-app notifications, mark read) · `/account/settings` (name, locale, avatar, password, MFA) · `/account/profiles` (list, create) · `/account/profiles/[id]` (edit, media, private contact, managers, submit) · `/account/profiles/[id]/events` (approved artists/venues propose events) · `/account/profiles/[id]/posts`, `/account/profiles/[id]/posts/[postId]` (approved blogs: posts and translations) |
+| Member | `/member` (dashboard: next meetings, my tasks, latest announcements, open polls, my shifts) · `/member/meetings`, `/member/meetings/[id]` (answer; attendance list for the board) · `/member/tasks`, `/member/tasks/[id]` (status, take/leave, comments) · `/member/announcements` · `/member/polls`, `/member/polls/[id]` (votes, results grid) · `/member/volunteer` · `/member/documents` (the board uploads and deletes here) · `GET /member/documents/[id]/download` (route handler → 60 s signed URL) · `/member/directory` |
 | Board | `/board` · `/board/tasks` (create/assign) · `/board/meetings` (create) · `/board/announcements` (compose, push to Discord) · `/board/polls` · `/board/volunteering` · `/board/news` · `/board/events` (proposals, publish) · `/board/finance` (ledger) · `/board/finance/projects/[id]` (budgets) · `/board/finance/receipts` · `/board/finance/exports` · `/board/vault` · `/board/correspondence`, `/board/correspondence/[id]` |
 | Admin | `/admin` (analytics) · `/admin/users` (roles, invitations) · `/admin/approvals` · `/admin/moderation` · `/admin/audit` · `/admin/settings` · `/admin/integrations` |
 | API | `POST /api/cron/[job]` · `POST /api/webhooks/content` (cache revalidation, D-062) · `POST /api/webhooks/signature/[provider]` |
@@ -323,7 +323,7 @@ erDiagram
 | `review_events` | `target_type` (`profile`/`event`/`post`), `target_id`, `action`, `actor_id`, `note_public` | Approval history, written by the workflow RPCs; admins, the board (events/posts) and the people concerned read it |
 | `review_event_notes` | `review_event_id`, `note_internal` | Admin only (private column split out, Guard rail 3) |
 | `moderation_reports` | `target_type`, `target_id`, `reason`, `details`, `reporter_id`, `status`, `resolved_by`, `resolution_note` | |
-| `notifications` | `user_id`, `kind`, `payload jsonb`, `read_at` | In-app notifications |
+| `notifications` | `user_id`, `kind`, `payload jsonb`, `read_at` | In-app notifications, written only by RPCs and triggers: `profile_submitted`, `profile_review` (phase 4), `announcement_published`, `task_assigned`, `meeting_scheduled`, `meeting_cancelled` (phase 5, D-073). Shown at `/account/notifications` and on the bell of the hidden areas |
 | `notification_deliveries` | `kind`, `target_id`, `user_id`, `channel`, `sent_at` | Unique key makes cron jobs idempotent |
 | `audit_log` | `id bigint identity`, `occurred_at`, `actor_id`, `actor_role`, `action`, `table_name`, `record_id`, `old_data`, `new_data` | Written only by `SECURITY DEFINER` triggers; admin read-only; no update/delete for anyone |
 | `site_settings` | `key`, `value jsonb`, `is_public` | Anonymous users read `is_public` keys |
@@ -338,7 +338,7 @@ changes), `events` (publish), `posts` (publish/unpublish), `ledger_entries`, `le
 | Bucket | Public | Path convention | Write | Read |
 |---|---|---|---|---|
 | `public-media` | yes | `profiles/{profile_id}/…`, `posts/{post_id}/…`, `events/{event_id}/…`, `site/…` | profile managers (own folder), board (posts/events), admin | anyone |
-| `member-documents` | no | `library/{document_id}/{filename}` | board+ | members+ per `documents.audience` (policy joins `documents`) |
+| `member-documents` | no | `library/{upload_id}/{filename}` | board+ | members+ per `documents.audience` (policy joins `documents` on `storage_path`, so a file is readable only at the path its row records; D-075) |
 | `board-vault` | no | `legal/…`, `receipts/{entry_id}/…`, `correspondence/{id}/…` | board+ | board+ |
 
 Private files are served through short-lived signed URLs (≈60 s) created server-side after an
@@ -423,11 +423,14 @@ everywhere except the delivery log, plus column-level `INSERT`/`UPDATE`. Status,
 | RPC | Who |
 |---|---|
 | `create_profile(type, slug, display_name)` / `submit_profile(id)` | any signed-in user / the profile's managers |
+| `add_profile_manager(id, email, role)` / `list_profile_managers(id)` | owners and admin / managers and admin (names, never emails) |
+| `profile_review_recipients(id)` | admin (emails and locales of a profile's managers, for decision emails) |
 | `review_profile(id, approved\|rejected\|suspended\|reinstated, note_public, note_internal)` | admin |
 | `set_post_status(id, status, note)` | board (news); managers of an approved blog; admin (unpublish only) |
 | `propose_event(as_profile, …)` / `set_event_status(id, status, note)` | managers of an approved artist or venue / board |
 | `set_task_status(id, status)` | assignees and board |
-| `meeting_rsvp_counts(id)` / `volunteer_shift_counts(event)` | members (counts only) |
+| `meeting_rsvp_counts(id)` / `volunteer_shift_counts(event)` / `volunteer_shift_overview()` | members (counts, and their own sign-up) |
+| `answer_meeting(meeting, answer, answer_note)` / `set_poll_votes(poll, votes)` | members, **as themselves** (SECURITY INVOKER: the RLS policies decide; D-074) |
 | `transition_correspondence(id, to_status, note)` | board forward, admin backward |
 | `set_ledger_period_closed(id, closed)` / `set_account_deactivated(id, bool)` | admin |
 | `request_account_deletion()` | any signed-in user (processing is a service-role job) |
@@ -522,11 +525,13 @@ the seed makes `admin@acf.test` the admin.
   or sends an invitation that attaches the role when the invited email signs in for the first time.
   There is no self-service path to a role.
 - **Public-profile onboarding** (any signed-in user):
-  1. `/account/profiles/new?type=artist` → `create_profile()` RPC inserts the profile (`draft`) and the
-     owner row in `profile_managers` atomically.
-  2. Owner completes the type-specific form (validated by Zod on the client and again in the action) → `submit_profile()` → `pending`; the admin gets an email and an in-app notification.
-  3. Admin approves/rejects in `/admin/approvals` (`review_profile()`) → `review_events` row, email to
-     the managers, cache tag revalidated → the profile appears in the catalogue.
+  1. `/account/profiles` → `create_profile()` RPC inserts the profile (`draft`), the owner row in
+     `profile_managers`, the private row and the type details atomically; the slug comes from the name.
+  2. Owner completes the editor (Zod in each Server Action, D-066; images resized in the browser, D-067) →
+     `submit_profile()` → `pending`; every admin gets an in-app notification (the email digest is phase 8).
+  3. Admin approves/rejects in `/admin/approvals` (`review_profile()`) → `review_events` row (+ internal note),
+     in-app notification and email to every manager in their locale (D-068), cache tag revalidated → the
+     profile appears in the catalogue.
 - **MFA:** TOTP enrollment in `/account/settings`. Requiring it (`aal2`) for board/admin data is
   planned and pending a decision.
 - **Account deletion:** self-service request → server action anonymizes the `accounts` row, removes
@@ -540,8 +545,9 @@ the seed makes `admin@acf.test` the admin.
   nothing (D-064).
 - One provider for both **Supabase Auth emails** (custom SMTP, which lifts the built-in SMTP's very low
   rate limit) and **app emails** (Resend HTTP API).
-- Templates in `src/emails/` (React Email), rendered in the recipient's `preferred_locale`; the
-  Arabic version is `dir="rtl"`.
+- Phase 4: app emails go through `src/lib/email/resend.ts`. Templates in `src/emails/` are plain text, rendered
+  with next-intl's `createTranslator` in the recipient's `preferred_locale` and snapshot-tested (D-068); React
+  Email can replace them when HTML emails are needed.
 - Requires a domain with SPF/DKIM records (open question: ACF domain).
 - Free-tier cap (about 100 emails/day and 3,000/month at planning time; verify): reminders are batched, and
   daily digests replace per-event emails when volume grows. Fallback provider: Brevo.

@@ -8,7 +8,9 @@ import {
   areaSections,
   areaSubSections,
   infoPages,
+  isSectionActive,
   legalPages,
+  placeholderSections,
   publicHref,
   publicSections,
   type Area,
@@ -65,5 +67,26 @@ describe('hrefs', () => {
     expect(areaSectionHref('admin', 'overview')).toBe('/admin');
     expect(areaSubSections('board')).not.toContain('overview');
     expect(areaSubSections('board')).toHaveLength(areaSections.board.length - 1);
+  });
+});
+
+describe('placeholder sections', () => {
+  it('leave out the sections that have their own pages', () => {
+    expect(placeholderSections('admin')).not.toContain('approvals');
+    expect(placeholderSections('board')).not.toContain('events');
+    expect(placeholderSections('board')).not.toContain('meetings');
+    expect(placeholderSections('board')).toContain('finance');
+    // Every member section has its own page since phase 5.
+    expect(placeholderSections('member')).toEqual([]);
+  });
+});
+
+describe('active section', () => {
+  it('matches a section and its detail pages, and the index only on itself', () => {
+    expect(isSectionActive('member', 'meetings', '/member/meetings')).toBe(true);
+    expect(isSectionActive('member', 'meetings', '/member/meetings/123')).toBe(true);
+    expect(isSectionActive('member', 'meetings', '/member/meetingsx')).toBe(false);
+    expect(isSectionActive('member', 'dashboard', '/member')).toBe(true);
+    expect(isSectionActive('member', 'dashboard', '/member/tasks')).toBe(false);
   });
 });

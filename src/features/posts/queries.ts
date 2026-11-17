@@ -84,17 +84,30 @@ export async function listLatestBlogPosts(limit = 6) {
   });
 }
 
+/** A blog post by slug (preferring `locale`), plus its published translations (for hreflang). */
 export async function getBlogPost(blogProfileId: string, slug: string, locale: Locale) {
   return publicRead([contentTags.posts], null, async (db) => {
     const { data, error } = await db
       .from('posts')
-      .select('id, locale, slug, title, excerpt, body_md, cover_path, published_at, updated_at')
+      .select(
+        'id, locale, slug, title, excerpt, body_md, cover_path, published_at, updated_at, translation_group',
+      )
       .eq('kind', 'blog')
       .eq('blog_profile_id', blogProfileId)
       .eq('slug', slug);
     throwIf(error);
     const rows = data ?? [];
-    return rows.find((row) => row.locale === locale) ?? rows[0] ?? null;
+    const post = rows.find((row) => row.locale === locale) ?? rows[0] ?? null;
+    if (!post) return null;
+    // Translations share a group, always within the same blog (enforced by a trigger).
+    const { data: translations, error: translationsError } = await db
+      .from('posts')
+      .select('locale, slug')
+      .eq('kind', 'blog')
+      .eq('blog_profile_id', blogProfileId)
+      .eq('translation_group', post.translation_group);
+    throwIf(translationsError);
+    return { ...post, translations: translations ?? [] };
   });
 }
 

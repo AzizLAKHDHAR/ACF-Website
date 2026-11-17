@@ -71,3 +71,26 @@ export function areaSectionHref<A extends Area>(area: A, section: AreaSection<A>
 export function areaSubSections<A extends Area>(area: A): AreaSection<A>[] {
   return areaSections[area].slice(1) as AreaSection<A>[];
 }
+
+/** Sections with their own route folder; the `[section]` placeholder must not pre-render them. */
+export const implementedSections: { [A in Area]: readonly AreaSection<A>[] } = {
+  member: ['meetings', 'tasks', 'announcements', 'polls', 'volunteer', 'documents', 'directory'],
+  board: ['meetings', 'announcements', 'polls', 'volunteering', 'events'],
+  admin: ['approvals'],
+};
+
+/** Whether `pathname` is a section's page or one of its detail pages (the index matches only itself). */
+export function isSectionActive<A extends Area>(
+  area: A,
+  section: AreaSection<A>,
+  pathname: string,
+): boolean {
+  const href = areaSectionHref(area, section);
+  return pathname === href || (href !== `/${area}` && pathname.startsWith(`${href}/`));
+}
+
+/** Sub-sections still served by the `[section]` placeholder page. */
+export function placeholderSections<A extends Area>(area: A): AreaSection<A>[] {
+  const implemented = implementedSections[area] as readonly AreaSection<A>[];
+  return areaSubSections(area).filter((section) => !implemented.includes(section));
+}

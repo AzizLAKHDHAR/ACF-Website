@@ -100,7 +100,7 @@ Done in the phase 3 PR (D-060 to D-065). Legal texts are drafts awaiting ACF; co
 
 Inputs needed: About/mission text in 3 languages, contact address, legal texts (or OK to draft), decision on migrating legacy content.
 
-## Phase 4: Profile onboarding and admin approval
+## Phase 4: Profile onboarding and admin approval ✅ (pgTAP and e2e run in CI; required fields per type await ACF)
 
 **Goal:** scene actors create and manage their own public profiles; the admin reviews them.
 
@@ -110,18 +110,24 @@ emails; event proposals by approved artists/venues; blog post editor for approve
 versions); claim flow for seeded profiles (if chosen).
 
 Acceptance criteria:
-- [ ] E2E: register → create an artist profile in Arabic → submit → admin approves → profile visible at `/ar/artists/{slug}` and in the catalogue.
-- [ ] E2E: rejection with a public note → the owner sees the note and can resubmit.
-- [ ] One user can own an artist **and** a studio profile and switch between them. A co-manager can edit; a non-manager can't (RLS test + e2e).
-- [ ] Uploads outside the user's own profile folder are denied (storage test). Oversized or wrong-type files are rejected with a localized message.
-- [ ] Approval and rejection emails are sent in each manager's preferred locale (template snapshot tests).
-- [ ] An approved venue can propose an event at its venue; the board publishes it; the event appears publicly.
-- [ ] An approved blog owner publishes a post in `fr` and its `ar` translation, linked with `hreflang`.
-- [ ] Every status change writes `review_events` and `audit_log`.
+- [x] E2E: register → create an artist profile in Arabic → submit → admin approves → profile visible at `/ar/artists/{slug}` and in the catalogue.
+- [x] E2E: rejection with a public note → the owner sees the note and can resubmit.
+- [x] One user can own an artist **and** a studio profile and switch between them. A co-manager can edit; a non-manager can't (RLS test + e2e).
+- [x] Uploads outside the user's own profile folder are denied (storage test). Oversized or wrong-type files are rejected with a localized message.
+- [x] Approval and rejection emails are sent in each manager's preferred locale (template snapshot tests).
+- [x] An approved venue can propose an event at its venue; the board publishes it; the event appears publicly.
+- [x] An approved blog owner publishes a post in `fr` and its `ar` translation, linked with `hreflang`.
+- [x] Every status change writes `review_events` and `audit_log`.
+
+Done in the phase 4 PR (D-066 to D-072): `/account/profiles` (create, edit, media, private contact, co-managers,
+submit), `/account/profiles/[id]/events` (proposals), `/account/profiles/[id]/posts` (blog editor with translations),
+`/admin/approvals` (queue, review with public and internal notes, decision emails), `/board/events` (publish or turn
+down proposals). Until ACF fixes the required fields, a profile needs a short introduction and a governorate to be
+submitted (D-070); the claim flow for seeded profiles is not built (no legacy profiles are seeded).
 
 Inputs needed: required fields per profile type, review criteria, whether edits to approved profiles need re-approval, whether to seed legacy artists.
 
-## Phase 5: Member space
+## Phase 5: Member space ✅ (pgTAP and e2e run in CI on the pull request)
 
 **Goal:** members coordinate on the site.
 
@@ -132,14 +138,23 @@ board-side forms that feed these features (create meeting, announcement, poll, s
 document). Task creation and assignment come in phase 6; phase 5 uses seeded tasks.
 
 Acceptance criteria:
-- [ ] A member can RSVP yes/maybe/no and change it. The board sees the attendance list. Members see counts.
-- [ ] A board-audience meeting, announcement, poll or document is invisible to members (RLS test + e2e).
-- [ ] Availability poll: members vote per slot; results grid; votes locked after `closes_at` (DB-enforced).
-- [ ] Volunteer sign-up respects capacity under concurrency (DB test with parallel sign-ups); members can cancel their own sign-up.
-- [ ] Library downloads use signed URLs that expire. Direct storage URLs are denied.
-- [ ] Tasks: a member sees members-visible and assigned tasks, can change the status of assigned tasks, and can self-assign `is_open` tasks only.
-- [ ] In-app notifications for new announcements, assignments and meetings.
-- [ ] All member screens pass axe in `ar` and `fr`.
+- [x] A member can RSVP yes/maybe/no and change it. The board sees the attendance list. Members see counts.
+- [x] A board-audience meeting, announcement, poll or document is invisible to members (RLS test + e2e).
+- [x] Availability poll: members vote per slot; results grid; votes locked after `closes_at` (DB-enforced).
+- [x] Volunteer sign-up respects capacity under concurrency (DB test with parallel sign-ups); members can cancel their own sign-up.
+- [x] Library downloads use signed URLs that expire. Direct storage URLs are denied.
+- [x] Tasks: a member sees members-visible and assigned tasks, can change the status of assigned tasks, and can self-assign `is_open` tasks only.
+- [x] In-app notifications for new announcements, assignments and meetings.
+- [x] All member screens pass axe in `ar` and `fr`.
+
+Done in the phase 5 PR (D-073 to D-078): the member dashboard and the meetings, tasks, announcements, polls,
+volunteering, documents and directory pages; the notifications page (`/account/notifications`) and a bell in every
+hidden area; the board's forms in `/board/meetings`, `/board/announcements`, `/board/polls` and `/board/volunteering`;
+library uploads on `/member/documents` (board only). Migration `20261117211020_member_space` adds the notification
+triggers, `answer_meeting()`, `set_poll_votes()` and `volunteer_shift_overview()`, and links library files to their
+row by path. Not built yet: editing meetings, polls and announcements after they're posted (create, cancel or close,
+delete only), minutes attached to meetings, choice polls, archiving documents, and pushing announcements to Discord
+(phase 8).
 
 ## Phase 6: Board space
 
