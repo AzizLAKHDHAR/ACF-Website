@@ -50,9 +50,10 @@ select tests.as('other');
 select is((select status::text from public.public_profiles where id = tests.id('pending_b')), 'rejected', 'the owner sees the rejection');
 select is((select note_public from public.review_events where target_id = tests.id('pending_b') and action = 'rejected'), 'Merci d''ajouter une biographie.', 'the owner reads the public note');
 select is(tests.rows($$select 1 from public.review_event_notes$$), 0, 'the owner cannot read internal notes');
-select is((select payload ->> 'decision' from public.notifications where user_id = tests.id('other') and kind = 'profile_review'), 'rejected', 'the owner is notified in-app');
-select is((select payload ->> 'note_public' from public.notifications where user_id = tests.id('other') and kind = 'profile_review'), 'Merci d''ajouter une biographie.', 'the notification carries the public note');
-select ok((select not (payload ? 'note_internal') from public.notifications where user_id = tests.id('other') and kind = 'profile_review'), 'the notification never carries the internal note');
+-- 'other' also has the approval notification for artist_b (tests.setup), so filter by profile.
+select is((select payload ->> 'decision' from public.notifications where user_id = tests.id('other') and kind = 'profile_review' and payload ->> 'profile_id' = tests.id('pending_b')::text), 'rejected', 'the owner is notified in-app');
+select is((select payload ->> 'note_public' from public.notifications where user_id = tests.id('other') and kind = 'profile_review' and payload ->> 'profile_id' = tests.id('pending_b')::text), 'Merci d''ajouter une biographie.', 'the notification carries the public note');
+select ok((select not (payload ? 'note_internal') from public.notifications where user_id = tests.id('other') and kind = 'profile_review' and payload ->> 'profile_id' = tests.id('pending_b')::text), 'the notification never carries the internal note');
 select lives_ok($$select public.submit_profile(tests.id('pending_b'))$$, 'the owner resubmits a rejected profile');
 select is((select status::text from public.public_profiles where id = tests.id('pending_b')), 'pending', 'the resubmitted profile is pending again');
 select tests.as('admin');
@@ -70,7 +71,7 @@ select is((select count(*)::int from public.review_events where target_id = test
 
 -- Approval notifies every manager, owner and editors alike.
 select tests.as('other');
-select public.add_profile_manager(tests.id('pending_b'), 'member@test.acf.invalid');
+select is(public.add_profile_manager(tests.id('pending_b'), 'member@test.acf.invalid'), tests.id('member'), 'the owner adds a co-manager to the resubmitted profile');
 select tests.as('admin');
 select lives_ok($$select public.review_profile(tests.id('pending_b'), 'approved')$$, 'the admin approves the resubmitted profile');
 select tests.as_superuser();

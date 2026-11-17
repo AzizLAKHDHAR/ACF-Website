@@ -54,9 +54,11 @@ select tests.as('member');
 select is(tests.rows($$select 1 from public.notifications$$), 1, 'members read their own notifications');
 select is(tests.affected($$update public.notifications set read_at = now() where id = tests.id('notification_member')$$), 1, 'members mark their notifications read');
 select throws_ok($$update public.notifications set kind = 'x' where id = tests.id('notification_member')$$, '42501', null, 'only read_at is editable');
+-- Admins have notifications of their own (profile submissions, 080-onboarding), so these checks
+-- look only at other people's rows.
 select tests.as('admin');
-select is(tests.rows($$select 1 from public.notifications$$), 0, 'admins do not read others'' notifications');
-select is(tests.affected($$update public.notifications set read_at = now()$$), 0, 'admins cannot mark others'' notifications');
+select is(tests.rows($$select 1 from public.notifications where user_id <> tests.id('admin')$$), 0, 'admins do not read others'' notifications');
+select is(tests.affected($$update public.notifications set read_at = now() where user_id <> tests.id('admin')$$), 0, 'admins cannot mark others'' notifications');
 
 -- Account deletion request
 select tests.as('registered');
