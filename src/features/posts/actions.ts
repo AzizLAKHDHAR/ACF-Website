@@ -116,10 +116,7 @@ export async function updateBlogPost(_state: FormState, formData: FormData): Pro
   return ok('saved');
 }
 
-export async function setBlogPostStatus(
-  _state: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export async function setBlogPostStatus(_state: FormState, formData: FormData): Promise<FormState> {
   const parsed = postStatusSchema.safeParse(formDataToRecord(formData));
   if (!parsed.success) return invalid(parsed.error);
   await requireUser();

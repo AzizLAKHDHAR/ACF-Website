@@ -72,7 +72,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
   // Blog posts are written in one language: listed once, under that language, with their
   // translations (same group, same blog) as hreflang alternates.
-  const blogPosts = posts.filter((post) => post.kind === 'blog' && post.blog && isLocale(post.locale));
+  const blogPosts = posts.filter(
+    (post) => post.kind === 'blog' && post.blog && isLocale(post.locale),
+  );
   const blogEntries = blogPosts.map((post) => {
     const group = blogPosts.filter((other) => other.translation_group === post.translation_group);
     return {

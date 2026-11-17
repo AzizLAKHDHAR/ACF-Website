@@ -49,7 +49,11 @@ async function emailManagers(
   const supabase = await createClient();
   const [{ data: recipients, error }, { data: profile }] = await Promise.all([
     supabase.rpc('profile_review_recipients', { profile: profileId }),
-    supabase.from('public_profiles').select('type, slug, display_name').eq('id', profileId).single(),
+    supabase
+      .from('public_profiles')
+      .select('type, slug, display_name')
+      .eq('id', profileId)
+      .single(),
   ]);
   if (error || !recipients || !profile) {
     console.error('[review] could not load email recipients', error?.message);

@@ -10,6 +10,10 @@ export const demoUsers = {
   board: 'board@acf.test',
   member: 'member@acf.test',
   registered: 'registered@acf.test',
+  /** Owns the approved demo artist and blog profiles (seed). */
+  artist: 'artist@acf.test',
+  /** Owns the approved demo venue profile (seed). */
+  venue: 'venue@acf.test',
 } as const;
 
 export function uniqueEmail(tag: string): string {

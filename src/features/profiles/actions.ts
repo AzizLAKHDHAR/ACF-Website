@@ -302,7 +302,8 @@ export async function setProfileMedia(
   if (previous && previous !== path && isOwnMediaPath(profileId, previous)) {
     // Best effort: an orphaned file only costs storage, never exposes anything new.
     const { error: removeError } = await supabase.storage.from('public-media').remove([previous]);
-    if (removeError) console.error('[profiles] could not delete replaced media', removeError.message);
+    if (removeError)
+      console.error('[profiles] could not delete replaced media', removeError.message);
   }
   refresh();
   return ok(path ? 'saved' : 'removed');
@@ -372,10 +373,7 @@ export async function deleteDraftProfile(
   return ok('deleted');
 }
 
-export async function addProfileManager(
-  _state: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export async function addProfileManager(_state: FormState, formData: FormData): Promise<FormState> {
   const parsed = addManagerSchema.safeParse(formDataToRecord(formData));
   if (!parsed.success) return invalid(parsed.error);
   await requireUser();

@@ -55,6 +55,11 @@ select is((select payload ->> 'note_public' from public.notifications where user
 select ok((select not (payload ? 'note_internal') from public.notifications where user_id = tests.id('other') and kind = 'profile_review'), 'the notification never carries the internal note');
 select lives_ok($$select public.submit_profile(tests.id('pending_b'))$$, 'the owner resubmits a rejected profile');
 select is((select status::text from public.public_profiles where id = tests.id('pending_b')), 'pending', 'the resubmitted profile is pending again');
+select tests.as('admin');
+select ok((select count(*) from public.notifications where user_id = tests.id('admin') and kind = 'profile_submitted' and payload ->> 'profile_id' = tests.id('pending_b')::text) >= 1, 'the admin is notified in-app of a submission');
+select tests.as('board');
+select is(tests.rows($$select 1 from public.notifications where kind = 'profile_submitted'$$), 0, 'the board is not notified of profile submissions');
+select tests.as('other');
 
 select tests.as('manager');
 select is(tests.rows($$select 1 from public.notifications where user_id = tests.id('other')$$), 0, 'others cannot read the notification');

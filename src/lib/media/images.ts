@@ -28,5 +28,8 @@ export function checkImageFile(file: { type: string; size: number }): ImageCheck
 /** Scales `width × height` down (never up) so the longest side is at most `max`. */
 export function fitWithin(width: number, height: number, max: number) {
   const scale = Math.min(1, max / Math.max(width, height));
-  return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
+  return {
+    width: Math.max(1, Math.round(width * scale)),
+    height: Math.max(1, Math.round(height * scale)),
+  };
 }

@@ -10,7 +10,12 @@ const base = {
 
 describe('review decision email', () => {
   for (const locale of ['ar', 'fr', 'en'] as const) {
-    for (const decision of ['approved', 'rejected', 'suspended', 'reinstated'] as ReviewDecision[]) {
+    for (const decision of [
+      'approved',
+      'rejected',
+      'suspended',
+      'reinstated',
+    ] as ReviewDecision[]) {
       it(`${decision} in ${locale}`, () => {
         const email = renderReviewDecisionEmail({
           ...base,

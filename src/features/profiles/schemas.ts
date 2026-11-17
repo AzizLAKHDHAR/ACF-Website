@@ -170,7 +170,10 @@ export const setMediaSchema = z.object({
 /** Where a profile's media lives in `public-media` (matches private.can_write_public_media()). */
 export function isOwnMediaPath(profileId: string, path: string): boolean {
   const prefix = `profiles/${profileId}/`;
-  return path.startsWith(prefix) && /^[a-z0-9-]+\.(webp|jpe?g|png|gif|avif)$/.test(path.slice(prefix.length));
+  return (
+    path.startsWith(prefix) &&
+    /^[a-z0-9-]+\.(webp|jpe?g|png|gif|avif)$/.test(path.slice(prefix.length))
+  );
 }
 
 /** The kind of a profile link, from its host (used for the label on the public page). */
@@ -199,7 +202,10 @@ export function linkKind(url: string): string {
  * fields per type yet (roadmap phase 4 → inputs needed); until then: a short description in at least
  * one language and a governorate, so the catalogue filters and cards have something to show.
  */
-export function missingForSubmit(profile: { tagline: Json; governorate_code: string | null }): string[] {
+export function missingForSubmit(profile: {
+  tagline: Json;
+  governorate_code: string | null;
+}): string[] {
   const missing: string[] = [];
   const tagline = profile.tagline;
   const hasTagline =

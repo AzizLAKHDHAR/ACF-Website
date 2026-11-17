@@ -8,7 +8,8 @@ function throwIf(error: { message: string } | null) {
   if (error) throw new Error(error.message);
 }
 
-const proposalColumns = `id, slug, title, starts_at, ends_at, status, venue_text, venue_profile_id, created_at,
+const proposalColumns =
+  `id, slug, title, starts_at, ends_at, status, venue_text, venue_profile_id, created_at,
   venue:public_profiles!events_venue_profile_id_fkey(slug, display_name),
   event_lineup(profile_id, public_profiles(display_name))` as const;
 

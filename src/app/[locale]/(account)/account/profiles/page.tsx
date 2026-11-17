@@ -75,7 +75,10 @@ export default async function MyProfilesPage({ params }: PageProps<'/[locale]/ac
         )}
       </section>
 
-      <section aria-labelledby="new-profile" className="flex flex-col gap-4 rounded-2xl border-2 p-6">
+      <section
+        aria-labelledby="new-profile"
+        className="flex flex-col gap-4 rounded-2xl border-2 p-6"
+      >
         <h2 id="new-profile" className="text-lg font-bold">
           {t('create.title')}
         </h2>

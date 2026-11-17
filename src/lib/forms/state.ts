@@ -95,15 +95,17 @@ export function fromDbError(
   const code = error?.code ?? '';
   const mapped: FormErrorKey | undefined =
     overrides[code] ??
-    ({
-      '42501': 'forbidden',
-      P0002: 'notFound',
-      P0001: 'invalidTransition',
-      '23505': 'conflict',
-      '23514': 'invalidInput',
-      '22023': 'invalidInput',
-      '22P02': 'invalidInput',
-    } as Record<string, FormErrorKey>)[code];
+    (
+      {
+        '42501': 'forbidden',
+        P0002: 'notFound',
+        P0001: 'invalidTransition',
+        '23505': 'conflict',
+        '23514': 'invalidInput',
+        '22023': 'invalidInput',
+        '22P02': 'invalidInput',
+      } as Record<string, FormErrorKey>
+    )[code];
   if (!mapped) console.error('[action] unexpected database error', code, error?.message);
   return { ok: false, error: mapped ?? 'failed' };
 }

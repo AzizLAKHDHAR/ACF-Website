@@ -100,7 +100,7 @@ Done in the phase 3 PR (D-060 to D-065). Legal texts are drafts awaiting ACF; co
 
 Inputs needed: About/mission text in 3 languages, contact address, legal texts (or OK to draft), decision on migrating legacy content.
 
-## Phase 4: Profile onboarding and admin approval
+## Phase 4: Profile onboarding and admin approval ✅ (pgTAP and e2e run in CI; required fields per type await ACF)
 
 **Goal:** scene actors create and manage their own public profiles; the admin reviews them.
 
@@ -110,14 +110,20 @@ emails; event proposals by approved artists/venues; blog post editor for approve
 versions); claim flow for seeded profiles (if chosen).
 
 Acceptance criteria:
-- [ ] E2E: register → create an artist profile in Arabic → submit → admin approves → profile visible at `/ar/artists/{slug}` and in the catalogue.
-- [ ] E2E: rejection with a public note → the owner sees the note and can resubmit.
-- [ ] One user can own an artist **and** a studio profile and switch between them. A co-manager can edit; a non-manager can't (RLS test + e2e).
-- [ ] Uploads outside the user's own profile folder are denied (storage test). Oversized or wrong-type files are rejected with a localized message.
-- [ ] Approval and rejection emails are sent in each manager's preferred locale (template snapshot tests).
-- [ ] An approved venue can propose an event at its venue; the board publishes it; the event appears publicly.
-- [ ] An approved blog owner publishes a post in `fr` and its `ar` translation, linked with `hreflang`.
-- [ ] Every status change writes `review_events` and `audit_log`.
+- [x] E2E: register → create an artist profile in Arabic → submit → admin approves → profile visible at `/ar/artists/{slug}` and in the catalogue.
+- [x] E2E: rejection with a public note → the owner sees the note and can resubmit.
+- [x] One user can own an artist **and** a studio profile and switch between them. A co-manager can edit; a non-manager can't (RLS test + e2e).
+- [x] Uploads outside the user's own profile folder are denied (storage test). Oversized or wrong-type files are rejected with a localized message.
+- [x] Approval and rejection emails are sent in each manager's preferred locale (template snapshot tests).
+- [x] An approved venue can propose an event at its venue; the board publishes it; the event appears publicly.
+- [x] An approved blog owner publishes a post in `fr` and its `ar` translation, linked with `hreflang`.
+- [x] Every status change writes `review_events` and `audit_log`.
+
+Done in the phase 4 PR (D-066 to D-072): `/account/profiles` (create, edit, media, private contact, co-managers,
+submit), `/account/profiles/[id]/events` (proposals), `/account/profiles/[id]/posts` (blog editor with translations),
+`/admin/approvals` (queue, review with public and internal notes, decision emails), `/board/events` (publish or turn
+down proposals). Until ACF fixes the required fields, a profile needs a short introduction and a governorate to be
+submitted (D-070); the claim flow for seeded profiles is not built (no legacy profiles are seeded).
 
 Inputs needed: required fields per profile type, review criteria, whether edits to approved profiles need re-approval, whether to seed legacy artists.
 

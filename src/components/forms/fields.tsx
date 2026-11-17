@@ -48,13 +48,7 @@ export function TextField({
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        name={name}
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
-        {...props}
-      />
+      <Input id={id} name={name} aria-invalid={invalid} aria-describedby={describedBy} {...props} />
       {hintNode}
       {errorNode}
     </div>

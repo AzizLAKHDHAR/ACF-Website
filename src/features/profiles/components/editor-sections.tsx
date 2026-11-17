@@ -417,11 +417,7 @@ export async function MediaSection({
   const t = await getTranslations({ locale, namespace: 'profiles' });
   const folder = `profiles/${profile.id}`;
   return (
-    <EditorSection
-      id="media"
-      title={t('editor.sections.media')}
-      description={t('media.intro')}
-    >
+    <EditorSection id="media" title={t('editor.sections.media')} description={t('media.intro')}>
       <div className="grid gap-8 sm:grid-cols-2">
         <ImageUpload
           label={t('media.avatar')}

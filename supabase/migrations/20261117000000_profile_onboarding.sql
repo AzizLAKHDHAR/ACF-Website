@@ -66,6 +66,37 @@ $$;
 create trigger profile_managers_audit after insert or update or delete on public.profile_managers
   for each row execute function private.audit_row('profile_id');
 
+-- ── Submissions notify the admins ─────────────────────────────────────────────
+-- Same rules as the phase 2 version; it also tells every active admin in-app (the daily admin
+-- digest email arrives with the cron jobs in phase 8).
+create or replace function public.submit_profile(profile uuid) returns void
+  language plpgsql security definer set search_path = ''
+as $$
+declare
+  profile_name text;
+  profile_type public.profile_type;
+begin
+  if not private.manages_profile(profile) then
+    raise exception 'You do not manage this profile' using errcode = '42501';
+  end if;
+  update public.public_profiles
+    set status = 'pending', submitted_at = now()
+    where id = profile and status in ('draft', 'rejected')
+    returning display_name, type into profile_name, profile_type;
+  if not found then
+    raise exception 'Only draft or rejected profiles can be submitted' using errcode = 'P0001';
+  end if;
+  insert into public.review_events (target_type, target_id, action, actor_id)
+  values ('profile', profile, 'submitted', (select auth.uid()));
+  insert into public.notifications (user_id, kind, payload)
+  select m.user_id, 'profile_submitted',
+         jsonb_build_object('profile_id', profile, 'profile_type', profile_type, 'display_name', profile_name)
+    from public.memberships m
+    join public.accounts a on a.id = m.user_id
+    where m.role = 'admin' and m.status = 'active' and a.deactivated_at is null;
+end;
+$$;
+
 -- ── Review decisions notify every manager ─────────────────────────────────────
 -- Same rules as the phase 2 version; it also writes one in-app notification per manager. The
 -- notification payload carries the public note only (internal notes stay in review_event_notes).

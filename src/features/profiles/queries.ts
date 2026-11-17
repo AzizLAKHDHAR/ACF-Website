@@ -22,9 +22,7 @@ export async function listMyProfiles(userId: string) {
   throwIf(error);
   return (data ?? [])
     .flatMap((row) =>
-      row.public_profiles
-        ? [{ ...row.public_profiles, role: row.role as 'owner' | 'editor' }]
-        : [],
+      row.public_profiles ? [{ ...row.public_profiles, role: row.role as 'owner' | 'editor' }] : [],
     )
     .sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 }

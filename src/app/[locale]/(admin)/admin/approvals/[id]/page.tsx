@@ -128,7 +128,12 @@ export default async function ReviewProfilePage({ params }: Props) {
             <dt className="text-sm font-semibold">{t('content.profile.links')}</dt>
             {linkUrls(profile.links).map((url) => (
               <dd key={url} dir="ltr" className="break-all">
-                <a href={url} rel="nofollow ugc noopener noreferrer" target="_blank" className="underline">
+                <a
+                  href={url}
+                  rel="nofollow ugc noopener noreferrer"
+                  target="_blank"
+                  className="underline"
+                >
                   {url}
                 </a>
               </dd>
@@ -213,7 +218,9 @@ export default async function ReviewProfilePage({ params }: Props) {
             {history.map((event) => (
               <li key={event.id} className="flex flex-col gap-1 border-s-2 ps-3 text-sm">
                 <span className="font-semibold">
-                  {t(`profiles.review.actions.${event.action}` as 'profiles.review.actions.submitted')}
+                  {t(
+                    `profiles.review.actions.${event.action}` as 'profiles.review.actions.submitted',
+                  )}
                   {' · '}
                   <time dateTime={event.created_at}>
                     {formatShortDate(event.created_at, locale)}

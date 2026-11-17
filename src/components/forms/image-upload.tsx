@@ -79,7 +79,8 @@ export function ImageUpload({
         .upload(path, blob, { contentType: blob.type, cacheControl: '31536000', upsert: false });
       if (uploadError) return setError('uploadFailed');
       const result = await onUploaded(path);
-      if (!result?.ok) return setError(result?.error === 'forbidden' ? 'forbidden' : 'uploadFailed');
+      if (!result?.ok)
+        return setError(result?.error === 'forbidden' ? 'forbidden' : 'uploadFailed');
       setDone(true);
       router.refresh();
     } catch {

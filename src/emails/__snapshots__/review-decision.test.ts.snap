@@ -1,0 +1,214 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`review decision email > approved in ar 1`] = `
+{
+  "subject": "نُشر ملفك «Les Pixels (démo)»",
+  "text": "مرحبًا Demo Artist،
+
+خبر سار: صادق فريق ACF على الملف «Les Pixels (démo)». أصبح الآن ظاهرًا في الدليل.
+
+الصفحة العامة:
+https://acf.test/fr/artists/demo-les-pixels
+
+إدارة الملف:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+فريق ACF",
+}
+`;
+
+exports[`review decision email > approved in en 1`] = `
+{
+  "subject": "Your profile “Les Pixels (démo)” is published",
+  "text": "Hello Demo Artist,
+
+Good news: the ACF team approved the profile “Les Pixels (démo)”. It now appears in the directory.
+
+The public page:
+https://acf.test/fr/artists/demo-les-pixels
+
+Manage the profile:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+The ACF team",
+}
+`;
+
+exports[`review decision email > approved in fr 1`] = `
+{
+  "subject": "Votre profil « Les Pixels (démo) » est publié",
+  "text": "Bonjour Demo Artist,
+
+Bonne nouvelle : l’équipe d’ACF a validé le profil « Les Pixels (démo) ». Il est maintenant visible dans l’annuaire.
+
+La page publique :
+https://acf.test/fr/artists/demo-les-pixels
+
+Gérer le profil :
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+L’équipe d’ACF",
+}
+`;
+
+exports[`review decision email > reinstated in ar 1`] = `
+{
+  "subject": "ملفك «Les Pixels (démo)» ظاهر من جديد",
+  "text": "مرحبًا Demo Artist،
+
+عاد الملف «Les Pixels (démo)» ظاهرًا في الدليل.
+
+رسالة من فريق ACF:
+Merci d’ajouter une biographie.
+
+الصفحة العامة:
+https://acf.test/fr/artists/demo-les-pixels
+
+إدارة الملف:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+فريق ACF",
+}
+`;
+
+exports[`review decision email > reinstated in en 1`] = `
+{
+  "subject": "Your profile “Les Pixels (démo)” is back online",
+  "text": "Hello Demo Artist,
+
+The profile “Les Pixels (démo)” appears in the directory again.
+
+Message from the ACF team:
+Merci d’ajouter une biographie.
+
+The public page:
+https://acf.test/fr/artists/demo-les-pixels
+
+Manage the profile:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+The ACF team",
+}
+`;
+
+exports[`review decision email > reinstated in fr 1`] = `
+{
+  "subject": "Votre profil « Les Pixels (démo) » est de nouveau en ligne",
+  "text": "Bonjour Demo Artist,
+
+Le profil « Les Pixels (démo) » est de nouveau visible dans l’annuaire.
+
+Message de l’équipe d’ACF :
+Merci d’ajouter une biographie.
+
+La page publique :
+https://acf.test/fr/artists/demo-les-pixels
+
+Gérer le profil :
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+L’équipe d’ACF",
+}
+`;
+
+exports[`review decision email > rejected in ar 1`] = `
+{
+  "subject": "ملفك «Les Pixels (démo)» يحتاج إلى تعديل",
+  "text": "مرحبًا Demo Artist،
+
+راجع فريق ACF الملف «Les Pixels (démo)» ويطلب بعض التعديلات قبل نشره. يمكنك تصحيحه ثم إعادة إرساله للمراجعة.
+
+رسالة من فريق ACF:
+Merci d’ajouter une biographie.
+
+إدارة الملف:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+فريق ACF",
+}
+`;
+
+exports[`review decision email > rejected in en 1`] = `
+{
+  "subject": "Your profile “Les Pixels (démo)” needs changes",
+  "text": "Hello Demo Artist,
+
+The ACF team reviewed the profile “Les Pixels (démo)” and asks for a few changes before publishing it. You can fix it, then send it for review again.
+
+Message from the ACF team:
+Merci d’ajouter une biographie.
+
+Manage the profile:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+The ACF team",
+}
+`;
+
+exports[`review decision email > rejected in fr 1`] = `
+{
+  "subject": "Votre profil « Les Pixels (démo) » est à revoir",
+  "text": "Bonjour Demo Artist,
+
+L’équipe d’ACF a examiné le profil « Les Pixels (démo) » et vous demande quelques changements avant de le publier. Vous pouvez le corriger puis le renvoyer pour validation.
+
+Message de l’équipe d’ACF :
+Merci d’ajouter une biographie.
+
+Gérer le profil :
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+L’équipe d’ACF",
+}
+`;
+
+exports[`review decision email > suspended in ar 1`] = `
+{
+  "subject": "عُلّق ملفك «Les Pixels (démo)»",
+  "text": "مرحبًا Demo Artist،
+
+لم يعد الملف «Les Pixels (démo)» ظاهرًا للعموم في الوقت الحالي.
+
+رسالة من فريق ACF:
+Merci d’ajouter une biographie.
+
+إدارة الملف:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+فريق ACF",
+}
+`;
+
+exports[`review decision email > suspended in en 1`] = `
+{
+  "subject": "Your profile “Les Pixels (démo)” is suspended",
+  "text": "Hello Demo Artist,
+
+The profile “Les Pixels (démo)” is no longer public for now.
+
+Message from the ACF team:
+Merci d’ajouter une biographie.
+
+Manage the profile:
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+The ACF team",
+}
+`;
+
+exports[`review decision email > suspended in fr 1`] = `
+{
+  "subject": "Votre profil « Les Pixels (démo) » est suspendu",
+  "text": "Bonjour Demo Artist,
+
+Le profil « Les Pixels (démo) » n’est plus visible publiquement pour le moment.
+
+Message de l’équipe d’ACF :
+Merci d’ajouter une biographie.
+
+Gérer le profil :
+https://acf.test/fr/account/profiles/00000000-0000-4000-b000-000000000001
+
+L’équipe d’ACF",
+}
+`;
