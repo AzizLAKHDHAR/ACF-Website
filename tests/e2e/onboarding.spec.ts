@@ -20,11 +20,27 @@ function token(): string {
   return Math.random().toString(36).slice(2, 8).replace(/[0-9]/g, 'x');
 }
 
+/** Six random Arabic letters: keeps a name Arabic-only (no Latin to build a slug from) yet unique. */
+function arabicToken(): string {
+  const letters = 'بتثجحخدذرزسشصضطظعغفقكلمنهوي';
+  return Array.from({ length: 6 }, () =>
+    letters.charAt(Math.floor(Math.random() * letters.length)),
+  ).join('');
+}
+
+/**
+ * Signs in and waits for the account page. The sign-in form posts a Server Action, so navigating
+ * away before it answers drops the session cookie and the next page sees a signed-out visitor.
+ */
+async function signInAndWait(page: Page, email: string, password?: string, locale = 'fr') {
+  await signIn(page, email, password, locale);
+  await expect(page).toHaveURL(`/${locale}/account`);
+}
+
 async function newSignedInPage(browser: Browser, email: string, password?: string, locale = 'fr') {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await signIn(page, email, password, locale);
-  await expect(page).toHaveURL(`/${locale}/account`);
+  await signInAndWait(page, email, password, locale);
   return page;
 }
 
@@ -86,11 +102,12 @@ test.describe('profile onboarding and approval', () => {
   }) => {
     const email = uniqueEmail('artist-ar');
     await createConfirmedUser(email, PASSWORD, 'ar');
-    await signIn(page, email, PASSWORD, 'ar');
-    await expect(page).toHaveURL('/ar/account');
+    await signInAndWait(page, email, PASSWORD, 'ar');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 
-    const name = `فرقة الأمواج ${token()}`;
+    // Not «الأمواج»: the search test (public-content) expects the seed's band to be its only match,
+    // and the suites share one database.
+    const name = `فرقة النسيم ${arabicToken()}`;
     const profileId = await createProfile(page, 'ar', 'artist', name);
     // An Arabic-only name gets a Latin fallback slug the owner can change.
     const slug = await page
@@ -138,7 +155,7 @@ test.describe('profile onboarding and approval', () => {
   }) => {
     const email = uniqueEmail('studio-fr');
     await createConfirmedUser(email, PASSWORD, 'fr');
-    await signIn(page, email, PASSWORD);
+    await signInAndWait(page, email, PASSWORD);
     const profileId = await createProfile(page, 'fr', 'studio', `Studio e2e ${token()}`);
     await fillRequired(page, 'fr', 'Studio fictif pour les tests');
     await submitForReview(page, 'fr');
@@ -167,7 +184,7 @@ test.describe('profile onboarding and approval', () => {
     const editor = uniqueEmail('editor');
     await createConfirmedUser(owner, PASSWORD, 'fr');
     await createConfirmedUser(editor, PASSWORD, 'fr');
-    await signIn(page, owner, PASSWORD);
+    await signInAndWait(page, owner, PASSWORD);
     const studioName = `Studio e2e ${token()}`;
     const studioId = await createProfile(page, 'fr', 'studio', studioName);
     const artistName = `Artiste e2e ${token()}`;
@@ -207,7 +224,7 @@ test.describe('profile onboarding and approval', () => {
   }) => {
     const email = uniqueEmail('upload');
     await createConfirmedUser(email, PASSWORD, 'ar');
-    await signIn(page, email, PASSWORD, 'ar');
+    await signInAndWait(page, email, PASSWORD, 'ar');
     await createProfile(page, 'ar', 'venue', `Venue e2e ${token()}`);
 
     const avatar = page.getByLabel(ar.profiles.media.avatar);
@@ -228,7 +245,7 @@ test.describe('profile onboarding and approval', () => {
   test('the editor and the approval queue pass axe (ar, fr)', async ({ page, browser }) => {
     const email = uniqueEmail('axe');
     await createConfirmedUser(email, PASSWORD, 'ar');
-    await signIn(page, email, PASSWORD, 'ar');
+    await signInAndWait(page, email, PASSWORD, 'ar');
     await createProfile(page, 'ar', 'artist', `Axe e2e ${token()}`);
     const editorResults = await new AxeBuilder({ page }).withTags(wcag).analyze();
     expect(editorResults.violations.map((v) => v.id)).toEqual([]);
